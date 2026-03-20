@@ -1,0 +1,64 @@
+import { spawn } from 'child_process'
+
+export type ClaudeMode = 'basic' | 'admin'
+
+export interface ClaudeResult {
+  stdout: string
+  stderr: string
+  exitCode: number
+}
+
+export interface InvokeClaudeOptions {
+  mode: ClaudeMode
+  prompt: string
+  onData?: (chunk: string) => void
+}
+
+export function invokeClaude(options: InvokeClaudeOptions): Promise<ClaudeResult> {
+  const { mode, prompt, onData } = options
+
+  if (mode !== 'basic' && mode !== 'admin') {
+    return Promise.reject(new Error(`Invalid mode: ${mode as string}. Must be 'basic' or 'admin'.`))
+  }
+
+  if (typeof prompt !== 'string' || prompt.trim() === '') {
+    return Promise.reject(new Error('Prompt must be a non-empty string.'))
+  }
+
+  const args: string[] = []
+
+  if (mode === 'admin') {
+    args.push('--dangerously-skip-permissions')
+  }
+
+  args.push('-p', prompt)
+
+  return new Promise<ClaudeResult>((resolve, reject) => {
+    const child = spawn('claude', args)
+
+    let stdout = ''
+    let stderr = ''
+
+    child.stdout.on('data', (data: Buffer) => {
+      const chunk = data.toString()
+      stdout += chunk
+      onData?.(chunk)
+    })
+
+    child.stderr.on('data', (data: Buffer) => {
+      stderr += data.toString()
+    })
+
+    child.on('close', (code: number | null) => {
+      resolve({
+        stdout,
+        stderr,
+        exitCode: code ?? 1,
+      })
+    })
+
+    child.on('error', (err: Error) => {
+      reject(err)
+    })
+  })
+}

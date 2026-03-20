@@ -14,6 +14,6 @@ state:
   retro_complete: false
   status: running
   last_result: pass
-  next_task: null
+  next_task: "[US-L4] Investigate: plan smoke test scripts — src/smoke/ directory, smoke:basic and smoke:admin npm scripts, real CLI invocation with permission mode prompt, stdout piping, vitest exclusion"
   consecutive_fails: 0
   completed_stories: [US-L1, US-L2, US-L3]

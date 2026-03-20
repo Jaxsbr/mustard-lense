@@ -1,0 +1,19 @@
+# Build Loop — Progress State
+# Schema: config + state read every iteration. Validate with yamllint.
+
+config:
+  verify: "echo \"no verify command configured\""
+  max_tasks_per_phase: 200
+  quality_check_suppressions: []
+
+state:
+  task_number: 1
+  phase: null
+  phase_complete: false
+  review_complete: false
+  retro_complete: false
+  status: idle
+  last_result: null
+  next_task: null
+  consecutive_fails: 0
+  completed_stories: []

@@ -29,3 +29,10 @@ entries:
     result: "pass"
     notes: "US-L1 complete. Next partially-done story: none. Starting US-L2 — CLI module with mode support. Queued investigate task per investigate-first mandate."
     tokens: ~
+  - task: 5
+    time: "2026-03-20T23:32:00Z"
+    story: "US-L2"
+    description: "Investigate: confirm child_process.spawn API, plan invokeClaude signature, ClaudeResult type, mode arg construction, validation, streaming"
+    result: "pass"
+    notes: "Confirmed: spawn('claude', args) with arg array. Basic mode omits --dangerously-skip-permissions, admin includes it. ClaudeResult{stdout,stderr,exitCode}. Validate prompt non-empty, mode strictly basic|admin. onData callback on stdout. Note: tsconfig.app.json types needs @types/node or separate tsconfig for lib/. Queued implement."
+    tokens: ~

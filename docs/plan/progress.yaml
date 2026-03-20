@@ -7,13 +7,13 @@ config:
   quality_check_suppressions: []
 
 state:
-  task_number: 3
+  task_number: 4
   phase: foundation
   phase_complete: false
   review_complete: false
   retro_complete: false
   status: running
   last_result: pass
-  next_task: "[US-L2] Investigate: confirm child_process.spawn API, plan invokeClaude function signature, ClaudeResult type, basic vs admin mode argument construction, input validation approach, and streaming callback pattern"
+  next_task: "[US-L2] Implement src/lib/claude-cli.ts — invokeClaude function with basic/admin modes, ClaudeResult type, input validation, streaming onData callback, child_process.spawn with argument array"
   consecutive_fails: 0
   completed_stories: [US-L1]

@@ -45,7 +45,7 @@ Stand up the mustard-lense application foundation — a TypeScript React project
 - [x] `docs/architecture/ARCHITECTURE.md` documents basic and admin CLI modes including security implications of `--dangerously-skip-permissions` [US-L5]
 - [x] `README.md` exists with project purpose, setup instructions, and lists all npm commands (`dev`, `build`, `lint`, `typecheck`, `test`, `smoke:basic`, `smoke:admin`) [US-L5]
 - [x] `AGENTS.md` includes file ownership map and directory layout reflecting the codebase structure [US-L5]
-- [ ] `AGENTS.md` reflects new modules, directories, and CLI modes introduced in this phase [phase]
+- [x] `AGENTS.md` reflects new modules, directories, and CLI modes introduced in this phase [phase]
 
 ### Golden principles (phase-relevant)
 - **Faithful stewardship** — quality foundation over speed; strict TypeScript, linting, and tests from day one

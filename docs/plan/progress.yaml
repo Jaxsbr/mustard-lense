@@ -8,11 +8,11 @@ config:
 
 state:
   task_number: 1
-  phase: null
+  phase: foundation
   phase_complete: false
   review_complete: false
   retro_complete: false
-  status: idle
+  status: running
   last_result: null
   next_task: null
   consecutive_fails: 0

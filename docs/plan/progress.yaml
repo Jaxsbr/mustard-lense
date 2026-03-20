@@ -2,18 +2,18 @@
 # Schema: config + state read every iteration. Validate with yamllint.
 
 config:
-  verify: "npm run typecheck && npm run lint && npm run build"
+  verify: "npm run typecheck && npm run lint && npm test && npm run build"
   max_tasks_per_phase: 200
   quality_check_suppressions: []
 
 state:
-  task_number: 6
+  task_number: 7
   phase: foundation
   phase_complete: false
   review_complete: false
   retro_complete: false
   status: running
   last_result: pass
-  next_task: "[US-L3] Implement Vitest setup and mocked unit tests for claude-cli module — install vitest, add test script, create src/lib/claude-cli.test.ts with mocked spawn, test basic/admin modes, ClaudeResult shape, error scenarios"
+  next_task: null
   consecutive_fails: 0
-  completed_stories: [US-L1, US-L2]
+  completed_stories: [US-L1, US-L2, US-L3]

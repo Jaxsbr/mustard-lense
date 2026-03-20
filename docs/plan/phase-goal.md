@@ -10,14 +10,14 @@ Stand up the mustard-lense application foundation — a TypeScript React project
 - US-L5 — Architecture and development guidance documentation
 
 ### Done-when (observable)
-- [ ] `npm run dev` starts Vite dev server on port 234 without error [US-L1]
-- [ ] `npm run build` exits 0 and produces `dist/` directory containing `index.html` [US-L1]
-- [ ] `npm run lint` exits 0 with zero errors on the clean codebase [US-L1]
-- [ ] `npm run typecheck` exits 0 with zero type errors [US-L1]
-- [ ] `index.html` includes `<meta name="viewport" ...>` tag for responsive rendering [US-L1]
-- [ ] Landing page at `/` contains text from Matthew 13:31-32 about the mustard seed growing from the smallest seed into a tree [US-L1]
-- [ ] `tsconfig.json` exists with `strict: true` [US-L1]
-- [ ] `vite.config.ts` exists and configures dev server port 234 [US-L1]
+- [x] `npm run dev` starts Vite dev server on port 234 without error [US-L1]
+- [x] `npm run build` exits 0 and produces `dist/` directory containing `index.html` [US-L1]
+- [x] `npm run lint` exits 0 with zero errors on the clean codebase [US-L1]
+- [x] `npm run typecheck` exits 0 with zero type errors [US-L1]
+- [x] `index.html` includes `<meta name="viewport" ...>` tag for responsive rendering [US-L1]
+- [x] Landing page at `/` contains text from Matthew 13:31-32 about the mustard seed growing from the smallest seed into a tree [US-L1]
+- [x] `tsconfig.json` exists with `strict: true` [US-L1]
+- [x] `vite.config.ts` exists and configures dev server port 234 [US-L1]
 - [ ] `src/lib/claude-cli.ts` exports an `invokeClaude` function that accepts `{ mode: 'basic' | 'admin', prompt: string }` [US-L2]
 - [ ] `invokeClaude` in basic mode spawns `claude` process WITHOUT `--dangerously-skip-permissions` in the argument list [US-L2]
 - [ ] `invokeClaude` in admin mode spawns `claude` process WITH `--dangerously-skip-permissions` in the argument list [US-L2]

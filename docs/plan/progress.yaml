@@ -2,7 +2,7 @@
 # Schema: config + state read every iteration. Validate with yamllint.
 
 config:
-  verify: "echo \"no verify command configured\""
+  verify: "npm run typecheck && npm run lint && npm run build"
   max_tasks_per_phase: 200
   quality_check_suppressions: []
 
@@ -16,4 +16,4 @@ state:
   last_result: pass
   next_task: "[US-L1] Scaffold Vite+React+TypeScript project with npm create vite, configure port 234, strict TS, ESLint lint script, typecheck script, viewport meta, and landing page with mustard seed parable"
   consecutive_fails: 0
-  completed_stories: []
+  completed_stories: [US-L1]

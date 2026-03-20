@@ -50,3 +50,10 @@ entries:
     result: "pass"
     notes: "US-L2 complete. Starting US-L3 — unit tests with mocked CLI. Queued investigate task."
     tokens: ~
+  - task: 8
+    time: "2026-03-20T23:35:00Z"
+    story: "US-L3"
+    description: "Investigate: confirm Vitest setup — install vitest, vi.mock child_process, EventEmitter mock for spawn, test script vitest run"
+    result: "pass"
+    notes: "Plan: install vitest, add test script 'vitest run', create claude-cli.test.ts with vi.mock('child_process'), EventEmitter mock for spawn return. Tests: basic mode args, admin mode args, ClaudeResult shape, non-zero exit, spawn error. Queued implement."
+    tokens: ~

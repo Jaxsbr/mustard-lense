@@ -7,13 +7,13 @@ config:
   quality_check_suppressions: []
 
 state:
-  task_number: 5
+  task_number: 6
   phase: foundation
   phase_complete: false
   review_complete: false
   retro_complete: false
   status: running
   last_result: pass
-  next_task: "[US-L3] Investigate: confirm Vitest setup approach — install vitest, configure in vite.config.ts or vitest.config.ts, add test script to package.json, plan mock strategy for child_process.spawn"
+  next_task: "[US-L3] Implement Vitest setup and mocked unit tests for claude-cli module — install vitest, add test script, create src/lib/claude-cli.test.ts with mocked spawn, test basic/admin modes, ClaudeResult shape, error scenarios"
   consecutive_fails: 0
   completed_stories: [US-L1, US-L2]

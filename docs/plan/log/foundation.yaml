@@ -71,6 +71,13 @@ entries:
     result: "pass"
     notes: "US-L3 complete. Starting US-L4 — on-demand smoke tests. Queued investigate."
     tokens: ~
+  - task: 14
+    time: "2026-03-20T23:50:00Z"
+    story: "US-L5"
+    description: "Implement ARCHITECTURE.md, update README.md and AGENTS.md with file ownership, directory layout, CLI modes"
+    result: "pass"
+    notes: "Created ARCHITECTURE.md, replaced template README, updated AGENTS.md with full project structure. ✓ US-L5 complete"
+    tokens: ~
   - task: 11
     time: "2026-03-20T23:44:00Z"
     story: "US-L4"

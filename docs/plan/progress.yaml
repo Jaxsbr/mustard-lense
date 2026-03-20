@@ -10,7 +10,7 @@ state:
   task_number: 10
   phase: foundation
   phase_complete: true
-  review_complete: false
+  review_complete: true
   retro_complete: false
   status: running
   last_result: pass

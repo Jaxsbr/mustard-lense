@@ -14,6 +14,6 @@ state:
   retro_complete: false
   status: running
   last_result: null
-  next_task: null
+  next_task: "[US-L1] Investigate: confirm Vite+React+TypeScript scaffold approach, identify exact packages and config needed for port 234, ESLint, strict TS, and landing page"
   consecutive_fails: 0
   completed_stories: []

@@ -71,3 +71,10 @@ entries:
     result: "pass"
     notes: "US-L3 complete. Starting US-L4 — on-demand smoke tests. Queued investigate."
     tokens: ~
+  - task: 11
+    time: "2026-03-20T23:44:00Z"
+    story: "US-L4"
+    description: "Investigate: plan smoke test scripts with tsx runner, onData piping, permission mode prompts"
+    result: "pass"
+    notes: "Plan confirmed: src/smoke/basic.ts and admin.ts, npx tsx runner, onData pipes to process.stdout, vitest excludes by default. Queued implement."
+    tokens: ~

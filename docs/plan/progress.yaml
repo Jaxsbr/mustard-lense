@@ -7,13 +7,13 @@ config:
   quality_check_suppressions: []
 
 state:
-  task_number: 7
+  task_number: 8
   phase: foundation
   phase_complete: false
   review_complete: false
   retro_complete: false
   status: running
   last_result: pass
-  next_task: "[US-L4] Investigate: plan smoke test scripts — src/smoke/ directory, smoke:basic and smoke:admin npm scripts, real CLI invocation with permission mode prompt, stdout piping, vitest exclusion"
+  next_task: "[US-L4] Implement smoke test scripts — create src/smoke/basic.ts and admin.ts, install tsx, add smoke:basic and smoke:admin npm scripts, pipe CLI output to stdout"
   consecutive_fails: 0
   completed_stories: [US-L1, US-L2, US-L3]

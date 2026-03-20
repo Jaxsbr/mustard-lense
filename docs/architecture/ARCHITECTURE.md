@@ -32,24 +32,20 @@
 └─────────────────────────────────────┘
 ```
 
-## Module structure (planned for foundation phase)
+## Module structure
 
 ```
 src/
+├── App.tsx                    # Landing page — mustard seed parable
+├── App.css                    # Landing page styles
+├── index.css                  # Global reset styles
+├── main.tsx                   # React entry point
 ├── lib/
 │   ├── claude-cli.ts          # CLI invocation module with mode support
 │   └── claude-cli.test.ts     # Unit tests (mocked child_process)
-├── App.tsx                    # Root React component
-├── main.tsx                   # Entry point
-└── ...
-smoke/
-├── smoke-basic.ts             # On-demand smoke test — basic mode
-└── smoke-admin.ts             # On-demand smoke test — admin mode
-docs/
-├── architecture/
-│   └── ARCHITECTURE.md        # This file
-└── product/
-    └── PRD.md                 # Product requirements
+└── smoke/
+    ├── basic.ts               # On-demand smoke test — basic mode
+    └── admin.ts               # On-demand smoke test — admin mode
 ```
 
 ## CLI modes

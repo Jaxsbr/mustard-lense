@@ -8,3 +8,10 @@ entries:
     result: "pass"
     notes: "Project is empty. Queued investigate task for US-L1 scaffold. No existing code or packages."
     tokens: ~
+  - task: 2
+    time: "2026-03-21T00:00:00Z"
+    story: "US-L1"
+    description: "Investigate: confirm Vite+React+TS scaffold approach — npm create vite with react-ts template, port 234 in vite.config.ts, strict TS already in template, add lint and typecheck scripts, landing page with Matthew 13:31-32"
+    result: "pass"
+    notes: "Confirmed approach: scaffold with react-ts template, configure port 234, add lint/typecheck scripts, replace App.tsx with mustard seed parable. Queued implement task."
+    tokens: ~

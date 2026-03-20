@@ -36,3 +36,10 @@ entries:
     result: "pass"
     notes: "Confirmed: spawn('claude', args) with arg array. Basic mode omits --dangerously-skip-permissions, admin includes it. ClaudeResult{stdout,stderr,exitCode}. Validate prompt non-empty, mode strictly basic|admin. onData callback on stdout. Note: tsconfig.app.json types needs @types/node or separate tsconfig for lib/. Queued implement."
     tokens: ~
+  - task: 6
+    time: "2026-03-20T23:33:00Z"
+    story: "US-L2"
+    description: "Implement src/lib/claude-cli.ts — invokeClaude with basic/admin modes, ClaudeResult type, validation, streaming, spawn with arg array"
+    result: "pass"
+    notes: "Created claude-cli.ts with all exports. Added 'node' to tsconfig.app.json types. All verify checks pass. ✓ US-L2 complete"
+    tokens: ~

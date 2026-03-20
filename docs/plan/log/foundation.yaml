@@ -22,3 +22,10 @@ entries:
     result: "pass"
     notes: "All 8 US-L1 criteria met. Updated verify command to npm run typecheck && lint && build. ✓ US-L1 complete"
     tokens: ~
+  - task: 4
+    time: "2026-03-20T23:31:00Z"
+    story: "US-L2"
+    description: "Investigation — queued investigate task for Claude CLI integration module"
+    result: "pass"
+    notes: "US-L1 complete. Next partially-done story: none. Starting US-L2 — CLI module with mode support. Queued investigate task per investigate-first mandate."
+    tokens: ~

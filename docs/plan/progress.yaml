@@ -14,6 +14,6 @@ state:
   retro_complete: false
   status: running
   last_result: pass
-  next_task: null
+  next_task: "[US-L2] Investigate: confirm child_process.spawn API, plan invokeClaude function signature, ClaudeResult type, basic vs admin mode argument construction, input validation approach, and streaming callback pattern"
   consecutive_fails: 0
   completed_stories: [US-L1]

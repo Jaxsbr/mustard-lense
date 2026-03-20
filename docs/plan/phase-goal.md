@@ -41,10 +41,10 @@ Stand up the mustard-lense application foundation — a TypeScript React project
 - [x] `smoke:admin` test output contains indication of unrestricted/trust/bypass mode (verified via string contains check) [US-L4]
 - [x] CLI output is piped to `process.stdout` so the developer sees real-time output during smoke test execution [US-L4]
 - [x] `npm test` does NOT execute smoke test files (smoke tests excluded from Vitest config or in a separate directory) [US-L4]
-- [ ] `docs/architecture/ARCHITECTURE.md` exists and describes system topology, module structure, and data flow [US-L5]
-- [ ] `docs/architecture/ARCHITECTURE.md` documents basic and admin CLI modes including security implications of `--dangerously-skip-permissions` [US-L5]
-- [ ] `README.md` exists with project purpose, setup instructions, and lists all npm commands (`dev`, `build`, `lint`, `typecheck`, `test`, `smoke:basic`, `smoke:admin`) [US-L5]
-- [ ] `AGENTS.md` includes file ownership map and directory layout reflecting the codebase structure [US-L5]
+- [x] `docs/architecture/ARCHITECTURE.md` exists and describes system topology, module structure, and data flow [US-L5]
+- [x] `docs/architecture/ARCHITECTURE.md` documents basic and admin CLI modes including security implications of `--dangerously-skip-permissions` [US-L5]
+- [x] `README.md` exists with project purpose, setup instructions, and lists all npm commands (`dev`, `build`, `lint`, `typecheck`, `test`, `smoke:basic`, `smoke:admin`) [US-L5]
+- [x] `AGENTS.md` includes file ownership map and directory layout reflecting the codebase structure [US-L5]
 - [ ] `AGENTS.md` reflects new modules, directories, and CLI modes introduced in this phase [phase]
 
 ### Golden principles (phase-relevant)

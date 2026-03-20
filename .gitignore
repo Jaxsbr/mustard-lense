@@ -1,0 +1,21 @@
+# Environment and secrets
+.env
+.env.*
+*.key
+*.pem
+credentials.json
+
+# Build loop
+.build-loop.lock
+
+# OS
+.DS_Store
+
+# Node
+node_modules/
+dist/
+
+# Python
+__pycache__/
+*.pyc
+.venv/

@@ -78,3 +78,10 @@ entries:
     result: "pass"
     notes: "Plan confirmed: src/smoke/basic.ts and admin.ts, npx tsx runner, onData pipes to process.stdout, vitest excludes by default. Queued implement."
     tokens: ~
+  - task: 12
+    time: "2026-03-20T23:46:00Z"
+    story: "US-L4"
+    description: "Implement smoke test scripts — src/smoke/basic.ts and admin.ts, tsx runner, smoke:basic and smoke:admin npm scripts"
+    result: "pass"
+    notes: "Created smoke scripts, installed tsx, added npm scripts. Vitest only runs .test.ts files. ✓ US-L4 complete"
+    tokens: ~

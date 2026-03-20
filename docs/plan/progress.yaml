@@ -14,6 +14,6 @@ state:
   retro_complete: false
   status: running
   last_result: pass
-  next_task: null
+  next_task: "[US-L3] Investigate: confirm Vitest setup approach — install vitest, configure in vite.config.ts or vitest.config.ts, add test script to package.json, plan mock strategy for child_process.spawn"
   consecutive_fails: 0
   completed_stories: [US-L1, US-L2]

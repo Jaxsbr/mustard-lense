@@ -14,6 +14,6 @@ state:
   retro_complete: false
   status: running
   last_result: pass
-  next_task: null
+  next_task: "[US-L5] Implement ARCHITECTURE.md, update README.md, and update AGENTS.md with file ownership map, directory layout, and CLI modes"
   consecutive_fails: 0
   completed_stories: [US-L1, US-L2, US-L3, US-L4]

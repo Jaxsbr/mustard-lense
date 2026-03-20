@@ -85,3 +85,10 @@ entries:
     result: "pass"
     notes: "Created smoke scripts, installed tsx, added npm scripts. Vitest only runs .test.ts files. ✓ US-L4 complete"
     tokens: ~
+  - task: 13
+    time: "2026-03-20T23:47:00Z"
+    story: "US-L5"
+    description: "Investigation — queued docs task for ARCHITECTURE.md, README.md, AGENTS.md updates"
+    result: "pass"
+    notes: "US-L4 complete. Starting US-L5 — documentation. Need ARCHITECTURE.md with topology/modes/security, README with purpose/setup/commands, AGENTS.md with file ownership and directory layout."
+    tokens: ~

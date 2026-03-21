@@ -7,15 +7,15 @@ config:
   quality_check_suppressions: []
 
 state:
-  task_number: 14
+  task_number: 15
   phase: rag-lense
-  phase_complete: false
+  phase_complete: true
   review_stage: null
   review_complete: false
   retro_complete: false
   pr_number: null
   status: running
   last_result: pass
-  next_task: "[phase] Update AGENTS.md with RAG modules, synthesiser, SSE streaming, and reindex endpoint"
+  next_task: null
   consecutive_fails: 0
   completed_stories: [US-L10, US-L11, US-L12, US-L13]

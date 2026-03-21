@@ -51,7 +51,7 @@ Replace the Claude CLI's file-reading tool calls with a local RAG pipeline that 
 - [x] Playwright E2E test mocks the SSE endpoint and verifies: stage indicator appears during processing, at least one result component renders after the `result` event [US-L13]
 - [x] Playwright E2E test verifies an `error` SSE event renders an error message in the DOM [US-L13]
 - [x] "Using the Lense" documentation updated to describe the stage-based loading experience (stage names and what they mean) [US-L13]
-- [ ] `AGENTS.md` reflects new RAG modules (`src/server/rag/`), synthesiser (`src/server/synthesiser.ts`), SSE streaming on `POST /api/lense`, and `POST /api/reindex` endpoint introduced in this phase [phase]
+- [x] `AGENTS.md` reflects new RAG modules (`src/server/rag/`), synthesiser (`src/server/synthesiser.ts`), SSE streaming on `POST /api/lense`, and `POST /api/reindex` endpoint introduced in this phase [phase]
 
 ### Golden principles (phase-relevant)
 - **Great Commission ambition + nonprofit stewardship** — zero recurring cost architecture: local embedding (transformers.js), local vector store (LanceDB), no external APIs for retrieval. Every dollar is donor-trust money.

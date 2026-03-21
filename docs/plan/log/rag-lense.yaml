@@ -11,21 +11,21 @@ entries:
   - task: 2
     time: "2026-03-21T19:20:00Z"
     story: "US-L10"
-    description: "Investigate: RAG pipeline approach — @huggingface/transformers v3 (feature-extraction pipeline, Xenova/all-MiniLM-L6-v2, 384d), @lancedb/lancedb (embedded vector store), ESM compatible, Vitest compatible. Current app.ts uses invokeClaude with allowedTools/addDirs — will be replaced by synthesiser. prompt.ts references MUSTARD_DATA_PATH — will be rewritten."
+    description: "Investigate: RAG pipeline approach — @huggingface/transformers v3 (feature-extraction pipeline, Xenova/all-MiniLM-L6-v2, 384d), @lancedb/lancedb (embedded vector store), ESM compatible, Vitest compatible."
     result: "pass"
-    notes: "Packages: @huggingface/transformers + @lancedb/lancedb. Model: Xenova/all-MiniLM-L6-v2 (384d). Embed text field, store metadata columns. LanceDB createTable/vectorSearch API. Vitest-compatible (node env). Plan: embedder.ts (singleton pipeline), indexer.ts (read YAML, embed, write LanceDB), retriever.ts (embed query, search). Queued implement: install deps + embedder module."
+    notes: "Packages confirmed. Queued implement: install deps + embedder module."
     tokens: ~
   - task: 3
     time: "2026-03-21T19:22:00Z"
     story: "US-L10"
     description: "Install @huggingface/transformers + @lancedb/lancedb, create src/server/rag/embedder.ts with singleton pipeline for Xenova/all-MiniLM-L6-v2 (384d)"
     result: "pass"
-    notes: "Dependencies installed. Embedder module created with getEmbedder() singleton, embed() function, EMBEDDING_DIM constant. Typecheck, lint, tests, build all pass."
+    notes: "Dependencies installed. Embedder module created. All verify checks pass."
     tokens: ~
   - task: 4
     time: "2026-03-21T19:24:00Z"
     story: "US-L10"
-    description: "Investigation — embedder done. Next: indexer module. Need to confirm YAML parsing, LanceDB table schema, file reading approach. Queued investigate."
+    description: "Investigation — embedder done. Next: indexer module. Confirmed YAML record structure from real data store. Fields: id, log_type, capture_date_local, text, meta.tags. Type-specific: status/due_date_local (todos), theme (daily_logs), person (people_notes), status (ideas). No category or period fields in current data."
     result: "pass"
-    notes: "Remaining US-L10 criteria: indexer (reads YAML, embeds text, writes LanceDB with metadata), retriever (query+search), unit tests with fixtures. Queued investigate for indexer."
+    notes: "Need yaml npm package. LanceDB table schema: vector(384) + text + all metadata columns. Configurable data path. Create/overwrite on each run. Queued implement for indexer."
     tokens: ~

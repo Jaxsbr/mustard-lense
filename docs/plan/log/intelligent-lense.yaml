@@ -29,3 +29,10 @@ entries:
     result: "pass"
     notes: "Created src/server/index.ts + prompt.ts. Express on port 3001, Vite proxy /api. Intent validation: type, empty, max length 2000. System prompt references ~/dev/mustard/data/. JSON extraction handles markdown fences. Structured error responses. Verify passes."
     tokens: ~
+  - task: 5
+    time: "2026-03-21T04:54:00Z"
+    story: "US-L6"
+    description: "Implement unit tests for API endpoint — 11 tests covering valid request, markdown extraction, basic mode, missing/empty/whitespace/non-string/too-long intent 400s, failure 500s, invalid JSON. Refactored app.ts/index.ts split for testability."
+    result: "pass"
+    notes: "19 total tests (8 CLI + 11 server). All pass. ✓ US-L6 complete — all 12 criteria met."
+    tokens: ~

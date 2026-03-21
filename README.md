@@ -33,10 +33,12 @@ The lense is the primary interface — a single text input where you describe wh
    - "notes about Nisal"
    - "open todos and recent ideas"
    - "what happened yesterday"
-4. Press Enter. A loading spinner appears while Claude reads your mustard data.
+4. Press Enter. The lense shows real-time processing stages:
+   - **"Finding records..."** — the RAG pipeline is searching your data for relevant records.
+   - **"Thinking..."** — Claude is analysing the retrieved records and composing a response.
 5. Results render as visual components — todo lists, timelines, note cards, idea lists, and summaries.
 
-Each new query replaces the previous results. The mustard seed verse is shown when no query has been submitted.
+Each new query replaces the previous results. Stage transitions are animated for a smooth experience. The mustard seed verse is shown when no query has been submitted.
 
 ### Component types
 

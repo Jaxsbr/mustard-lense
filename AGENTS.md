@@ -27,7 +27,6 @@ mustard-lense/
 │   ├── server/
 │   │   ├── app.ts            # Express app with POST /api/lense (SSE) and POST /api/reindex
 │   │   ├── index.ts          # Server entry point — builds index on startup, then listens on port 3001
-│   │   ├── prompt.ts         # Legacy prompt (unused — synthesis prompt is in synthesiser.ts)
 │   │   ├── synthesiser.ts    # Synthesiser interface + CliSynthesiser (wraps invokeClaude)
 │   │   ├── synthesiser.test.ts # Unit tests for CliSynthesiser (mocked invokeClaude)
 │   │   ├── server.test.ts    # API endpoint unit tests (mocked retriever + synthesiser)

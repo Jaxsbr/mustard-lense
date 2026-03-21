@@ -16,6 +16,6 @@ state:
   pr_number: null
   status: running
   last_result: pass
-  next_task: null
+  next_task: "[US-L12] Investigate: SSE streaming approach — plan how to rewrite POST /api/lense as SSE stream, add POST /api/reindex, update server entry point for startup indexing, identify test changes needed"
   consecutive_fails: 0
   completed_stories: [US-L10, US-L11]

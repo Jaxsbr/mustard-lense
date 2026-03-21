@@ -7,7 +7,7 @@ config:
   quality_check_suppressions: []
 
 state:
-  task_number: 10
+  task_number: 11
   phase: rag-lense
   phase_complete: false
   review_stage: null
@@ -16,6 +16,6 @@ state:
   pr_number: null
   status: running
   last_result: pass
-  next_task: "[US-L12] Investigate: SSE streaming approach — plan how to rewrite POST /api/lense as SSE stream, add POST /api/reindex, update server entry point for startup indexing, identify test changes needed"
+  next_task: "[US-L12] Rewrite app.ts for SSE streaming + reindex endpoint, update index.ts for startup indexing, rewrite server.test.ts for SSE + reindex tests"
   consecutive_fails: 0
   completed_stories: [US-L10, US-L11]

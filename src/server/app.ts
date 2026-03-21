@@ -26,7 +26,8 @@ app.post('/api/lense', async (req, res) => {
     const result = await invokeClaude({ mode: 'basic', prompt })
 
     if (result.exitCode !== 0) {
-      res.status(500).json({ error: 'Claude invocation failed.', stderr: result.stderr })
+      console.error('Claude invocation failed:', result.stderr)
+      res.status(500).json({ error: 'Claude invocation failed.' })
       return
     }
 
@@ -35,6 +36,13 @@ app.post('/api/lense', async (req, res) => {
     const jsonStr = jsonMatch ? jsonMatch[1].trim() : result.stdout.trim()
 
     const parsed: LenseResponse = JSON.parse(jsonStr)
+
+    if (!parsed.components || !Array.isArray(parsed.components)) {
+      console.error('Invalid response shape from Claude:', jsonStr.slice(0, 200))
+      res.status(500).json({ error: 'Unexpected response format.' })
+      return
+    }
+
     res.json(parsed)
   } catch (err) {
     const message = err instanceof Error ? err.message : 'Unknown error'

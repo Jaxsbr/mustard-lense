@@ -7,7 +7,7 @@ config:
   quality_check_suppressions: []
 
 state:
-  task_number: 8
+  task_number: 9
   phase: rag-lense
   phase_complete: false
   review_stage: null
@@ -16,6 +16,6 @@ state:
   pr_number: null
   status: running
   last_result: pass
-  next_task: "[US-L11] Implement synthesiser interface + CliSynthesiser — create src/server/synthesiser.ts with Synthesiser interface, CliSynthesiser class, and rewrite prompt.ts to inject records inline"
+  next_task: "[US-L11] Implement unit tests for CliSynthesiser — mock invokeClaude, test success path returns LenseResponse and error path returns generic error without leaking raw output"
   consecutive_fails: 0
   completed_stories: [US-L10]

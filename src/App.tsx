@@ -3,21 +3,39 @@ import type { LenseResponse } from './shared/schema.js'
 import { ResultRenderer } from './components/ResultRenderer.js'
 import './App.css'
 
+type Stage = 'idle' | 'retrieving' | 'thinking' | 'done'
+
+function parseSSEEvents(text: string): Array<{ event: string; data: string }> {
+  const events: Array<{ event: string; data: string }> = []
+  const parts = text.split('\n\n').filter(Boolean)
+  for (const part of parts) {
+    const lines = part.split('\n')
+    let event = ''
+    let data = ''
+    for (const line of lines) {
+      if (line.startsWith('event: ')) event = line.slice(7)
+      if (line.startsWith('data: ')) data = line.slice(6)
+    }
+    if (event) events.push({ event, data })
+  }
+  return events
+}
+
 function App() {
   const [intent, setIntent] = useState('')
-  const [loading, setLoading] = useState(false)
+  const [stage, setStage] = useState<Stage>('idle')
   const [results, setResults] = useState<LenseResponse | null>(null)
   const [error, setError] = useState<string | null>(null)
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     const query = intent.trim()
-    if (!query || loading) return
+    if (!query || stage !== 'idle') return
 
     setIntent('')
     setResults(null)
     setError(null)
-    setLoading(true)
+    setStage('retrieving')
 
     try {
       const res = await fetch('/api/lense', {
@@ -26,21 +44,53 @@ function App() {
         body: JSON.stringify({ intent: query }),
       })
 
+      // Intent validation returns 400 JSON before opening stream
       if (!res.ok) {
         const body = await res.json().catch(() => ({ error: 'Request failed' }))
         throw new Error(body.error ?? `HTTP ${res.status}`)
       }
 
-      const data: LenseResponse = await res.json()
-      setResults(data)
+      const reader = res.body!.getReader()
+      const decoder = new TextDecoder()
+      let buffer = ''
+
+      while (true) {
+        const { done, value } = await reader.read()
+        if (done) break
+        buffer += decoder.decode(value, { stream: true })
+
+        // Process complete events from buffer
+        const parts = buffer.split('\n\n')
+        buffer = parts.pop() ?? ''
+
+        for (const part of parts) {
+          if (!part.trim()) continue
+          const events = parseSSEEvents(part + '\n\n')
+          for (const evt of events) {
+            if (evt.event === 'retrieving') {
+              setStage('retrieving')
+            } else if (evt.event === 'thinking') {
+              setStage('thinking')
+            } else if (evt.event === 'result') {
+              const data: LenseResponse = JSON.parse(evt.data)
+              setResults(data)
+              setStage('done')
+            } else if (evt.event === 'error') {
+              const data = JSON.parse(evt.data)
+              throw new Error(data.error ?? 'Processing failed')
+            }
+          }
+        }
+      }
     } catch (err) {
       const message = err instanceof Error ? err.message : 'Something went wrong'
       setError(message)
     } finally {
-      setLoading(false)
+      setStage('idle')
     }
   }
 
+  const loading = stage === 'retrieving' || stage === 'thinking'
   const showEmptyState = !loading && !results && !error
 
   return (
@@ -60,8 +110,13 @@ function App() {
       </form>
 
       {loading && (
-        <div className="lense-loader" aria-label="Loading">
-          <div className="lense-spinner" />
+        <div className="lense-stage" aria-label="Processing stage">
+          <div className="lense-stage-indicator">
+            <div className="lense-spinner" />
+            <span className="lense-stage-text" key={stage}>
+              {stage === 'retrieving' ? 'Finding records...' : 'Thinking...'}
+            </span>
+          </div>
         </div>
       )}
 

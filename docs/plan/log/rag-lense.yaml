@@ -15,3 +15,10 @@ entries:
     result: "pass"
     notes: "Packages: @huggingface/transformers + @lancedb/lancedb. Model: Xenova/all-MiniLM-L6-v2 (384d). Embed text field, store metadata columns. LanceDB createTable/vectorSearch API. Vitest-compatible (node env). Plan: embedder.ts (singleton pipeline), indexer.ts (read YAML, embed, write LanceDB), retriever.ts (embed query, search). Queued implement: install deps + embedder module."
     tokens: ~
+  - task: 3
+    time: "2026-03-21T19:22:00Z"
+    story: "US-L10"
+    description: "Install @huggingface/transformers + @lancedb/lancedb, create src/server/rag/embedder.ts with singleton pipeline for Xenova/all-MiniLM-L6-v2 (384d)"
+    result: "pass"
+    notes: "Dependencies installed. Embedder module created with getEmbedder() singleton, embed() function, EMBEDDING_DIM constant. Typecheck, lint, tests, build all pass."
+    tokens: ~

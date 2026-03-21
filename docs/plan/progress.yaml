@@ -7,7 +7,7 @@ config:
   quality_check_suppressions: []
 
 state:
-  task_number: 3
+  task_number: 4
   phase: rag-lense
   phase_complete: false
   review_stage: null
@@ -16,6 +16,6 @@ state:
   pr_number: null
   status: running
   last_result: pass
-  next_task: "[US-L10] Install @huggingface/transformers + @lancedb/lancedb dependencies, create src/server/rag/embedder.ts with singleton embedding pipeline using Xenova/all-MiniLM-L6-v2"
+  next_task: null
   consecutive_fails: 0
   completed_stories: []

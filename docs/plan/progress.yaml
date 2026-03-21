@@ -16,4 +16,4 @@ state:
   last_result: pass
   next_task: "[US-L9] Implement smoke:lense script — send HTTP request to API, assert valid JSON with components array, print component types"
   consecutive_fails: 0
-  completed_stories: [US-L6, US-L7, US-L8]
+  completed_stories: [US-L6, US-L7, US-L8, US-L9]

@@ -45,11 +45,11 @@ Connect the React frontend to the Claude Code CLI backend through a lightweight 
 - [x] Passing an unrecognized component type to the registry returns a fallback component that renders a visible element (not empty/blank) and does not throw a runtime error [US-L8]
 - [x] Renderer components use a shared CSS module, CSS variables, or design tokens file for consistent spacing, typography, and color [US-L8]
 - [x] All renderer components render mustard data text using React JSX expressions (textContent), not `dangerouslySetInnerHTML` [US-L8]
-- [ ] `package.json` defines a `smoke:lense` script that is separate from the `test` script [US-L9]
-- [ ] `npm test` does NOT execute the lense smoke test [US-L9]
-- [ ] `npm run smoke:lense` sends an HTTP request with a cross-cutting intent (e.g., "what's going on this week") to the API endpoint [US-L9]
-- [ ] The smoke test asserts the response parses as valid JSON containing a `components` array with at least one entry [US-L9]
-- [ ] The smoke test prints the component types present in the response to stdout [US-L9]
+- [x] `package.json` defines a `smoke:lense` script that is separate from the `test` script [US-L9]
+- [x] `npm test` does NOT execute the lense smoke test [US-L9]
+- [x] `npm run smoke:lense` sends an HTTP request with a cross-cutting intent (e.g., "what's going on this week") to the API endpoint [US-L9]
+- [x] The smoke test asserts the response parses as valid JSON containing a `components` array with at least one entry [US-L9]
+- [x] The smoke test prints the component types present in the response to stdout [US-L9]
 - [ ] `AGENTS.md` reflects new API server modules, response schema, frontend components, and lense interaction introduced in this phase [phase]
 
 ### Golden principles (phase-relevant)

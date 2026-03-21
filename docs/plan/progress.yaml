@@ -16,6 +16,6 @@ state:
   pr_number: null
   status: running
   last_result: pass
-  next_task: null
+  next_task: "[US-L11] Investigate: synthesiser interface design — plan Synthesiser interface shape, CliSynthesiser wrapping invokeClaude, new prompt construction with inline records"
   consecutive_fails: 0
   completed_stories: [US-L10]

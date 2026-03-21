@@ -1,0 +1,108 @@
+phase: "foundation"
+started: "2026-03-20T22:47:37Z"
+entries:
+  - task: 1
+    time: "2026-03-20T22:47:37Z"
+    story: "US-L1"
+    description: "Investigation — determine scaffold approach for Vite+React+TypeScript project"
+    result: "pass"
+    notes: "Project is empty. Queued investigate task for US-L1 scaffold. No existing code or packages."
+    tokens: ~
+  - task: 2
+    time: "2026-03-21T00:00:00Z"
+    story: "US-L1"
+    description: "Investigate: confirm Vite+React+TS scaffold approach — npm create vite with react-ts template, port 234 in vite.config.ts, strict TS already in template, add lint and typecheck scripts, landing page with Matthew 13:31-32"
+    result: "pass"
+    notes: "Confirmed approach: scaffold with react-ts template, configure port 234, add lint/typecheck scripts, replace App.tsx with mustard seed parable. Queued implement task."
+    tokens: ~
+  - task: 3
+    time: "2026-03-20T23:30:45Z"
+    story: "US-L1"
+    description: "Scaffold Vite+React+TypeScript project with landing page, port 234, strict TS, lint/typecheck scripts, viewport meta, Matthew 13:31-32 parable"
+    result: "pass"
+    notes: "All 8 US-L1 criteria met. Updated verify command to npm run typecheck && lint && build. ✓ US-L1 complete"
+    tokens: ~
+  - task: 4
+    time: "2026-03-20T23:31:00Z"
+    story: "US-L2"
+    description: "Investigation — queued investigate task for Claude CLI integration module"
+    result: "pass"
+    notes: "US-L1 complete. Next partially-done story: none. Starting US-L2 — CLI module with mode support. Queued investigate task per investigate-first mandate."
+    tokens: ~
+  - task: 5
+    time: "2026-03-20T23:32:00Z"
+    story: "US-L2"
+    description: "Investigate: confirm child_process.spawn API, plan invokeClaude signature, ClaudeResult type, mode arg construction, validation, streaming"
+    result: "pass"
+    notes: "Confirmed: spawn('claude', args) with arg array. Basic mode omits --dangerously-skip-permissions, admin includes it. ClaudeResult{stdout,stderr,exitCode}. Validate prompt non-empty, mode strictly basic|admin. onData callback on stdout. Note: tsconfig.app.json types needs @types/node or separate tsconfig for lib/. Queued implement."
+    tokens: ~
+  - task: 6
+    time: "2026-03-20T23:33:00Z"
+    story: "US-L2"
+    description: "Implement src/lib/claude-cli.ts — invokeClaude with basic/admin modes, ClaudeResult type, validation, streaming, spawn with arg array"
+    result: "pass"
+    notes: "Created claude-cli.ts with all exports. Added 'node' to tsconfig.app.json types. All verify checks pass. ✓ US-L2 complete"
+    tokens: ~
+  - task: 7
+    time: "2026-03-20T23:34:00Z"
+    story: "US-L3"
+    description: "Investigation — queued investigate task for Vitest setup and mocked CLI tests"
+    result: "pass"
+    notes: "US-L2 complete. Starting US-L3 — unit tests with mocked CLI. Queued investigate task."
+    tokens: ~
+  - task: 8
+    time: "2026-03-20T23:35:00Z"
+    story: "US-L3"
+    description: "Investigate: confirm Vitest setup — install vitest, vi.mock child_process, EventEmitter mock for spawn, test script vitest run"
+    result: "pass"
+    notes: "Plan: install vitest, add test script 'vitest run', create claude-cli.test.ts with vi.mock('child_process'), EventEmitter mock for spawn return. Tests: basic mode args, admin mode args, ClaudeResult shape, non-zero exit, spawn error. Queued implement."
+    tokens: ~
+  - task: 9
+    time: "2026-03-20T23:42:00Z"
+    story: "US-L3"
+    description: "Implement Vitest setup and mocked unit tests for claude-cli module"
+    result: "pass"
+    notes: "Installed vitest, added test script, created 8 mocked tests. All pass. Updated verify to include npm test. ✓ US-L3 complete"
+    tokens: ~
+  - task: 10
+    time: "2026-03-20T23:43:00Z"
+    story: "US-L4"
+    description: "Investigation — queued investigate for smoke test scripts"
+    result: "pass"
+    notes: "US-L3 complete. Starting US-L4 — on-demand smoke tests. Queued investigate."
+    tokens: ~
+  - task: 14
+    time: "2026-03-20T23:50:00Z"
+    story: "US-L5"
+    description: "Implement ARCHITECTURE.md, update README.md and AGENTS.md with file ownership, directory layout, CLI modes"
+    result: "pass"
+    notes: "Created ARCHITECTURE.md, replaced template README, updated AGENTS.md with full project structure. ✓ US-L5 complete"
+    tokens: ~
+  - task: 15
+    time: "2026-03-20T23:52:00Z"
+    story: "phase"
+    description: "Phase completion gate — all 36 done-when criteria verified, verify passes, AGENTS.md consistent"
+    result: "pass"
+    notes: "All stories complete: US-L1 (8/8), US-L2 (8/8), US-L3 (7/7), US-L4 (8/8), US-L5 (4/4), phase (1/1). Final verify passes. Foundation phase complete."
+    tokens: ~
+  - task: 11
+    time: "2026-03-20T23:44:00Z"
+    story: "US-L4"
+    description: "Investigate: plan smoke test scripts with tsx runner, onData piping, permission mode prompts"
+    result: "pass"
+    notes: "Plan confirmed: src/smoke/basic.ts and admin.ts, npx tsx runner, onData pipes to process.stdout, vitest excludes by default. Queued implement."
+    tokens: ~
+  - task: 12
+    time: "2026-03-20T23:46:00Z"
+    story: "US-L4"
+    description: "Implement smoke test scripts — src/smoke/basic.ts and admin.ts, tsx runner, smoke:basic and smoke:admin npm scripts"
+    result: "pass"
+    notes: "Created smoke scripts, installed tsx, added npm scripts. Vitest only runs .test.ts files. ✓ US-L4 complete"
+    tokens: ~
+  - task: 13
+    time: "2026-03-20T23:47:00Z"
+    story: "US-L5"
+    description: "Investigation — queued docs task for ARCHITECTURE.md, README.md, AGENTS.md updates"
+    result: "pass"
+    notes: "US-L4 complete. Starting US-L5 — documentation. Need ARCHITECTURE.md with topology/modes/security, README with purpose/setup/commands, AGENTS.md with file ownership and directory layout."
+    tokens: ~

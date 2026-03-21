@@ -1,0 +1,30 @@
+main {
+  max-width: 600px;
+  margin: 4rem auto;
+  padding: 0 1rem;
+  font-family: system-ui, -apple-system, sans-serif;
+  color: #1a1a1a;
+}
+
+h1 {
+  font-size: 2rem;
+  margin-bottom: 1.5rem;
+}
+
+blockquote {
+  border-left: 4px solid #c59d2a;
+  margin: 0;
+  padding: 1rem 1.5rem;
+  background: #fdf8e8;
+  border-radius: 0 8px 8px 0;
+}
+
+blockquote p {
+  margin: 0 0 0.75rem 0;
+  line-height: 1.6;
+}
+
+blockquote footer {
+  font-style: italic;
+  color: #666;
+}

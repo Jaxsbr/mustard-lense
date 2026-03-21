@@ -125,6 +125,29 @@ describe('invokeClaude', () => {
     expect(chunks).toEqual(['chunk1', 'chunk2'])
   })
 
+  it('passes --allowedTools and --add-dir args when specified', async () => {
+    const proc = createMockProcess()
+    mockSpawn.mockReturnValue(proc as never)
+
+    const promise = invokeClaude({
+      mode: 'basic',
+      prompt: 'test',
+      allowedTools: ['Read', 'Glob'],
+      addDirs: ['~/dev/mustard/data'],
+    })
+
+    proc.stdout.emit('data', Buffer.from('{}'))
+    proc.emit('close', 0)
+
+    await promise
+
+    expect(mockSpawn).toHaveBeenCalledWith('claude', [
+      '--allowedTools', 'Read', 'Glob',
+      '--add-dir', '~/dev/mustard/data',
+      '-p', 'test',
+    ])
+  })
+
   it('rejects with error for empty prompt', async () => {
     await expect(invokeClaude({ mode: 'basic', prompt: '' })).rejects.toThrow(
       'Prompt must be a non-empty string',

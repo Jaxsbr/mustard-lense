@@ -7,8 +7,8 @@ config:
   quality_check_suppressions: []
 
 state:
-  task_number: 10
-  phase: foundation
+  task_number: 16
+  phase: intelligent-lense
   phase_complete: true
   review_complete: true
   retro_complete: true
@@ -16,4 +16,4 @@ state:
   last_result: pass
   next_task: null
   consecutive_fails: 0
-  completed_stories: [US-L1, US-L2, US-L3, US-L4, US-L5]
+  completed_stories: [US-L6, US-L7, US-L8, US-L9]

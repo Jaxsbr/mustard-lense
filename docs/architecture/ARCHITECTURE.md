@@ -6,8 +6,24 @@
 ┌─────────────────────────────────────┐
 │         Browser (React SPA)         │
 │ localhost:5234 (dev) / :5678 (prod) │
+│                                     │
+│  ┌──────────┐  ┌─────────────────┐  │
+│  │  Lense   │  │    Template     │  │
+│  │  Input   │──│   Renderers     │  │
+│  └──────────┘  └─────────────────┘  │
 └──────────────┬──────────────────────┘
-               │
+               │ POST /api/lense
+               ▼
+┌─────────────────────────────────────┐
+│         API Server (Express)        │
+│  (planned for intelligent-lense)    │
+│                                     │
+│  ┌──────────┐  ┌─────────────────┐  │
+│  │  System   │  │   Response      │  │
+│  │  Prompt   │  │   Schema        │  │
+│  └──────────┘  └─────────────────┘  │
+└──────────────┬──────────────────────┘
+               │ invokeClaude(basic)
                ▼
 ┌─────────────────────────────────────┐
 │       Claude Code CLI Module        │
@@ -23,12 +39,14 @@
 ┌─────────────────────────────────────┐
 │         Claude Code CLI             │
 │         (system binary)             │
-└─────────────────────────────────────┘
-               │
-               ▼  (future)
+└──────────────┬──────────────────────┘
+               │ reads YAML files
+               ▼
 ┌─────────────────────────────────────┐
 │       Mustard Data Store            │
-│    localhost:3000 (Flask/YAML)      │
+│    ~/dev/mustard/data/ (YAML)       │
+│  todos/ daily_logs/ people_notes/   │
+│  ideas/                             │
 └─────────────────────────────────────┘
 ```
 
@@ -36,16 +54,31 @@
 
 ```
 src/
-├── App.tsx                    # Landing page — mustard seed parable
-├── App.css                    # Landing page styles
+├── App.tsx                    # Lense page — input, loading, result rendering
+├── App.css                    # App styles
 ├── index.css                  # Global reset styles
 ├── main.tsx                   # React entry point
+├── components/                # (planned for intelligent-lense phase)
+│   ├── LenseInput.tsx         # Intent input field with submit/loading states
+│   ├── ResultRenderer.tsx     # Component registry — maps type string to renderer
+│   ├── TodoList.tsx           # todo-list component renderer
+│   ├── LogTimeline.tsx        # log-timeline component renderer
+│   ├── PersonNotes.tsx        # person-notes component renderer
+│   ├── IdeaList.tsx           # idea-list component renderer
+│   └── Summary.tsx            # summary component renderer
+├── shared/                    # (planned for intelligent-lense phase)
+│   └── schema.ts             # Response schema — TypeScript interfaces for component types
+├── server/                    # (planned for intelligent-lense phase)
+│   ├── index.ts               # Express API server entry point
+│   ├── prompt.ts              # System prompt construction
+│   └── server.test.ts         # API endpoint unit tests (mocked invokeClaude)
 ├── lib/
 │   ├── claude-cli.ts          # CLI invocation module with mode support
 │   └── claude-cli.test.ts     # Unit tests (mocked child_process)
 └── smoke/
     ├── basic.ts               # On-demand smoke test — basic mode
-    └── admin.ts               # On-demand smoke test — admin mode
+    ├── admin.ts               # On-demand smoke test — admin mode
+    └── lense.ts               # On-demand smoke test — lense E2E (planned)
 ```
 
 ## CLI modes
@@ -70,17 +103,28 @@ Claude Code CLI with `--dangerously-skip-permissions`. Used for tasks that requi
 
 ## Data flow
 
-### Current (foundation phase)
+### Lense query flow (planned for intelligent-lense phase)
 
-1. User interacts with React SPA in browser
-2. (Future) SPA sends prompts to a backend layer
-3. Backend invokes Claude Code CLI via `invokeClaude()`
-4. CLI output streams back via `onData` callback
-5. Response rendered in UI
+1. User types natural language intent into the lense input and presses Enter
+2. Frontend sends `POST /api/lense` with `{ "intent": "..." }` to the API server
+3. API server constructs a full prompt: system prompt (data store path, response schema, component types) + user intent
+4. API server calls `invokeClaude({ mode: 'basic', prompt })` — basic mode, no admin permissions needed
+5. Claude Code CLI reads YAML files from `~/dev/mustard/data/` (todos, daily_logs, people_notes, ideas)
+6. Claude returns structured JSON matching the response schema: `{ "components": [{ "type": "todo-list", "data": {...} }, ...] }`
+7. API server parses JSON from stdout and returns it to the frontend
+8. Frontend maps each component to a template renderer (component registry) and animates them into view
 
-### Future (data interface phase)
+### Response schema contract
 
-The SPA will also communicate with the mustard data store (Flask API on port 3000) for CRUD operations on todos, people notes, daily logs, and ideas. The Claude Code CLI may orchestrate these operations conversationally.
+Claude returns a JSON object with a `components` array. Each component has:
+- `type` — discriminator string matching a known component type (`todo-list`, `log-timeline`, `person-notes`, `idea-list`, `summary`)
+- `data` — typed object with fields specific to the component type
+
+The shared schema module (`src/shared/schema.ts`, planned) defines TypeScript interfaces for each component type, used by both server validation and frontend rendering.
+
+### Future (data write phase)
+
+The lense currently supports read-only queries. Future phases will add write operations (capture, edit, lifecycle management) through the same intent model, using admin CLI mode where needed.
 
 ## Hosting
 
@@ -94,4 +138,6 @@ The SPA will also communicate with the mustard data store (Flask API on port 300
 | System | Purpose | Required |
 |--------|---------|----------|
 | Claude Code CLI (`claude`) | AI conversation engine | Yes (smoke tests require it; unit tests mock it) |
-| Mustard data store | Record storage | No (future phase) |
+| Mustard data store (`~/dev/mustard/data/`) | Record storage (YAML files) | Yes for lense queries (Claude Code reads directly); unit tests mock `invokeClaude` |
+| Express (or equivalent) | API server for lense endpoint | Yes (planned for intelligent-lense phase) |
+| Playwright | E2E browser testing for lense UI | Yes (planned for intelligent-lense phase) |

@@ -23,13 +23,17 @@ Claude Code CLI integration with two permission modes:
 - **Basic mode** — standard CLI invocation with permission restrictions for routine tasks
 - **Admin mode** — CLI with `--dangerously-skip-permissions` for tasks that require unrestricted access
 
+### Intelligent Lense
+
+Natural language intent input that queries the mustard data store through Claude Code and renders structured, visual responses using template components. No chat UI — the interaction model is intent in, view out. Claude Code reads the data store directly (YAML on disk) and returns structured JSON matching a defined component schema. The frontend renders pre-built template components (todo lists, timelines, note cards, idea cards, summaries) with animated transitions.
+
 ### Data Interface (future)
 
-Conversational and visual interface for mustard data store operations — capture, browse, edit, lifecycle management.
+Write operations for mustard data store — capture, edit, lifecycle management. The Intelligent Lense provides read-only access; this capability area covers mutation.
 
 ### Dynamic UI (future)
 
-Contextual UI generation based on data shape and user intent. Favourite/reusable UI elements that grow the app based on usage patterns.
+Contextual UI generation based on data shape and user intent. Favourite/reusable UI elements that grow the app based on usage patterns. The template component system from the Intelligent Lense is the foundation this will build on.
 
 ---
 
@@ -130,11 +134,102 @@ As a developer (human or AI), I want architecture documentation and development 
 
 ---
 
+### US-L6 — API server with intent endpoint and response schema
+
+As the application, I want an API server that accepts natural language intent, routes it to Claude Code with a system prompt instructing it to read the mustard data store and return structured JSON, so that the frontend can render intelligent, data-driven views.
+
+**Acceptance criteria**:
+- Server exposes a POST endpoint that accepts a JSON body with an `intent` string field
+- The endpoint constructs a system prompt that instructs Claude Code to: read the mustard data store at `~/dev/mustard/data/`, interpret the user's intent, and return JSON matching the response schema
+- The endpoint invokes `invokeClaude` in basic mode with the constructed prompt
+- The response schema defines component types: `todo-list`, `log-timeline`, `person-notes`, `idea-list`, `summary`
+- Each component type has a typed data shape (TypeScript interface) usable by both server and frontend
+- The endpoint parses Claude's output as JSON and returns it to the client
+- The endpoint returns appropriate HTTP error codes for invalid input (400) and processing failures (500)
+- `npm run dev` starts both the Vite dev server and the API server
+- The `intent` field is validated for type and maximum length before processing
+
+**User guidance:** N/A — internal API endpoint consumed by the frontend.
+
+**Design rationale:** Co-locating the system prompt and response schema with the API server centralizes the contract between Claude and the frontend. Basic mode is sufficient since reading files doesn't require admin permissions.
+
+---
+
+### US-L7 — Lense input with loading and animated transitions
+
+As a user, I want a single input field where I type what I want to see, with a loading indicator while processing and smooth animated transitions when results appear, so that the interaction feels responsive and intentional despite backend latency.
+
+**Acceptance criteria**:
+- A text input field is prominently displayed on the main page
+- Pressing Enter or clicking a submit affordance sends the intent to the API endpoint (US-L6)
+- A loading spinner/indicator is shown while the API processes the request
+- The input is visually distinguished during the loading state
+- When the response arrives, result components animate into view (not instant appear)
+- On a new query, the current view animates out before the loading state begins (always-replace)
+- The input field clears when a new query is submitted
+- Error states are displayed gracefully when the API returns an error
+- The landing page mustard seed verse is the default/empty state before any query
+
+**User guidance:**
+- Discovery: Navigate to `http://localhost:5234` — the lense input is the primary interface element
+- Manual section: new page: "Using the Lense"
+- Key steps: 1. Type a natural language query into the lense input (e.g., "what's on my plate this week"). 2. Press Enter and watch the loading indicator while Claude processes your intent. 3. View the rendered results — data cards, lists, and summaries drawn from your mustard data.
+
+**Design rationale:** The always-replace model keeps the interface clean and avoids drifting toward a chat thread. Animated transitions make the latency feel intentional rather than sluggish — the "whoa, this is nice" moment.
+
+---
+
+### US-L8 — Template renderer components for mustard data types
+
+As a user, I want structured, visually clean components that render my mustard data (todos, logs, people notes, ideas, summaries), so that query results are immediately scannable and useful rather than raw text.
+
+**Acceptance criteria**:
+- A component registry maps each component type string to a React component
+- `todo-list` component renders items with status indicator, text, and due date (when present)
+- `log-timeline` component renders daily log entries chronologically with date and theme
+- `person-notes` component renders notes about a person with capture date and text
+- `idea-list` component renders ideas with status badge and text
+- `summary` component renders a title and text block for cross-cutting synthesis
+- All components accept typed props matching the response schema interfaces (US-L6)
+- Components follow a consistent visual style (spacing, typography, color palette)
+- An unrecognized component type renders a graceful fallback (not a crash or blank space)
+
+**User guidance:**
+- Discovery: Components render automatically when you query the lense — no direct interaction needed
+- Manual section: existing page: "Using the Lense"
+- Key steps: 1. Query the lense with an intent like "open todos" or "notes about Nisal." 2. View the rendered components — todo lists show status and due dates, timelines show chronological logs, summaries provide cross-cutting insights.
+
+**Design rationale:** Template components over raw LLM text ensures consistent visual quality and enables future interactive affordances (checkboxes, filters) that free-form text can't support. The fallback for unknown types prevents schema evolution from breaking the UI.
+
+---
+
+### US-L9 — End-to-end smoke test with real data
+
+As a developer, I want an on-demand smoke test that sends a real intent through the full stack (API server, Claude Code, mustard data store, JSON response), so that I can verify the integration works end-to-end.
+
+**Acceptance criteria**:
+- `npm run smoke:lense` runs an on-demand smoke test separate from `npm test`
+- The test sends a cross-cutting intent to the API endpoint
+- The test asserts the response is valid JSON matching the response schema structure
+- The test asserts at least one component is present in the response
+- The test output shows the component types returned and a summary of the data
+- The test requires the real `claude` CLI and the real mustard data store at `~/dev/mustard/data/`
+
+**User guidance:**
+- Discovery: Run `npm run smoke:lense` from the project terminal
+- Manual section: existing page: "Testing Guide"
+- Key steps: 1. Ensure the `claude` CLI is installed and the mustard data store exists at `~/dev/mustard/data/`. 2. Run `npm run smoke:lense` to send a real query through the full stack. 3. Observe the response — component types and data summary printed to terminal.
+
+**Design rationale:** An API-level smoke test verifies the most fragile part of the system (the system prompt producing valid JSON from real data) without requiring a browser. Separate from `npm test` to avoid dependence on external systems.
+
+---
+
 ## Implementation phases
 
 | Phase | Name | Stories | Status |
 |-------|------|---------|--------|
-| 1 | Foundation | US-L1, US-L2, US-L3, US-L4, US-L5 | Planned |
+| 1 | Foundation | US-L1, US-L2, US-L3, US-L4, US-L5 | Shipped |
+| 2 | Intelligent Lense | US-L6, US-L7, US-L8, US-L9 | Planned |
 
 ### Phase 1 — Foundation
 
@@ -186,3 +281,60 @@ Stand up the mustard-lense application foundation — a TypeScript React project
 - **Safety and ethics** — admin mode (`--dangerously-skip-permissions`) must be explicit, opt-in, and documented; never the default
 - **Clarity over complexity** — keep the foundation minimal and well-documented; resist premature abstraction
 - **Continuous improvement** — architecture docs and tests established early so future phases compound on a solid base
+
+### Phase 2 — Intelligent Lense
+
+Connect the React frontend to the Claude Code CLI backend through a lightweight API server, creating an intelligent lense interface. The user types natural language intent into a single input field, the backend routes it to Claude Code (which reads the mustard data store directly), and the frontend renders the response as pre-built template components with animated transitions. No chat UI — input replaces previous results, loading spinner during processing, components animate into view.
+
+**Done-when (observable):**
+
+- [ ] A server module exists (e.g. `src/server/`) that exports an Express or equivalent HTTP server with a `POST /api/lense` route [US-L6]
+- [ ] `POST /api/lense` with valid `{ "intent": "open todos" }` body returns HTTP 200 with `Content-Type: application/json` [US-L6]
+- [ ] A system prompt module exists that references the mustard data store path (`~/dev/mustard/data/`) and enumerates the response schema component types [US-L6]
+- [ ] The API endpoint calls `invokeClaude` with `mode: 'basic'` (verified by unit test mocking `invokeClaude`) [US-L6]
+- [ ] A shared response schema module exports TypeScript interfaces for all five component types: `todo-list`, `log-timeline`, `person-notes`, `idea-list`, `summary` [US-L6]
+- [ ] Each component type interface defines a `type` discriminator field and a `data` object with typed fields (e.g., `todo-list` data includes `items` array with `id`, `text`, `status` fields) [US-L6]
+- [ ] `npm run dev` starts both the Vite dev server on port 5234 and the API server, with API requests from the frontend proxied or routed correctly [US-L6]
+- [ ] Unit tests exist for the API endpoint that mock `invokeClaude` and verify: valid request returns parsed JSON, missing intent returns 400, invocation failure returns 500 [US-L6]
+- [ ] Root URL (`/`) renders a visible text input element that serves as the lense input [US-L7]
+- [ ] Submitting the input (Enter key or submit affordance) triggers a `POST` request to `/api/lense` with the input value as `intent` [US-L7]
+- [ ] A loading indicator element (spinner or equivalent) is present in the DOM while the API request is in flight [US-L7]
+- [ ] The input element has a visually distinct loading state (e.g., `disabled` attribute or CSS class change) while the request is in flight [US-L7]
+- [ ] Result components are rendered inside an animation wrapper that applies CSS `transition` or `animation` on mount (verifiable by presence of animation/transition CSS properties or class) [US-L7]
+- [ ] When a new query is submitted, existing result components are removed from the DOM before new results render (always-replace) [US-L7]
+- [ ] The input value resets to empty string after a query is submitted [US-L7]
+- [ ] When the API returns an error, an error message is rendered in the DOM (not a browser alert or console-only error) [US-L7]
+- [ ] Before any query is submitted, the page displays the Matthew 13:31-32 mustard seed verse as the default empty state [US-L7]
+- [ ] Playwright test exists that: types a query, asserts loading indicator appears, and asserts at least one result component renders after loading completes [US-L7]
+- [ ] A component registry module exists that accepts a component type string and returns the corresponding React component (or a fallback) [US-L8]
+- [ ] `todo-list` renderer displays each item's `status` (as a visual indicator), `text`, and `due_date_local` when present [US-L8]
+- [ ] `log-timeline` renderer displays entries with `capture_date_local`, `theme`, and `text` [US-L8]
+- [ ] `person-notes` renderer displays notes with `person` name, `capture_date_local`, and `text` [US-L8]
+- [ ] `idea-list` renderer displays items with `status` badge and `text` [US-L8]
+- [ ] `summary` renderer displays a `title` and `text` block [US-L8]
+- [ ] All renderer components accept props typed with the shared schema interfaces from US-L6 (`npm run typecheck` passes) [US-L8]
+- [ ] Passing an unrecognized component type to the registry returns a fallback component that renders a visible element (not empty/blank) and does not throw a runtime error [US-L8]
+- [ ] Renderer components use a shared CSS module, CSS variables, or design tokens file for consistent spacing, typography, and color [US-L8]
+- [ ] `package.json` defines a `smoke:lense` script that is separate from the `test` script [US-L9]
+- [ ] `npm test` does NOT execute the lense smoke test [US-L9]
+- [ ] `npm run smoke:lense` sends an HTTP request with a cross-cutting intent (e.g., "what's going on this week") to the API endpoint [US-L9]
+- [ ] The smoke test asserts the response parses as valid JSON containing a `components` array with at least one entry [US-L9]
+- [ ] The smoke test prints the component types present in the response to stdout [US-L9]
+- [ ] `POST /api/lense` returns 400 when the `intent` field is missing from the request body [US-L6]
+- [ ] `POST /api/lense` returns 400 when the `intent` field is an empty string [US-L6]
+- [ ] `POST /api/lense` returns 500 with a structured JSON error body (not a raw stack trace) when `invokeClaude` fails [US-L6]
+- [ ] The `intent` field is validated for type (`string`) and maximum length before being passed to `invokeClaude` [US-L6]
+- [ ] All renderer components render mustard data text using React JSX expressions (textContent), not `dangerouslySetInnerHTML` [US-L8]
+- [ ] `AGENTS.md` reflects new API server modules, response schema, frontend components, and lense interaction introduced in this phase [phase]
+- [ ] `README.md` or `docs/` contains a "Using the Lense" section documenting the lense input, example queries, and component types rendered [US-L7]
+
+**Hosting:**
+- Dev: `npm run dev` on port 5234 (Vite + API server)
+- Production: macOS plist serving built app on port 5678
+
+**Golden principles (phase-relevant):**
+- **Faithful stewardship** — quality over speed; the system prompt and response schema are the highest-leverage code in this phase — get them right
+- **Safety and ethics** — basic CLI mode only; user intent is passed via argument array, not shell interpolation; no dangerouslySetInnerHTML
+- **Clarity over complexity** — template components over dynamic code generation; a known set of component types rather than unbounded flexibility
+- **People first** — polished transitions and loading states treat user time and attention with respect; the interface should feel intentional, not bolted-on
+- **Continuous improvement** — the response schema and component registry are designed to grow; new component types can be added without restructuring

@@ -1,0 +1,115 @@
+phase: "intelligent-lense"
+started: "2026-03-21T04:45:06Z"
+entries:
+  - task: 1
+    time: "2026-03-21T04:45:06Z"
+    story: "US-L6"
+    description: "Investigation — determine first task, classify phase as server/schema/cross-cutting, queue investigate for US-L6 API server approach"
+    result: "pass"
+    notes: "Phase type: server/schema/cross-cutting (investigate-first mandate). 4 stories, 38 criteria. US-L6 is the foundation — schema, server, prompt. Queued investigate task."
+    tokens: ~
+  - task: 2
+    time: "2026-03-21T04:48:00Z"
+    story: "US-L6"
+    description: "Investigate: API server approach — Express on port 3001, Vite proxy, concurrently for dual dev, shared schema at src/shared/schema.ts, system prompt reads ~/dev/mustard/data/, mock invokeClaude in tests"
+    result: "pass"
+    notes: "Confirmed approach: Express server (port 3001), Vite proxy /api -> localhost:3001, concurrently for npm run dev. Schema: src/shared/schema.ts with 5 component types. Server: src/server/index.ts + prompt.ts + server.test.ts. Current tests: 8. Queued implement for schema module first."
+    tokens: ~
+  - task: 3
+    time: "2026-03-21T04:50:00Z"
+    story: "US-L6"
+    description: "Implement shared response schema module (src/shared/schema.ts) — 5 component types with type discriminator and typed data objects, LenseResponse wrapper"
+    result: "pass"
+    notes: "Created schema.ts with TodoListComponent, LogTimelineComponent, PersonNotesComponent, IdeaListComponent, SummaryComponent. Union type LenseComponent, LenseResponse wrapper. Verify passes."
+    tokens: ~
+  - task: 4
+    time: "2026-03-21T04:52:00Z"
+    story: "US-L6"
+    description: "Implement Express API server — POST /api/lense with intent validation, system prompt, invokeClaude basic mode, JSON extraction, error handling. Vite proxy + concurrently for dual dev."
+    result: "pass"
+    notes: "Created src/server/index.ts + prompt.ts. Express on port 3001, Vite proxy /api. Intent validation: type, empty, max length 2000. System prompt references ~/dev/mustard/data/. JSON extraction handles markdown fences. Structured error responses. Verify passes."
+    tokens: ~
+  - task: 5
+    time: "2026-03-21T04:54:00Z"
+    story: "US-L6"
+    description: "Implement unit tests for API endpoint — 11 tests covering valid request, markdown extraction, basic mode, missing/empty/whitespace/non-string/too-long intent 400s, failure 500s, invalid JSON. Refactored app.ts/index.ts split for testability."
+    result: "pass"
+    notes: "19 total tests (8 CLI + 11 server). All pass. ✓ US-L6 complete — all 12 criteria met."
+    tokens: ~
+  - task: 6
+    time: "2026-03-21T04:56:00Z"
+    story: "US-L8"
+    description: "Investigation — US-L6 complete. Next: US-L8 (template renderers) before US-L7 (lense input needs renderers). Queued investigate for component registry approach."
+    result: "pass"
+    notes: "US-L8 before US-L7: renderers needed for result display. 10 criteria for US-L8. Need: component registry, 5 renderers, shared CSS tokens, fallback, JSX-only."
+    tokens: ~
+  - task: 7
+    time: "2026-03-21T04:58:00Z"
+    story: "US-L8"
+    description: "Investigate: component registry as ResultRenderer.tsx, 5 renderer components with typed props, tokens.css for shared design, FallbackComponent for unknown types, JSX-only rendering"
+    result: "pass"
+    notes: "Plan: src/components/ with ResultRenderer.tsx (registry), TodoList.tsx, LogTimeline.tsx, PersonNotes.tsx, IdeaList.tsx, Summary.tsx, FallbackComponent.tsx, tokens.css. All typed with shared schema interfaces. JSX expressions only. Queued implement."
+    tokens: ~
+  - task: 8
+    time: "2026-03-21T04:59:00Z"
+    story: "US-L8"
+    description: "Implement component registry, 5 template renderers, fallback component, shared design tokens CSS, and components.css"
+    result: "pass"
+    notes: "Created 9 files in src/components/. ResultRenderer maps type to component. tokens.css has CSS variables, components.css has shared classes. All typed, JSX-only. Verify passes. ✓ US-L8 complete — all 10 criteria met."
+    tokens: ~
+  - task: 9
+    time: "2026-03-21T05:01:00Z"
+    story: "US-L7"
+    description: "Investigate: plan lense input UI — App.tsx rewrite with input, loading, results, animation, error, always-replace. Playwright test needed. Docs needed."
+    result: "pass"
+    notes: "Plan: rewrite App.tsx with useState for intent/loading/results/error. fetch /api/lense. CSS keyframes for fade-in animation. Spinner component. Mustard verse as empty state. Playwright for E2E test (separate task). Using the Lense docs (separate task). Queued implement."
+    tokens: ~
+  - task: 10
+    time: "2026-03-21T05:02:00Z"
+    story: "US-L7"
+    description: "Implement lense input UI — text input, submit, loading spinner, animated results (fadeSlideIn), error display, always-replace, mustard seed empty state, input clears on submit"
+    result: "pass"
+    notes: "Rewrote App.tsx with full lense interaction. CSS animations with staggered delays. Loading spinner. 10 of 12 US-L7 criteria met by this commit. Remaining: Playwright test, docs. Verify passes."
+    tokens: ~
+  - task: 11
+    time: "2026-03-21T05:04:00Z"
+    story: "US-L7"
+    description: "Implement Playwright E2E tests — 2 tests with mocked API: submit query shows loading + renders results with animation, error response shows error in DOM"
+    result: "pass"
+    notes: "Both Playwright tests pass. Vitest now excludes e2e/. 11 of 12 US-L7 criteria met. Remaining: docs. Verify passes."
+    tokens: ~
+  - task: 12
+    time: "2026-03-21T05:06:00Z"
+    story: "US-L7"
+    description: "Add 'Using the Lense' section to README.md — lense input docs, example queries, component types, prerequisites"
+    result: "pass"
+    notes: "README updated with Using the Lense section. ✓ US-L7 complete — all 11 criteria met."
+    tokens: ~
+  - task: 13
+    time: "2026-03-21T05:08:00Z"
+    story: "US-L9"
+    description: "Investigation — US-L7 complete. Remaining: US-L9 (lense smoke test) + phase AGENTS.md update. Queued implement for smoke test."
+    result: "pass"
+    notes: "US-L9: 5 criteria. Create src/smoke/lense.ts, add smoke:lense npm script, send fetch to http://localhost:3001/api/lense, assert components array, print types. Requires running API server."
+    tokens: ~
+  - task: 14
+    time: "2026-03-21T05:10:00Z"
+    story: "US-L9"
+    description: "Implement smoke:lense script — src/smoke/lense.ts sends HTTP request, asserts JSON with components array, prints types"
+    result: "pass"
+    notes: "Created lense.ts smoke test, added smoke:lense npm script. ✓ US-L9 complete — all 5 criteria met."
+    tokens: ~
+  - task: 15
+    time: "2026-03-21T05:12:00Z"
+    story: "phase"
+    description: "Update AGENTS.md with all new modules, files, and conventions from intelligent-lense phase"
+    result: "pass"
+    notes: "AGENTS.md updated with: server modules, schema, components, renderers, Playwright, smoke:lense, lense interaction model."
+    tokens: ~
+  - task: 16
+    time: "2026-03-21T05:14:00Z"
+    story: "phase"
+    description: "Phase completion gate — all 38 done-when criteria verified, verify passes, AGENTS.md consistent, error-path tests present"
+    result: "pass"
+    notes: "All stories complete: US-L6 (12/12), US-L7 (11/11), US-L8 (10/10), US-L9 (5/5), phase (1/1). 19 unit tests + 2 Playwright E2E tests pass. Intelligent-lense phase complete."
+    tokens: ~

@@ -22,3 +22,10 @@ entries:
     result: "pass"
     notes: "Created schema.ts with TodoListComponent, LogTimelineComponent, PersonNotesComponent, IdeaListComponent, SummaryComponent. Union type LenseComponent, LenseResponse wrapper. Verify passes."
     tokens: ~
+  - task: 4
+    time: "2026-03-21T04:52:00Z"
+    story: "US-L6"
+    description: "Implement Express API server — POST /api/lense with intent validation, system prompt, invokeClaude basic mode, JSON extraction, error handling. Vite proxy + concurrently for dual dev."
+    result: "pass"
+    notes: "Created src/server/index.ts + prompt.ts. Express on port 3001, Vite proxy /api. Intent validation: type, empty, max length 2000. System prompt references ~/dev/mustard/data/. JSON extraction handles markdown fences. Structured error responses. Verify passes."
+    tokens: ~

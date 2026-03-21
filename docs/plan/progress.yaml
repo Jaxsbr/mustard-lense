@@ -7,7 +7,7 @@ config:
   quality_check_suppressions: []
 
 state:
-  task_number: 6
+  task_number: 7
   phase: rag-lense
   phase_complete: false
   review_stage: null
@@ -16,6 +16,6 @@ state:
   pr_number: null
   status: running
   last_result: pass
-  next_task: "[US-L10] Implement unit tests for indexer and retriever using fixture YAML data — create src/server/rag/rag.test.ts with mocked embedder"
+  next_task: null
   consecutive_fails: 0
-  completed_stories: []
+  completed_stories: [US-L10]

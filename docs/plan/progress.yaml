@@ -7,13 +7,13 @@ config:
   quality_check_suppressions: []
 
 state:
-  task_number: 10
-  phase: foundation
-  phase_complete: true
-  review_complete: true
-  retro_complete: true
+  task_number: 1
+  phase: intelligent-lense
+  phase_complete: false
+  review_complete: false
+  retro_complete: false
   status: running
-  last_result: pass
+  last_result: null
   next_task: null
   consecutive_fails: 0
-  completed_stories: [US-L1, US-L2, US-L3, US-L4, US-L5]
+  completed_stories: []

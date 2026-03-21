@@ -5,7 +5,7 @@
 ```
 ┌─────────────────────────────────────┐
 │         Browser (React SPA)         │
-│  localhost:234 (dev) / :567 (prod)  │
+│ localhost:5234 (dev) / :5678 (prod) │
 └──────────────┬──────────────────────┘
                │
                ▼
@@ -86,8 +86,8 @@ The SPA will also communicate with the mustard data store (Flask API on port 300
 
 | Environment | Port | Mechanism |
 |-------------|------|-----------|
-| Development | 234 | Vite dev server (`npm run dev`) |
-| Production | 567 | macOS launchd plist serving built assets |
+| Development | 5234 | Vite dev server (`npm run dev`) |
+| Production | 5678 | macOS launchd plist serving built assets |
 
 ## Dependencies on external systems
 

@@ -23,7 +23,7 @@ mustard-lense/
 │   ├── plan/               # Build loop state
 │   └── product/            # PRD and specs
 ├── index.html              # SPA shell with viewport meta
-├── vite.config.ts          # Dev server port 234
+├── vite.config.ts          # Dev server port 5234
 ├── tsconfig.json           # Project references root
 ├── tsconfig.app.json       # App TS config (strict, node types)
 ├── tsconfig.node.json      # Node TS config

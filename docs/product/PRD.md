@@ -40,7 +40,7 @@ Contextual UI generation based on data shape and user intent. Favourite/reusable
 As a developer, I want a TypeScript React project with lint, type-check, and build commands plus a landing page, so that the codebase has a reliable foundation and a visible starting point.
 
 **Acceptance criteria**:
-- `npm run dev` starts dev server on port 234
+- `npm run dev` starts dev server on port 5234
 - `npm run build` produces a production-ready bundle
 - `npm run lint` runs ESLint with zero errors on the clean codebase
 - `npm run typecheck` runs TypeScript compiler check with zero errors
@@ -48,9 +48,9 @@ As a developer, I want a TypeScript React project with lint, type-check, and bui
 - Landing page is visually clean, centered, and responsive
 
 **User guidance:**
-- Discovery: Navigate to `http://localhost:234` (dev) or `http://localhost:567` (production)
+- Discovery: Navigate to `http://localhost:5234` (dev) or `http://localhost:5678` (production)
 - Manual section: new page: "Getting Started"
-- Key steps: 1. Run `npm install` to install dependencies. 2. Run `npm run dev` to start the dev server on port 234. 3. Open `http://localhost:234` to see the landing page with the mustard seed verse.
+- Key steps: 1. Run `npm install` to install dependencies. 2. Run `npm run dev` to start the dev server on port 5234. 3. Open `http://localhost:5234` to see the landing page with the mustard seed verse.
 
 **Design rationale:** Vite + React + TypeScript gives fast dev feedback and type safety that will support future dynamic UI generation experiments.
 
@@ -98,9 +98,8 @@ As a developer, I want on-demand smoke tests that invoke the real Claude Code CL
 **Acceptance criteria**:
 - `npm run smoke:basic` invokes the CLI in basic mode
 - `npm run smoke:admin` invokes the CLI in admin mode
-- Each test prompts the CLI to report its restriction/permission mode
-- Basic mode test asserts output contains an indication of standard/restricted mode
-- Admin mode test asserts output contains an indication of unrestricted/trust mode
+- Each test prompts the CLI and asserts non-empty output with exit code 0
+- Both mode tests confirm successful CLI integration (non-empty stdout, zero exit code)
 - CLI output is streamed to the terminal during the test run
 - Smoke tests are NOT triggered by `npm test`
 
@@ -110,6 +109,8 @@ As a developer, I want on-demand smoke tests that invoke the real Claude Code CL
 - Key steps: 1. Ensure the `claude` CLI is installed and available in PATH. 2. Run `npm run smoke:basic` to test basic mode — observe CLI output streamed to terminal. 3. Run `npm run smoke:admin` to test admin mode with bypass permissions.
 
 **Design rationale:** Separate npm scripts per mode keep smoke tests explicit and prevent accidental admin-mode invocations. Streaming output gives real-time visibility into what the CLI is doing.
+
+**Technical limitation (discovered):** Claude Code CLI does not self-report its permission mode in non-interactive (`-p`) output. The mode indicators ("bypass permissions on" / "? for shortcuts") are rendered only in the interactive TUI, not in piped stdout/stderr. Smoke tests therefore assert successful integration (non-empty output, zero exit code) rather than permission-mode detection. Correct flag construction per mode is verified by the mocked unit tests (US-L3).
 
 ---
 
@@ -141,14 +142,14 @@ Stand up the mustard-lense application foundation — a TypeScript React project
 
 **Done-when (observable):**
 
-- [ ] `npm run dev` starts Vite dev server on port 234 without error [US-L1]
+- [ ] `npm run dev` starts Vite dev server on port 5234 without error [US-L1]
 - [ ] `npm run build` exits 0 and produces `dist/` directory containing `index.html` [US-L1]
 - [ ] `npm run lint` exits 0 with zero errors on the clean codebase [US-L1]
 - [ ] `npm run typecheck` exits 0 with zero type errors [US-L1]
 - [ ] `index.html` includes `<meta name="viewport" ...>` tag for responsive rendering [US-L1]
 - [ ] Landing page at `/` contains text from Matthew 13:31-32 about the mustard seed growing from the smallest seed into a tree [US-L1]
 - [ ] `tsconfig.json` exists with `strict: true` [US-L1]
-- [ ] `vite.config.ts` exists and configures dev server port 234 [US-L1]
+- [ ] `vite.config.ts` exists and configures dev server port 5234 [US-L1]
 - [ ] `src/lib/claude-cli.ts` exports an `invokeClaude` function that accepts `{ mode: 'basic' | 'admin', prompt: string }` [US-L2]
 - [ ] `invokeClaude` in basic mode spawns `claude` process WITHOUT `--dangerously-skip-permissions` in the argument list [US-L2]
 - [ ] `invokeClaude` in admin mode spawns `claude` process WITH `--dangerously-skip-permissions` in the argument list [US-L2]
@@ -164,10 +165,8 @@ Stand up the mustard-lense application foundation — a TypeScript React project
 - [ ] Tests cover error scenarios: non-zero exit code and spawn failure (e.g., `claude` not found) [US-L3]
 - [ ] `package.json` defines `smoke:basic` script that is separate from `test` script [US-L4]
 - [ ] `package.json` defines `smoke:admin` script that is separate from `test` script [US-L4]
-- [ ] `npm run smoke:basic` invokes the real `claude` CLI in basic mode with a prompt asking it to report its permission/restriction mode [US-L4]
-- [ ] `npm run smoke:admin` invokes the real `claude` CLI in admin mode with a prompt asking it to report its permission/restriction mode [US-L4]
-- [ ] `smoke:basic` test output contains indication of restricted/standard mode (verified via string contains check) [US-L4]
-- [ ] `smoke:admin` test output contains indication of unrestricted/trust/bypass mode (verified via string contains check) [US-L4]
+- [ ] `npm run smoke:basic` invokes the real `claude` CLI in basic mode and asserts non-empty stdout with exit code 0 [US-L4]
+- [ ] `npm run smoke:admin` invokes the real `claude` CLI in admin mode and asserts non-empty stdout with exit code 0 [US-L4]
 - [ ] CLI output is piped to `process.stdout` so the developer sees real-time output during smoke test execution [US-L4]
 - [ ] `npm test` does NOT execute smoke test files (smoke tests excluded from Vitest config or in a separate directory) [US-L4]
 - [ ] `docs/architecture/ARCHITECTURE.md` exists and describes system topology, module structure, and data flow [US-L5]
@@ -179,8 +178,8 @@ Stand up the mustard-lense application foundation — a TypeScript React project
 - [ ] `invokeClaude` validates that `mode` is strictly `'basic'` or `'admin'` before spawning (rejects unexpected values) [US-L2]
 
 **Hosting:**
-- Dev: `npm run dev` on port 234
-- Production: macOS plist serving built app on port 567
+- Dev: `npm run dev` on port 5234
+- Production: macOS plist serving built app on port 5678
 
 **Golden principles (phase-relevant):**
 - **Faithful stewardship** — quality foundation over speed; strict TypeScript, linting, and tests from day one

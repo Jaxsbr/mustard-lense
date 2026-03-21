@@ -38,6 +38,7 @@ export function invokeClaude(options: InvokeClaudeOptions): Promise<ClaudeResult
 
     let stdout = ''
     let stderr = ''
+    let settled = false
 
     child.stdout.on('data', (data: Buffer) => {
       const chunk = data.toString()
@@ -50,6 +51,8 @@ export function invokeClaude(options: InvokeClaudeOptions): Promise<ClaudeResult
     })
 
     child.on('close', (code: number | null) => {
+      if (settled) return
+      settled = true
       resolve({
         stdout,
         stderr,
@@ -58,6 +61,8 @@ export function invokeClaude(options: InvokeClaudeOptions): Promise<ClaudeResult
     })
 
     child.on('error', (err: Error) => {
+      if (settled) return
+      settled = true
       reject(err)
     })
   })

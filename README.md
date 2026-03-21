@@ -12,7 +12,7 @@ npm install
 
 | Command | Description |
 |---------|-------------|
-| `npm run dev` | Start Vite dev server on port 234 |
+| `npm run dev` | Start Vite dev server on port 5234 |
 | `npm run build` | Type-check and build for production |
 | `npm run lint` | Run ESLint |
 | `npm run typecheck` | Run TypeScript type checking |

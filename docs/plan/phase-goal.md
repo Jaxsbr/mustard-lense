@@ -50,7 +50,7 @@ Connect the React frontend to the Claude Code CLI backend through a lightweight 
 - [x] `npm run smoke:lense` sends an HTTP request with a cross-cutting intent (e.g., "what's going on this week") to the API endpoint [US-L9]
 - [x] The smoke test asserts the response parses as valid JSON containing a `components` array with at least one entry [US-L9]
 - [x] The smoke test prints the component types present in the response to stdout [US-L9]
-- [ ] `AGENTS.md` reflects new API server modules, response schema, frontend components, and lense interaction introduced in this phase [phase]
+- [x] `AGENTS.md` reflects new API server modules, response schema, frontend components, and lense interaction introduced in this phase [phase]
 
 ### Golden principles (phase-relevant)
 - **Faithful stewardship** — quality over speed; the system prompt and response schema are the highest-leverage code in this phase — get them right

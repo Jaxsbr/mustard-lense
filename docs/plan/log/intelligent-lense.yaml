@@ -99,3 +99,17 @@ entries:
     result: "pass"
     notes: "Created lense.ts smoke test, added smoke:lense npm script. ✓ US-L9 complete — all 5 criteria met."
     tokens: ~
+  - task: 15
+    time: "2026-03-21T05:12:00Z"
+    story: "phase"
+    description: "Update AGENTS.md with all new modules, files, and conventions from intelligent-lense phase"
+    result: "pass"
+    notes: "AGENTS.md updated with: server modules, schema, components, renderers, Playwright, smoke:lense, lense interaction model."
+    tokens: ~
+  - task: 16
+    time: "2026-03-21T05:14:00Z"
+    story: "phase"
+    description: "Phase completion gate — all 38 done-when criteria verified, verify passes, AGENTS.md consistent, error-path tests present"
+    result: "pass"
+    notes: "All stories complete: US-L6 (12/12), US-L7 (11/11), US-L8 (10/10), US-L9 (5/5), phase (1/1). 19 unit tests + 2 Playwright E2E tests pass. Intelligent-lense phase complete."
+    tokens: ~

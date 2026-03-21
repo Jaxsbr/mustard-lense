@@ -78,3 +78,10 @@ entries:
     result: "pass"
     notes: "Both Playwright tests pass. Vitest now excludes e2e/. 11 of 12 US-L7 criteria met. Remaining: docs. Verify passes."
     tokens: ~
+  - task: 12
+    time: "2026-03-21T05:06:00Z"
+    story: "US-L7"
+    description: "Add 'Using the Lense' section to README.md — lense input docs, example queries, component types, prerequisites"
+    result: "pass"
+    notes: "README updated with Using the Lense section. ✓ US-L7 complete — all 11 criteria met."
+    tokens: ~

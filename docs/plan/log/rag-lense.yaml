@@ -8,3 +8,10 @@ entries:
     result: "pass"
     notes: "Phase type: server/schema/cross-cutting (investigate-first mandate). 23 existing tests pass. US-L10 has 9 criteria. Need transformers.js + LanceDB deps, embedder/indexer/retriever modules, fixture tests."
     tokens: ~
+  - task: 2
+    time: "2026-03-21T19:20:00Z"
+    story: "US-L10"
+    description: "Investigate: RAG pipeline approach — @huggingface/transformers v3 (feature-extraction pipeline, Xenova/all-MiniLM-L6-v2, 384d), @lancedb/lancedb (embedded vector store), ESM compatible, Vitest compatible. Current app.ts uses invokeClaude with allowedTools/addDirs — will be replaced by synthesiser. prompt.ts references MUSTARD_DATA_PATH — will be rewritten."
+    result: "pass"
+    notes: "Packages: @huggingface/transformers + @lancedb/lancedb. Model: Xenova/all-MiniLM-L6-v2 (384d). Embed text field, store metadata columns. LanceDB createTable/vectorSearch API. Vitest-compatible (node env). Plan: embedder.ts (singleton pipeline), indexer.ts (read YAML, embed, write LanceDB), retriever.ts (embed query, search). Queued implement: install deps + embedder module."
+    tokens: ~

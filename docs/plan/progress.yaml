@@ -16,4 +16,4 @@ state:
   last_result: pass
   next_task: "[US-L6] Implement unit tests for API endpoint — mock invokeClaude, test valid request, missing intent 400, empty intent 400, invocation failure 500"
   consecutive_fails: 0
-  completed_stories: []
+  completed_stories: [US-L6]

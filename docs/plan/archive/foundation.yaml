@@ -1,5 +1,11 @@
 phase: "foundation"
 started: "2026-03-20T22:47:37Z"
+reconciliation_status:
+  r1: done
+  r2: done
+  r3: done
+  r4: done
+  r5: done
 entries:
   - task: 1
     time: "2026-03-20T22:47:37Z"
@@ -71,20 +77,6 @@ entries:
     result: "pass"
     notes: "US-L3 complete. Starting US-L4 — on-demand smoke tests. Queued investigate."
     tokens: ~
-  - task: 14
-    time: "2026-03-20T23:50:00Z"
-    story: "US-L5"
-    description: "Implement ARCHITECTURE.md, update README.md and AGENTS.md with file ownership, directory layout, CLI modes"
-    result: "pass"
-    notes: "Created ARCHITECTURE.md, replaced template README, updated AGENTS.md with full project structure. ✓ US-L5 complete"
-    tokens: ~
-  - task: 15
-    time: "2026-03-20T23:52:00Z"
-    story: "phase"
-    description: "Phase completion gate — all 36 done-when criteria verified, verify passes, AGENTS.md consistent"
-    result: "pass"
-    notes: "All stories complete: US-L1 (8/8), US-L2 (8/8), US-L3 (7/7), US-L4 (8/8), US-L5 (4/4), phase (1/1). Final verify passes. Foundation phase complete."
-    tokens: ~
   - task: 11
     time: "2026-03-20T23:44:00Z"
     story: "US-L4"
@@ -105,4 +97,18 @@ entries:
     description: "Investigation — queued docs task for ARCHITECTURE.md, README.md, AGENTS.md updates"
     result: "pass"
     notes: "US-L4 complete. Starting US-L5 — documentation. Need ARCHITECTURE.md with topology/modes/security, README with purpose/setup/commands, AGENTS.md with file ownership and directory layout."
+    tokens: ~
+  - task: 14
+    time: "2026-03-20T23:50:00Z"
+    story: "US-L5"
+    description: "Implement ARCHITECTURE.md, update README.md and AGENTS.md with file ownership, directory layout, CLI modes"
+    result: "pass"
+    notes: "Created ARCHITECTURE.md, replaced template README, updated AGENTS.md with full project structure. ✓ US-L5 complete"
+    tokens: ~
+  - task: 15
+    time: "2026-03-20T23:52:00Z"
+    story: "phase"
+    description: "Phase completion gate — all 36 done-when criteria verified, verify passes, AGENTS.md consistent"
+    result: "pass"
+    notes: "All stories complete: US-L1 (8/8), US-L2 (8/8), US-L3 (7/7), US-L4 (8/8), US-L5 (4/4), phase (1/1). Final verify passes. Foundation phase complete."
     tokens: ~

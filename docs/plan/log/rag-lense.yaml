@@ -36,3 +36,10 @@ entries:
     result: "pass"
     notes: "Concerns: 1) finally block resets stage to idle after done state, 2) sequential embedding in indexer loop. Nit: LanceDB cache in node_modules. Review posted to GitHub."
     tokens: ~
+  - task: 17
+    time: "2026-03-21T21:02:00Z"
+    story: "phase"
+    description: "[review] handle-pr-review pr=3 — triaged 3 threads: 1 fixed (stage reset), 1 TODO added (batch embedding), 1 acknowledged (cache path). All quality checks pass."
+    result: "pass"
+    notes: "Fixed stage reset bug (finally→catch), added batch embedding TODO, resolved all 3 threads, posted summary. 37 tests pass."
+    tokens: ~

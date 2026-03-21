@@ -7,13 +7,13 @@ config:
   quality_check_suppressions: []
 
 state:
-  task_number: 13
+  task_number: 14
   phase: intelligent-lense
   phase_complete: false
   review_complete: false
   retro_complete: false
   status: running
   last_result: pass
-  next_task: null
+  next_task: "[US-L9] Implement smoke:lense script — send HTTP request to API, assert valid JSON with components array, print component types"
   consecutive_fails: 0
   completed_stories: [US-L6, US-L7, US-L8]

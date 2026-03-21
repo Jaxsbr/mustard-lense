@@ -25,7 +25,7 @@ Claude Code CLI integration with two permission modes:
 
 ### Intelligent Lense
 
-Natural language intent input that queries the mustard data store through Claude Code and renders structured, visual responses using template components. No chat UI — the interaction model is intent in, view out. Claude Code reads the data store directly (YAML on disk) and returns structured JSON matching a defined component schema. The frontend renders pre-built template components (todo lists, timelines, note cards, idea cards, summaries) with animated transitions.
+Natural language intent input that queries the mustard data store and renders structured, visual responses using template components. No chat UI — the interaction model is intent in, view out. A local RAG pipeline (transformers.js embeddings + LanceDB vector store) retrieves relevant records by semantic similarity, then a synthesis layer (Claude Code CLI, swappable to Anthropic SDK) produces structured JSON matching a defined component schema. The frontend shows real processing stages via SSE and renders pre-built template components (todo lists, timelines, note cards, idea cards, summaries) with animated transitions.
 
 ### Data Interface (future)
 
@@ -134,7 +134,7 @@ As a developer (human or AI), I want architecture documentation and development 
 
 ---
 
-### US-L6 — API server with intent endpoint and response schema
+### US-L6 — API server with intent endpoint and response schema [Shipped]
 
 As the application, I want an API server that accepts natural language intent, routes it to Claude Code with a system prompt instructing it to read the mustard data store and return structured JSON, so that the frontend can render intelligent, data-driven views.
 
@@ -155,7 +155,7 @@ As the application, I want an API server that accepts natural language intent, r
 
 ---
 
-### US-L7 — Lense input with loading and animated transitions
+### US-L7 — Lense input with loading and animated transitions [Shipped]
 
 As a user, I want a single input field where I type what I want to see, with a loading indicator while processing and smooth animated transitions when results appear, so that the interaction feels responsive and intentional despite backend latency.
 
@@ -179,7 +179,7 @@ As a user, I want a single input field where I type what I want to see, with a l
 
 ---
 
-### US-L8 — Template renderer components for mustard data types
+### US-L8 — Template renderer components for mustard data types [Shipped]
 
 As a user, I want structured, visually clean components that render my mustard data (todos, logs, people notes, ideas, summaries), so that query results are immediately scannable and useful rather than raw text.
 
@@ -203,7 +203,7 @@ As a user, I want structured, visually clean components that render my mustard d
 
 ---
 
-### US-L9 — End-to-end smoke test with real data
+### US-L9 — End-to-end smoke test with real data [Shipped]
 
 As a developer, I want an on-demand smoke test that sends a real intent through the full stack (API server, Claude Code, mustard data store, JSON response), so that I can verify the integration works end-to-end.
 
@@ -224,12 +224,95 @@ As a developer, I want an on-demand smoke test that sends a real intent through 
 
 ---
 
+### US-L10 — Local RAG pipeline with embedding and vector store
+
+As the application, I want a local RAG pipeline that indexes mustard records into a vector store and retrieves the most relevant records for a given query, so that data retrieval completes in milliseconds instead of dozens of CLI tool-call round trips.
+
+**Acceptance criteria**:
+- An embedding wrapper module uses transformers.js with the `all-MiniLM-L6-v2` model to generate embeddings locally (zero external API calls)
+- An indexer reads all YAML files from `~/dev/mustard/data/` (todos, daily_logs, people_notes, ideas), embeds the `text` field, and writes vectors + metadata to a LanceDB table
+- Each record is stored with metadata columns: `id`, `log_type`, `capture_date_local`, and type-specific fields (`person`, `status`, `due_date_local`, `category`, `theme`, `period`, `tags`)
+- A retriever accepts a query string, embeds it, performs similarity search, and returns the top-k records (default k=5) with their metadata
+- The LanceDB table is created or overwritten on each index run (no incremental updates)
+- Unit tests exist for the indexer and retriever using fixture YAML data (no real data store dependency)
+
+**User guidance:** N/A — internal module.
+
+**Design rationale:** Local embedding (transformers.js) + embedded vector store (LanceDB) meets the zero recurring cost constraint while keeping the entire retrieval pipeline in-process — no external services, no API keys, no additional server processes.
+
+---
+
+### US-L11 — Synthesis layer abstraction
+
+As the application, I want the Claude invocation abstracted behind a synthesis interface that receives pre-retrieved records and an intent string, so that the retrieval and synthesis steps are decoupled and the underlying LLM mechanism can be swapped without touching retrieval or frontend code.
+
+**Acceptance criteria**:
+- A synthesiser interface exists with a method that accepts an intent string and an array of retrieved records, and returns the structured `LenseResponse`
+- A CLI synthesiser implementation satisfies the interface by wrapping `invokeClaude` in basic mode
+- The system prompt injects retrieved records inline (record text + metadata) instead of instructing the LLM to read files from disk
+- The `invokeClaude` call no longer passes `allowedTools` or `addDirs` — the LLM receives data, not filesystem access
+- User intent is wrapped in `<user-intent>` delimiters (existing prompt injection resistance preserved)
+- Raw LLM output is never returned to the client on error paths — errors return generic messages and log details server-side only (existing pattern preserved)
+- Unit tests verify the CLI synthesiser with mocked `invokeClaude`, including success and error paths
+
+**User guidance:** N/A — internal module.
+
+**Design rationale:** Abstracting synthesis behind an interface decouples retrieval from LLM invocation. The CLI works now but has ~7s cold start; this architecture lets a future phase swap to the Anthropic SDK for sub-3s focused queries without touching retrieval or frontend.
+
+---
+
+### US-L12 — SSE streaming API with RAG retrieval
+
+As the application, I want `POST /api/lense` to return an SSE stream with real processing stage events and a new `/api/reindex` endpoint for manual index refresh, so that the frontend can show meaningful progress and the index can be rebuilt on demand.
+
+**Acceptance criteria**:
+- `POST /api/lense` returns `Content-Type: text/event-stream` instead of `application/json`
+- The stream emits named stage events in order: `retrieving`, `thinking`, then `result`
+- The `result` event data contains the components JSON (same `{ components: [...] }` shape)
+- An `error` event is emitted on the stream if retrieval or synthesis fails (no raw stack traces or LLM output leaked to the client)
+- Intent validation (type, length, empty) returns HTTP 400 before opening the stream (existing validation preserved)
+- `POST /api/reindex` triggers a full vector index rebuild and returns HTTP 200 with `{ status: "ok", records: <count> }` on success
+- The vector index is built on server start (in the server entry point) so the first query does not wait for indexing
+- Unit tests mock the retriever and synthesiser and verify the SSE event sequence (retrieving → thinking → result)
+- Unit tests verify the `/api/reindex` endpoint returns 200
+
+**User guidance:** N/A — internal API consumed by the frontend.
+
+**Design rationale:** SSE over client-timed stages gives real state transitions from the server rather than fake timed messages — more honest, more lovable. POST + SSE response (not EventSource GET) matches the request-response pattern of a query while enabling streaming, the same pattern used by LLM streaming APIs.
+
+---
+
+### US-L13 — Frontend SSE consumption with stage-based loading
+
+As a user, I want to see real processing stages ("Finding records...", "Thinking...") while my query is being handled, so that I understand what the system is doing instead of watching a static spinner.
+
+**Acceptance criteria**:
+- The frontend sends `POST /api/lense` and reads the response as an SSE stream (not JSON)
+- Stage-specific loading messages are displayed during processing: "Finding records..." during the `retrieving` stage, "Thinking..." during the `thinking` stage
+- Stage transitions have animated visual changes (not instant text swap)
+- Result components render when the `result` event arrives (same component rendering as before)
+- An `error` event renders an error message in the DOM (existing error display pattern preserved)
+- Always-replace behavior is preserved — a new query clears previous results before showing stages
+- Input clears on submit (existing behavior preserved)
+- Playwright E2E test mocks the SSE endpoint and verifies: stage indicator appears during processing, result components render after the result event
+- Playwright E2E test verifies error event renders error message in the DOM
+
+**User guidance:**
+- Discovery: Navigate to `http://localhost:5234` — same lense input, now with real-time processing stages
+- Manual section: existing page: "Using the Lense"
+- Key steps: 1. Type a natural language query into the lense input (e.g., "what's on my plate this week"). 2. Watch the stage indicators — "Finding records..." while retrieval runs, "Thinking..." while Claude processes your intent. 3. View the rendered results when processing completes.
+
+**Design rationale:** Real stage transitions from the server (retrieval done → thinking) rather than fake timed messages give honest, purposeful feedback. This upgrades the loading experience from "something is happening" to "here's what's happening now" — the lovability upgrade for this phase.
+
+---
+
 ## Implementation phases
 
 | Phase | Name | Stories | Status |
 |-------|------|---------|--------|
 | 1 | Foundation | US-L1, US-L2, US-L3, US-L4, US-L5 | Shipped |
-| 2 | Intelligent Lense | US-L6, US-L7, US-L8, US-L9 | Planned |
+| 2 | Intelligent Lense | US-L6, US-L7, US-L8, US-L9 | Shipped |
+| 3 | RAG Lense | US-L10, US-L11, US-L12, US-L13 | Planned |
 
 ### Phase 1 — Foundation
 
@@ -338,3 +421,57 @@ Connect the React frontend to the Claude Code CLI backend through a lightweight 
 - **Clarity over complexity** — template components over dynamic code generation; a known set of component types rather than unbounded flexibility
 - **People first** — polished transitions and loading states treat user time and attention with respect; the interface should feel intentional, not bolted-on
 - **Continuous improvement** — the response schema and component registry are designed to grow; new component types can be added without restructuring
+
+### Phase 3 — RAG Lense
+
+Replace the Claude CLI's file-reading tool calls with a local RAG pipeline that pre-retrieves relevant mustard records and injects them inline into the synthesis prompt. Change POST /api/lense from synchronous JSON to an SSE stream with real processing stage events (retrieving → thinking → result). Abstract the synthesis layer behind an interface so it can be swapped from the CLI to the Anthropic SDK in a future phase. Add a manual reindex endpoint.
+
+**Done-when (observable):**
+
+- [ ] `src/server/rag/` directory exists with embedding, indexer, and retriever modules [US-L10]
+- [ ] Embedding module imports from a transformers.js package and loads the `Xenova/all-MiniLM-L6-v2` model (verifiable by model name string in source) [US-L10]
+- [ ] Indexer reads all YAML files from a configurable data store path, embeds the `text` field of each record, and writes vectors to a LanceDB table [US-L10]
+- [ ] Each LanceDB record stores metadata columns: `id`, `log_type`, `capture_date_local`, and type-specific fields where present (`person`, `status`, `due_date_local`, `category`, `theme`, `period`, `tags`) [US-L10]
+- [ ] Retriever exports a function that accepts a query string and optional `k` parameter (default 5), returns an array of records with `text` and metadata fields [US-L10]
+- [ ] Indexer creates or overwrites the LanceDB table on each run — not incremental [US-L10]
+- [ ] Unit tests exist for indexer and retriever using fixture YAML data — `npm test` does not depend on the real mustard data store [US-L10]
+- [ ] Embedding runs locally in-process — no HTTP calls to external embedding APIs (verifiable by absence of fetch/axios calls in embedding module) [US-L10]
+- [ ] `package.json` includes a transformers.js package and a LanceDB package as dependencies [US-L10]
+- [ ] `src/server/synthesiser.ts` exports a `Synthesiser` interface with a method accepting `intent` (string) and `records` (array of retrieved records), returning `Promise<LenseResponse>` [US-L11]
+- [ ] `src/server/synthesiser.ts` exports a `CliSynthesiser` class or function that implements the `Synthesiser` interface by wrapping `invokeClaude` [US-L11]
+- [ ] The synthesis prompt injects retrieved records inline with their text and metadata — no file-reading instructions, no data store path reference, no `allowedTools` or `addDirs` in the `invokeClaude` call [US-L11]
+- [ ] User intent is wrapped in `<user-intent>` delimiters in the synthesis prompt (existing prompt injection resistance preserved) [US-L11]
+- [ ] Retrieved records injected into the prompt are wrapped in explicit delimiters (e.g., `<record>...</record>`) to distinguish data from instructions [US-L11]
+- [ ] Error paths return generic messages and log details server-side only — raw LLM output is never included in client-facing error responses [US-L11]
+- [ ] Unit tests verify `CliSynthesiser` with mocked `invokeClaude`: success path returns `LenseResponse`, error path returns generic error without leaking raw output [US-L11]
+- [ ] `POST /api/lense` returns `Content-Type: text/event-stream` [US-L12]
+- [ ] The SSE stream emits named events in order: `retrieving`, `thinking`, `result` [US-L12]
+- [ ] The `result` event `data` field parses as JSON with a `components` array matching the existing `LenseResponse` shape [US-L12]
+- [ ] An `error` event is emitted on stream failure with a generic error message (no stack traces, no raw LLM output) [US-L12]
+- [ ] Intent validation (type check, empty check, max length) returns HTTP 400 JSON response before opening the SSE stream [US-L12]
+- [ ] `POST /api/reindex` triggers a full vector index rebuild and returns HTTP 200 with `{ "status": "ok", "records": <count> }` on success [US-L12]
+- [ ] `POST /api/reindex` returns HTTP 500 with a structured JSON error body (not a raw stack trace) when indexing fails [US-L12]
+- [ ] Server entry point (`src/server/index.ts`) triggers vector index build on startup before accepting requests [US-L12]
+- [ ] Unit tests mock retriever and synthesiser and verify the SSE event sequence (`retrieving` → `thinking` → `result`) [US-L12]
+- [ ] Unit test verifies `POST /api/reindex` returns 200 with record count [US-L12]
+- [ ] `smoke:lense` script updated to read the SSE stream and extract the `result` event instead of calling `res.json()` [US-L12]
+- [ ] Diagnostic timing is logged server-side for retrieval and synthesis stages (console output includes retrieval and synthesis durations) [US-L12]
+- [ ] Frontend sends `POST` to `/api/lense` and reads the response as an SSE stream [US-L13]
+- [ ] "Finding records..." text is visible in the DOM during the `retrieving` stage [US-L13]
+- [ ] "Thinking..." text is visible in the DOM during the `thinking` stage [US-L13]
+- [ ] Stage transitions have CSS `animation` or `transition` properties (verifiable by computed style or class presence) [US-L13]
+- [ ] Result components render when the `result` SSE event arrives (same component rendering pipeline as before) [US-L13]
+- [ ] An `error` SSE event renders an error message in the DOM (not a browser alert or console-only error) [US-L13]
+- [ ] New query clears previous results before showing stage indicators (always-replace behavior preserved) [US-L13]
+- [ ] Input value resets to empty string after submit (existing behavior preserved) [US-L13]
+- [ ] Playwright E2E test mocks the SSE endpoint and verifies: stage indicator appears during processing, at least one result component renders after the `result` event [US-L13]
+- [ ] Playwright E2E test verifies an `error` SSE event renders an error message in the DOM [US-L13]
+- [ ] "Using the Lense" documentation updated to describe the stage-based loading experience (stage names and what they mean) [US-L13]
+- [ ] `AGENTS.md` reflects new RAG modules (`src/server/rag/`), synthesiser (`src/server/synthesiser.ts`), SSE streaming on `POST /api/lense`, and `POST /api/reindex` endpoint introduced in this phase [phase]
+
+**Golden principles (phase-relevant):**
+- **Great Commission ambition + nonprofit stewardship** — zero recurring cost architecture: local embedding (transformers.js), local vector store (LanceDB), no external APIs for retrieval. Every dollar is donor-trust money.
+- **Faithful stewardship** — RAG retrieval quality is the highest-leverage code in this phase; k=5 validated by POC benchmarking. Get the embedding and retrieval right.
+- **People first** — SSE stage events give honest, purposeful feedback; "Finding records..." and "Thinking..." respect user attention more than a static spinner.
+- **Clarity over complexity** — server-start indexing + manual reindex over file-system watchers; synthesis interface is minimal (one method). No premature abstraction.
+- **Continuous improvement** — synthesis interface enables future SDK swap without rework; RAG pipeline enables future dynamic-k, metadata filtering, and full-scan optimizations.

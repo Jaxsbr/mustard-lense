@@ -1,6 +1,7 @@
 import express from 'express'
 import { invokeClaude } from '../lib/claude-cli.js'
 import { buildSystemPrompt } from './prompt.js'
+import { isValidComponentData } from '../shared/schema.js'
 import type { LenseResponse } from '../shared/schema.js'
 
 const app = express()
@@ -62,7 +63,15 @@ app.post('/api/lense', async (req, res) => {
       return
     }
 
-    res.json(parsed)
+    const validComponents = parsed.components.filter((c) => {
+      if (!isValidComponentData(c)) {
+        console.warn('Dropping component with invalid data shape:', c.type)
+        return false
+      }
+      return true
+    })
+
+    res.json({ components: validComponents })
   } catch (err) {
     const message = err instanceof Error ? err.message : 'Unknown error'
     res.status(500).json({ error: 'Failed to process intent.', detail: message })

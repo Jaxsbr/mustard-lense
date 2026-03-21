@@ -1,4 +1,5 @@
 import type { LenseComponent } from '../shared/schema.js'
+import { isValidComponentData } from '../shared/schema.js'
 import { TodoList } from './TodoList.js'
 import { LogTimeline } from './LogTimeline.js'
 import { PersonNotes } from './PersonNotes.js'
@@ -7,6 +8,10 @@ import { Summary } from './Summary.js'
 import { FallbackComponent } from './FallbackComponent.js'
 
 export function ResultRenderer({ component }: { component: LenseComponent }) {
+  if (!isValidComponentData(component)) {
+    return <FallbackComponent type={`${component.type} (data shape mismatch)`} />
+  }
+
   switch (component.type) {
     case 'todo-list':
       return <TodoList data={component.data} />

@@ -14,6 +14,6 @@ state:
   retro_complete: false
   status: running
   last_result: null
-  next_task: null
+  next_task: "[US-L6] Investigate: determine API server approach — Express vs Vite middleware, shared schema module location, system prompt design, dev server setup for dual Vite+API, test strategy for mocking invokeClaude"
   consecutive_fails: 0
   completed_stories: []

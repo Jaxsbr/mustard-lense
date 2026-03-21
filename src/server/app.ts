@@ -24,12 +24,27 @@ app.post('/api/lense', async (req, res) => {
 
   try {
     const prompt = buildSystemPrompt(intent)
+
+    const spawnTime = Date.now()
+    let firstByteTime: number | null = null
+
     const result = await invokeClaude({
       mode: 'basic',
       prompt,
       allowedTools: ['Read', 'Glob'],
       addDirs: ['~/dev/mustard/data'],
+      onData: () => {
+        if (firstByteTime === null) firstByteTime = Date.now()
+      },
     })
+
+    const doneTime = Date.now()
+    const total = doneTime - spawnTime
+    const spawnToFirstByte = firstByteTime ? firstByteTime - spawnTime : total
+    const firstByteToDone = firstByteTime ? doneTime - firstByteTime : 0
+    console.log(
+      `[lense] spawn→first-byte: ${spawnToFirstByte}ms | first-byte→done: ${firstByteToDone}ms | total: ${total}ms`,
+    )
 
     if (result.exitCode !== 0) {
       console.error('Claude invocation failed:', result.stderr)

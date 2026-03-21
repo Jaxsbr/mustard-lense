@@ -183,6 +183,31 @@ describe('POST /api/lense', () => {
     expect(res.body.detail).toBeUndefined()
   })
 
+  it('logs diagnostic timing after successful invocation', async () => {
+    const logSpy = vi.spyOn(console, 'log').mockImplementation(() => {})
+
+    mockInvokeClaude.mockResolvedValue({
+      stdout: '{"components":[]}',
+      stderr: '',
+      exitCode: 0,
+    })
+
+    await request(app)
+      .post('/api/lense')
+      .send({ intent: 'test' })
+      .expect(200)
+
+    const timingCall = logSpy.mock.calls.find(
+      (call) => typeof call[0] === 'string' && call[0].includes('[lense] spawn→first-byte:'),
+    )
+    expect(timingCall).toBeDefined()
+    expect(timingCall![0]).toMatch(
+      /\[lense\] spawn→first-byte: \d+ms \| first-byte→done: \d+ms \| total: \d+ms/,
+    )
+
+    logSpy.mockRestore()
+  })
+
   it('returns 500 when Claude returns empty response', async () => {
     mockInvokeClaude.mockResolvedValue({
       stdout: '',

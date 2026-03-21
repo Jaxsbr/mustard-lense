@@ -7,7 +7,7 @@ config:
   quality_check_suppressions: []
 
 state:
-  task_number: 5
+  task_number: 6
   phase: rag-lense
   phase_complete: false
   review_stage: null
@@ -16,6 +16,6 @@ state:
   pr_number: null
   status: running
   last_result: pass
-  next_task: "[US-L10] Implement retriever module — create src/server/rag/retriever.ts that accepts query string + optional k (default 5), embeds query, performs LanceDB vector search, returns records with text and metadata"
+  next_task: "[US-L10] Implement unit tests for indexer and retriever using fixture YAML data — create src/server/rag/rag.test.ts with mocked embedder"
   consecutive_fails: 0
   completed_stories: []

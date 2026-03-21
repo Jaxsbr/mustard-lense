@@ -7,7 +7,7 @@ config:
   quality_check_suppressions: []
 
 state:
-  task_number: 13
+  task_number: 14
   phase: rag-lense
   phase_complete: false
   review_stage: null
@@ -16,6 +16,6 @@ state:
   pr_number: null
   status: running
   last_result: pass
-  next_task: "[US-L13] Rewrite App.tsx for SSE stream consumption with stage-based loading indicators, add CSS animations for stage transitions, update Playwright E2E tests to mock SSE"
+  next_task: null
   consecutive_fails: 0
-  completed_stories: [US-L10, US-L11, US-L12]
+  completed_stories: [US-L10, US-L11, US-L12, US-L13]

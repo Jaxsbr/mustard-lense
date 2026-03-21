@@ -16,6 +16,6 @@ state:
   pr_number: null
   status: running
   last_result: pass
-  next_task: null
+  next_task: "[US-L10] Investigate: indexer module approach — confirm YAML parsing library, plan LanceDB table schema with all metadata columns, determine how to read YAML files from configurable path"
   consecutive_fails: 0
   completed_stories: []

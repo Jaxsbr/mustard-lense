@@ -22,3 +22,10 @@ entries:
     result: "pass"
     notes: "Dependencies installed. Embedder module created with getEmbedder() singleton, embed() function, EMBEDDING_DIM constant. Typecheck, lint, tests, build all pass."
     tokens: ~
+  - task: 4
+    time: "2026-03-21T19:24:00Z"
+    story: "US-L10"
+    description: "Investigation — embedder done. Next: indexer module. Need to confirm YAML parsing, LanceDB table schema, file reading approach. Queued investigate."
+    result: "pass"
+    notes: "Remaining US-L10 criteria: indexer (reads YAML, embeds text, writes LanceDB with metadata), retriever (query+search), unit tests with fixtures. Queued investigate for indexer."
+    tokens: ~

@@ -77,6 +77,7 @@ export async function buildIndex(dataPath: string = DEFAULT_DATA_PATH): Promise<
   const records = files.map(parseRecord).filter((r): r is MustardRecord => r !== null)
   console.log(`[indexer] Parsed ${records.length} valid records`)
 
+  // TODO: batch embedding when data store scales beyond ~100 records
   const rows = []
   for (const record of records) {
     const vector = await embed(record.text)

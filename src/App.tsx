@@ -3,7 +3,7 @@ import type { LenseResponse } from './shared/schema.js'
 import { ResultRenderer } from './components/ResultRenderer.js'
 import './App.css'
 
-type Stage = 'idle' | 'retrieving' | 'thinking' | 'done'
+type Stage = 'idle' | 'retrieving' | 'thinking'
 
 function parseSSEEvents(text: string): Array<{ event: string; data: string }> {
   const events: Array<{ event: string; data: string }> = []
@@ -74,7 +74,7 @@ function App() {
             } else if (evt.event === 'result') {
               const data: LenseResponse = JSON.parse(evt.data)
               setResults(data)
-              setStage('done')
+              setStage('idle')
             } else if (evt.event === 'error') {
               const data = JSON.parse(evt.data)
               throw new Error(data.error ?? 'Processing failed')
@@ -85,7 +85,6 @@ function App() {
     } catch (err) {
       const message = err instanceof Error ? err.message : 'Something went wrong'
       setError(message)
-    } finally {
       setStage('idle')
     }
   }

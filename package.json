@@ -13,6 +13,7 @@
     "test": "vitest run",
     "smoke:basic": "npx tsx src/smoke/basic.ts",
     "smoke:admin": "npx tsx src/smoke/admin.ts",
+    "smoke:lense": "npx tsx src/smoke/lense.ts",
     "test:e2e": "npx playwright test",
     "preview": "vite preview"
   },

@@ -8,3 +8,10 @@ entries:
     result: "pass"
     notes: "Phase type: server/schema/cross-cutting (investigate-first mandate). 4 stories, 38 criteria. US-L6 is the foundation — schema, server, prompt. Queued investigate task."
     tokens: ~
+  - task: 2
+    time: "2026-03-21T04:48:00Z"
+    story: "US-L6"
+    description: "Investigate: API server approach — Express on port 3001, Vite proxy, concurrently for dual dev, shared schema at src/shared/schema.ts, system prompt reads ~/dev/mustard/data/, mock invokeClaude in tests"
+    result: "pass"
+    notes: "Confirmed approach: Express server (port 3001), Vite proxy /api -> localhost:3001, concurrently for npm run dev. Schema: src/shared/schema.ts with 5 component types. Server: src/server/index.ts + prompt.ts + server.test.ts. Current tests: 8. Queued implement for schema module first."
+    tokens: ~

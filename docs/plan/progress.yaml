@@ -16,4 +16,4 @@ state:
   last_result: pass
   next_task: "[US-L8] Implement component registry, 5 template renderers (TodoList, LogTimeline, PersonNotes, IdeaList, Summary), fallback component, and shared design tokens CSS"
   consecutive_fails: 0
-  completed_stories: [US-L6]
+  completed_stories: [US-L6, US-L8]

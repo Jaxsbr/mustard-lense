@@ -52,7 +52,7 @@ app.post('/api/lense', async (req, res) => {
       parsed = JSON.parse(jsonStr)
     } catch {
       console.error('Claude returned non-JSON response:', raw.slice(0, 500))
-      res.status(500).json({ error: 'Claude did not return valid JSON.', detail: raw.slice(0, 300) })
+      res.status(500).json({ error: 'Claude did not return valid JSON.' })
       return
     }
 

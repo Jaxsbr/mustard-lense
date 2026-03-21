@@ -164,10 +164,10 @@ describe('POST /api/lense', () => {
       .expect(500)
 
     expect(res.body.error).toBe('Claude did not return valid JSON.')
-    expect(res.body.detail).toContain('not valid json')
+    expect(res.body.detail).toBeUndefined()
   })
 
-  it('returns 500 with raw response when Claude needs permissions', async () => {
+  it('returns 500 without leaking raw response when Claude needs permissions', async () => {
     mockInvokeClaude.mockResolvedValue({
       stdout: 'I need permission to access the filesystem to read those files.',
       stderr: '',
@@ -180,7 +180,7 @@ describe('POST /api/lense', () => {
       .expect(500)
 
     expect(res.body.error).toBe('Claude did not return valid JSON.')
-    expect(res.body.detail).toContain('I need permission')
+    expect(res.body.detail).toBeUndefined()
   })
 
   it('returns 500 when Claude returns empty response', async () => {

@@ -14,6 +14,6 @@ state:
   retro_complete: false
   status: running
   last_result: pass
-  next_task: null
+  next_task: "[US-L8] Investigate: plan component registry, 5 renderer components, shared design tokens/CSS, fallback component approach, ensure JSX-only rendering (no dangerouslySetInnerHTML)"
   consecutive_fails: 0
   completed_stories: [US-L6]

@@ -71,3 +71,10 @@ entries:
     result: "pass"
     notes: "Rewrote App.tsx with full lense interaction. CSS animations with staggered delays. Loading spinner. 10 of 12 US-L7 criteria met by this commit. Remaining: Playwright test, docs. Verify passes."
     tokens: ~
+  - task: 11
+    time: "2026-03-21T05:04:00Z"
+    story: "US-L7"
+    description: "Implement Playwright E2E tests — 2 tests with mocked API: submit query shows loading + renders results with animation, error response shows error in DOM"
+    result: "pass"
+    notes: "Both Playwright tests pass. Vitest now excludes e2e/. 11 of 12 US-L7 criteria met. Remaining: docs. Verify passes."
+    tokens: ~

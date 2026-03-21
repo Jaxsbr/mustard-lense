@@ -7,13 +7,13 @@ config:
   quality_check_suppressions: []
 
 state:
-  task_number: 11
+  task_number: 12
   phase: intelligent-lense
   phase_complete: false
   review_complete: false
   retro_complete: false
   status: running
   last_result: pass
-  next_task: "[US-L7] Implement Playwright E2E test — types query, asserts loading indicator, asserts result component renders"
+  next_task: "[US-L7] Add 'Using the Lense' documentation section to README.md"
   consecutive_fails: 0
   completed_stories: [US-L6, US-L8]

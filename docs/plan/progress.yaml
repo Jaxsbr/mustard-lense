@@ -16,6 +16,6 @@ state:
   pr_number: null
   status: running
   last_result: pass
-  next_task: null
+  next_task: "[US-L13] Investigate: frontend SSE consumption — review current App.tsx fetch logic, plan SSE stream reading with stage indicators, identify E2E test changes needed"
   consecutive_fails: 0
   completed_stories: [US-L10, US-L11, US-L12]

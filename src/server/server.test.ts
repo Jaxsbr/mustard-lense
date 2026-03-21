@@ -34,10 +34,14 @@ describe('POST /api/lense', () => {
       .expect('Content-Type', /json/)
 
     expect(res.body).toEqual(mockResponse)
-    expect(mockInvokeClaude).toHaveBeenCalledWith({
-      mode: 'basic',
-      prompt: expect.stringContaining('open todos'),
-    })
+    expect(mockInvokeClaude).toHaveBeenCalledWith(
+      expect.objectContaining({
+        mode: 'basic',
+        prompt: expect.stringContaining('open todos'),
+        allowedTools: ['Read', 'Glob'],
+        addDirs: ['~/dev/mustard/data'],
+      }),
+    )
   })
 
   it('extracts JSON from markdown-fenced response', async () => {
@@ -159,7 +163,38 @@ describe('POST /api/lense', () => {
       .send({ intent: 'test' })
       .expect(500)
 
-    expect(res.body).toHaveProperty('error')
-    expect(res.body).toHaveProperty('detail')
+    expect(res.body.error).toBe('Claude did not return valid JSON.')
+    expect(res.body.detail).toContain('not valid json')
+  })
+
+  it('returns 500 with raw response when Claude needs permissions', async () => {
+    mockInvokeClaude.mockResolvedValue({
+      stdout: 'I need permission to access the filesystem to read those files.',
+      stderr: '',
+      exitCode: 0,
+    })
+
+    const res = await request(app)
+      .post('/api/lense')
+      .send({ intent: 'show my todos' })
+      .expect(500)
+
+    expect(res.body.error).toBe('Claude did not return valid JSON.')
+    expect(res.body.detail).toContain('I need permission')
+  })
+
+  it('returns 500 when Claude returns empty response', async () => {
+    mockInvokeClaude.mockResolvedValue({
+      stdout: '',
+      stderr: '',
+      exitCode: 0,
+    })
+
+    const res = await request(app)
+      .post('/api/lense')
+      .send({ intent: 'test' })
+      .expect(500)
+
+    expect(res.body.error).toBe('Claude returned an empty response.')
   })
 })

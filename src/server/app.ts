@@ -23,7 +23,12 @@ app.post('/api/lense', async (req, res) => {
 
   try {
     const prompt = buildSystemPrompt(intent)
-    const result = await invokeClaude({ mode: 'basic', prompt })
+    const result = await invokeClaude({
+      mode: 'basic',
+      prompt,
+      allowedTools: ['Read', 'Glob'],
+      addDirs: ['~/dev/mustard/data'],
+    })
 
     if (result.exitCode !== 0) {
       console.error('Claude invocation failed:', result.stderr)
@@ -31,11 +36,25 @@ app.post('/api/lense', async (req, res) => {
       return
     }
 
-    // Extract JSON from Claude's response — it may contain markdown fences
-    const jsonMatch = result.stdout.match(/```(?:json)?\s*([\s\S]*?)```/)
-    const jsonStr = jsonMatch ? jsonMatch[1].trim() : result.stdout.trim()
+    const raw = result.stdout.trim()
+    if (!raw) {
+      console.error('Claude returned empty response. stderr:', result.stderr)
+      res.status(500).json({ error: 'Claude returned an empty response.' })
+      return
+    }
 
-    const parsed: LenseResponse = JSON.parse(jsonStr)
+    // Extract JSON from Claude's response — it may contain markdown fences
+    const jsonMatch = raw.match(/```(?:json)?\s*([\s\S]*?)```/)
+    const jsonStr = jsonMatch ? jsonMatch[1].trim() : raw
+
+    let parsed: LenseResponse
+    try {
+      parsed = JSON.parse(jsonStr)
+    } catch {
+      console.error('Claude returned non-JSON response:', raw.slice(0, 500))
+      res.status(500).json({ error: 'Claude did not return valid JSON.', detail: raw.slice(0, 300) })
+      return
+    }
 
     if (!parsed.components || !Array.isArray(parsed.components)) {
       console.error('Invalid response shape from Claude:', jsonStr.slice(0, 200))

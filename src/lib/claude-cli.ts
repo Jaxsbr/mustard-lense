@@ -11,11 +11,13 @@ export interface ClaudeResult {
 export interface InvokeClaudeOptions {
   mode: ClaudeMode
   prompt: string
+  allowedTools?: string[]
+  addDirs?: string[]
   onData?: (chunk: string) => void
 }
 
 export function invokeClaude(options: InvokeClaudeOptions): Promise<ClaudeResult> {
-  const { mode, prompt, onData } = options
+  const { mode, prompt, allowedTools, addDirs, onData } = options
 
   if (mode !== 'basic' && mode !== 'admin') {
     return Promise.reject(new Error(`Invalid mode: ${mode as string}. Must be 'basic' or 'admin'.`))
@@ -29,6 +31,16 @@ export function invokeClaude(options: InvokeClaudeOptions): Promise<ClaudeResult
 
   if (mode === 'admin') {
     args.push('--dangerously-skip-permissions')
+  }
+
+  if (allowedTools?.length) {
+    args.push('--allowedTools', ...allowedTools)
+  }
+
+  if (addDirs?.length) {
+    for (const dir of addDirs) {
+      args.push('--add-dir', dir)
+    }
   }
 
   args.push('-p', prompt)

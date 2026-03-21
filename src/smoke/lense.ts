@@ -5,7 +5,25 @@
 const API_URL = 'http://localhost:3001/api/lense'
 const INTENT = "what's going on this week"
 
+async function checkServer(): Promise<void> {
+  try {
+    await fetch(API_URL, { method: 'HEAD' })
+  } catch (err) {
+    if (err instanceof TypeError && (err as NodeJS.ErrnoException).cause) {
+      const cause = (err as NodeJS.ErrnoException).cause as NodeJS.ErrnoException
+      if (cause?.code === 'ECONNREFUSED') {
+        console.error('API server is not running.')
+        console.error('Start it first:  npm run dev:server')
+        process.exit(1)
+      }
+    }
+    throw err
+  }
+}
+
 async function main() {
+  await checkServer()
+
   console.log(`Sending intent: "${INTENT}"`)
   console.log(`To: ${API_URL}\n`)
 

@@ -27,9 +27,9 @@ Claude Code CLI integration with two permission modes:
 
 Natural language intent input that queries the mustard data store and renders structured, visual responses using template components. No chat UI — the interaction model is intent in, view out. A local RAG pipeline (transformers.js embeddings + LanceDB vector store) retrieves relevant records by semantic similarity, then a synthesis layer (Claude Code CLI, swappable to Anthropic SDK) produces structured JSON matching a defined component schema. The frontend shows real processing stages via SSE and renders pre-built template components (todo lists, timelines, note cards, idea cards, summaries) with animated transitions.
 
-### Data Interface (future)
+### Structured CRUD
 
-Write operations for mustard data store — capture, edit, lifecycle management. The Intelligent Lense provides read-only access; this capability area covers mutation.
+Structured browse, capture, and edit interface for the mustard data store. A collapsible panel alongside the lense provides tab-based navigation across record types with type-specific list views, a detail drawer for individual records, and quick capture. The panel is the reliable utility drawer; the lense is the AI-powered insight engine. Together they form the unified mustard product.
 
 ### Dynamic UI (future)
 
@@ -306,13 +306,103 @@ As a user, I want to see real processing stages ("Finding records...", "Thinking
 
 ---
 
+### US-U1 — Record browse API with configurable data directory
+
+As Jaco, I want an API endpoint that returns my mustard records filtered by type, reading from a configurable data directory, so that the CRUD panel can display my data without depending on the RAG pipeline.
+
+**Acceptance criteria**:
+- `GET /api/records?type=todo` returns a JSON array of records matching that `log_type`
+- `GET /api/records` (no type filter) returns all records across all types
+- Each record in the response includes all fields: `id`, `log_type`, `capture_date_local`, `text`, `person`, `status`, `due_date_local`, `category`, `theme`, `period`, `tags`
+- Records are sorted by `capture_date_local` descending (newest first)
+- The data directory is read from `MUSTARD_DATA_DIR` env var, falling back to `~/dev/mustard/data/`
+- Both the browse API and the RAG indexer use the same `MUSTARD_DATA_DIR` env var
+- `GET /api/records?type=invalid_type` returns an empty array (not an error)
+- Unit tests exist for the browse endpoint using fixture YAML data (no real data store dependency)
+
+**User guidance:** N/A — internal API consumed by the CRUD panel frontend.
+
+**Design rationale:** A dedicated read endpoint decoupled from the RAG pipeline gives the CRUD panel instant, deterministic access to records without embedding or vector search overhead. The shared `MUSTARD_DATA_DIR` env var ensures both subsystems read from the same source.
+
+---
+
+### US-U2 — Split-screen layout with collapsible CRUD panel
+
+As Jaco, I want a split-screen layout with a collapsible structured panel on the left and the lense on the right, so that I can browse my data and query the lense side-by-side in one tool.
+
+**Acceptance criteria**:
+- The app renders a two-column layout: CRUD panel on the left, lense on the right
+- A toggle button collapses and expands the CRUD panel
+- When the panel is collapsed, the lense expands to fill the full width
+- When the panel is expanded, it occupies approximately 40% of the viewport width
+- The lense (input + results) is always visible regardless of panel state
+- The app title updates to "Mustard" (replacing "Mustard Lense")
+- The layout is usable at viewport widths down to 768px (panel auto-collapses on narrow viewports)
+- Playwright E2E test verifies: both panel and lense regions are visible, toggle collapses the panel, lense input remains functional after toggle
+
+**User guidance:**
+- Discovery: Navigate to `http://localhost:5234` — the split-screen layout is the default view
+- Manual section: new page: "App Layout"
+- Key steps: 1. Open the app — the CRUD panel is on the left, the lense input on the right. 2. Click the panel toggle to collapse the CRUD panel and give the lense full width. 3. Click again to restore the split-screen view.
+
+**Design rationale:** The lense is the primary experience (AI-powered insight); the CRUD panel is the reliable utility drawer (structured browse). Always-visible lense ensures the AI capability is never hidden behind a tab or mode switch. Left-panel placement follows the convention of navigation/sidebar panels (VS Code, Slack, email clients).
+
+---
+
+### US-U3 — Type tabs in CRUD panel
+
+As Jaco, I want tabs in the CRUD panel for Todos, People, Ideas, and Daily Logs, so that I can quickly switch between record types without leaving the panel.
+
+**Acceptance criteria**:
+- The CRUD panel header displays four tabs: Todos, People, Ideas, Daily Logs
+- Each tab maps to a `log_type` value (`todo`, `people_note`, `idea`, `daily_log`)
+- Clicking a tab fetches records of that type from `GET /api/records?type=<log_type>` and displays them in the panel body
+- The active tab is visually distinguished (highlight, underline, or equivalent)
+- The Todos tab is active by default on first load
+- Each tab displays a record count badge showing the number of records of that type
+- Tab switching shows a brief loading state while records are fetched
+- Unit tests verify tab rendering and active state toggling
+
+**User guidance:**
+- Discovery: Tabs are visible at the top of the CRUD panel — the leftmost column of the app
+- Manual section: existing page: "App Layout"
+- Key steps: 1. Open the app — the Todos tab is active by default, showing your todo records. 2. Click the "People" tab to see people notes, or "Ideas" for ideas. 3. The record count badge on each tab shows how many records exist for that type.
+
+**Design rationale:** Tab-per-type mirrors how the data is already organized on disk (one directory per type) and matches Jaco's mental model — "show me my todos" vs "show me my people notes." Cross-cutting queries ("everything from today") are the lense's job, keeping the CRUD panel simple and predictable.
+
+---
+
+### US-U4 — Type-specific list views
+
+As Jaco, I want each tab in the CRUD panel to render a compact, scannable list view tailored to that record type, so that I can quickly find and review records without opening each one.
+
+**Acceptance criteria**:
+- Todo list items display: status indicator (visual icon/badge), text (truncated to ~80 chars with ellipsis), and `due_date_local` when present
+- People list items display: `person` name (bold), text (truncated to ~80 chars), and `capture_date_local`
+- Idea list items display: `status` badge, and text (truncated to ~80 chars)
+- Daily log list items display: `capture_date_local`, `theme` (when present), and text (truncated to ~80 chars)
+- All list views use shared design tokens (spacing, typography, colors) from the existing `tokens.css`
+- Empty state: when a tab has zero records, a friendly message is displayed (not a blank panel)
+- List items render mustard data text using React JSX expressions (textContent), not `dangerouslySetInnerHTML`
+- Playwright E2E test verifies: at least one list item renders in a tab, and list items display the expected fields for that type (mocked API response)
+
+**User guidance:**
+- Discovery: List views render automatically when you select a tab in the CRUD panel
+- Manual section: existing page: "App Layout"
+- Key steps: 1. Click the "Todos" tab — each item shows a status icon, the todo text, and a due date (if set). 2. Click "People" — each item shows the person's name in bold, a note preview, and the capture date. 3. Scan the list to find what you need — key fields are front and centre.
+
+**Design rationale:** Compact list items (key fields only, truncated text) optimize for scanning speed — the user should identify the right record at a glance. Type-specific field selection surfaces what matters most per type (due date for todos, person name for people notes) rather than showing a generic field dump.
+
+---
+
 ## Implementation phases
 
 | Phase | Name | Stories | Status |
 |-------|------|---------|--------|
 | 1 | Foundation | US-L1, US-L2, US-L3, US-L4, US-L5 | Shipped |
 | 2 | Intelligent Lense | US-L6, US-L7, US-L8, US-L9 | Shipped |
-| 3 | RAG Lense | US-L10, US-L11, US-L12, US-L13 | Planned |
+| 3 | RAG Lense | US-L10, US-L11, US-L12, US-L13 | Shipped |
+| 4 | Structured Browse | US-U1, US-U2, US-U3, US-U4 | Planned |
 
 ### Phase 1 — Foundation
 
@@ -475,3 +565,64 @@ Replace the Claude CLI's file-reading tool calls with a local RAG pipeline that 
 - **People first** — SSE stage events give honest, purposeful feedback; "Finding records..." and "Thinking..." respect user attention more than a static spinner.
 - **Clarity over complexity** — server-start indexing + manual reindex over file-system watchers; synthesis interface is minimal (one method). No premature abstraction.
 - **Continuous improvement** — synthesis interface enables future SDK swap without rework; RAG pipeline enables future dynamic-k, metadata filtering, and full-scan optimizations.
+
+### Phase 4 — Structured Browse
+
+Introduce a structured browse panel alongside the existing lense, creating the unified mustard split-screen layout. A collapsible CRUD panel on the left provides tab-based navigation across four record types (Todos, People, Ideas, Daily Logs) with type-specific compact list views. The lense on the right remains always visible. A new read API endpoint serves records directly from YAML files, with the data directory configurable via `MUSTARD_DATA_DIR` env var (shared with the RAG indexer). Browse only — no write operations, no detail drawer, no capture form.
+
+**Done-when (observable):**
+
+- [ ] `GET /api/records` returns HTTP 200 with `Content-Type: application/json` containing a JSON array [US-U1]
+- [ ] `GET /api/records?type=todo` returns only records where `log_type` equals `todo` [US-U1]
+- [ ] `GET /api/records` (no type parameter) returns records from all log types [US-U1]
+- [ ] Each record object in the response contains fields: `id`, `log_type`, `capture_date_local`, `text`, `person`, `status`, `due_date_local`, `category`, `theme`, `period`, `tags` [US-U1]
+- [ ] Records are sorted by `capture_date_local` descending (newest first) [US-U1]
+- [ ] The data directory is read from `MUSTARD_DATA_DIR` env var, defaulting to `~/dev/mustard/data/` when unset [US-U1]
+- [ ] The RAG indexer (`src/server/rag/indexer.ts`) reads from `MUSTARD_DATA_DIR` env var when set (shared configuration with the browse API) [US-U1]
+- [ ] `GET /api/records?type=nonexistent_type` returns HTTP 200 with an empty JSON array `[]` [US-U1]
+- [ ] A data reader module exists (e.g. `src/server/data/reader.ts`) that exports a function for reading and parsing YAML records from the configured data directory [US-U1]
+- [ ] `.env.example` documents `MUSTARD_DATA_DIR` with a description and default value [US-U1]
+- [ ] Unit tests for the browse endpoint exist and pass using fixture YAML data — `npm test` does not depend on the real mustard data store [US-U1]
+- [ ] `GET /api/records` returns HTTP 500 with a structured JSON error body (not a raw stack trace or unhandled exception) when YAML file reading fails [US-U1]
+- [ ] The `type` query parameter is used as an in-memory filter on parsed records — not interpolated into file system paths, shell commands, or directory names [US-U1]
+- [ ] The app renders a two-column layout: CRUD panel on the left, lense on the right [US-U2]
+- [ ] A toggle button in the DOM collapses and expands the CRUD panel [US-U2]
+- [ ] When collapsed, the lense region fills the full viewport width (panel region not visible) [US-U2]
+- [ ] When expanded, the CRUD panel occupies approximately 40% of the viewport width [US-U2]
+- [ ] The lense input and result rendering remain functional in both collapsed and expanded panel states [US-U2]
+- [ ] The visible app title reads "Mustard" (not "Mustard Lense") [US-U2]
+- [ ] At viewport widths below 768px, the CRUD panel is collapsed by default [US-U2]
+- [ ] CRUD panel components exist in a dedicated directory (e.g. `src/components/panel/`) [US-U2]
+- [ ] Playwright E2E test verifies: both panel and lense regions are present in the DOM, toggle button collapses and expands the panel, lense input accepts text input after toggle [US-U2]
+- [ ] User guide page documents the split-screen layout, panel toggle, type tabs, and list view field descriptions (at `docs/manual/layout.md` or equivalent path) [US-U2]
+- [ ] Four tab elements render in the CRUD panel header with labels: "Todos", "People", "Ideas", "Daily Logs" [US-U3]
+- [ ] Clicking a tab triggers a fetch to `GET /api/records?type=<log_type>` where log_type is `todo`, `people_note`, `idea`, or `daily_log` respectively [US-U3]
+- [ ] The active tab is visually distinguished (verifiable by CSS class or `aria-selected` attribute) [US-U3]
+- [ ] The "Todos" tab is active by default on first load [US-U3]
+- [ ] Each tab displays a record count badge showing the number of records for that type [US-U3]
+- [ ] A loading indicator is visible in the panel body while records are being fetched [US-U3]
+- [ ] Unit tests verify tab rendering and active state toggling [US-U3]
+- [ ] Todo list items display: status indicator (visual icon or badge), text (truncated to ~80 chars with ellipsis), and `due_date_local` when present [US-U4]
+- [ ] People list items display: `person` name (bold), text (truncated to ~80 chars), and `capture_date_local` [US-U4]
+- [ ] Idea list items display: `status` badge and text (truncated to ~80 chars) [US-U4]
+- [ ] Daily log list items display: `capture_date_local`, `theme` (when present), and text (truncated to ~80 chars) [US-U4]
+- [ ] List views use CSS custom properties from `tokens.css` for spacing, typography, and colors [US-U4]
+- [ ] When a tab has zero records, a friendly empty-state message is displayed in the panel body (not a blank panel) [US-U4]
+- [ ] List items render record text via React JSX expressions (textContent), not `dangerouslySetInnerHTML` [US-U4]
+- [ ] Playwright E2E test verifies: at least one list item renders in a tab, list items contain expected field elements for that record type (mocked API response) [US-U4]
+- [ ] `AGENTS.md` reflects new browse API endpoint (`GET /api/records`), data reader module, CRUD panel components, split-screen layout, and `MUSTARD_DATA_DIR` configuration introduced in this phase [phase]
+
+**AGENTS.md sections affected:**
+- File ownership map (new data reader module, panel components)
+- Directory layout (new `src/server/data/`, `src/components/panel/`)
+- Behavior rules (new `GET /api/records` endpoint, split-screen layout)
+- Testing conventions (new test files for browse API and panel components)
+
+**User documentation:**
+- New "App Layout" page at `docs/manual/layout.md` documenting split-screen layout, panel toggle, type tabs, and list view field descriptions
+
+**Golden principles (phase-relevant):**
+- **People first** — split-screen layout and type-specific views respect Jaco's time; data is scannable at a glance, not buried behind AI queries
+- **Clarity over complexity** — tab-per-type mirrors the on-disk data structure; direct YAML file reading with no ORM; configurable data path via a single env var
+- **Faithful stewardship** — unit tests and E2E tests from day one; shared `MUSTARD_DATA_DIR` ensures browse API and RAG indexer always read from the same source
+- **Continuous improvement** — the CRUD panel architecture is designed to extend with write operations, detail drawer, and capture form in subsequent phases

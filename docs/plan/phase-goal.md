@@ -1,61 +1,59 @@
 ## Phase goal
 
-Replace the Claude CLI's file-reading tool calls with a local RAG pipeline that pre-retrieves relevant mustard records and injects them inline into the synthesis prompt. Change POST /api/lense from synchronous JSON to an SSE stream with real processing stage events (retrieving → thinking → result). Abstract the synthesis layer behind an interface so it can be swapped from the CLI to the Anthropic SDK in a future phase. Add a manual reindex endpoint.
+Introduce a structured browse panel alongside the existing lense, creating the unified mustard split-screen layout. A collapsible CRUD panel on the left provides tab-based navigation across four record types (Todos, People, Ideas, Daily Logs) with type-specific compact list views. The lense on the right remains always visible. A new read API endpoint serves records directly from YAML files, with the data directory configurable via `MUSTARD_DATA_DIR` env var (shared with the RAG indexer). Browse only — no write operations, no detail drawer, no capture form.
 
 ### Dependencies
-- intelligent-lense
+- rag-lense
 
 ### Stories in scope
-- US-L10 — Local RAG pipeline with embedding and vector store
-- US-L11 — Synthesis layer abstraction
-- US-L12 — SSE streaming API with RAG retrieval
-- US-L13 — Frontend SSE consumption with stage-based loading
+- US-U1 — Record browse API with configurable data directory
+- US-U2 — Split-screen layout with collapsible CRUD panel
+- US-U3 — Type tabs in CRUD panel
+- US-U4 — Type-specific list views
 
 ### Done-when (observable)
-- [x] `src/server/rag/` directory exists with embedding, indexer, and retriever modules [US-L10]
-- [x] Embedding module imports from a transformers.js package and loads the `Xenova/all-MiniLM-L6-v2` model (verifiable by model name string in source) [US-L10]
-- [x] Indexer reads all YAML files from a configurable data store path, embeds the `text` field of each record, and writes vectors to a LanceDB table [US-L10]
-- [x] Each LanceDB record stores metadata columns: `id`, `log_type`, `capture_date_local`, and type-specific fields where present (`person`, `status`, `due_date_local`, `category`, `theme`, `period`, `tags`) [US-L10]
-- [x] Retriever exports a function that accepts a query string and optional `k` parameter (default 5), returns an array of records with `text` and metadata fields [US-L10]
-- [x] Indexer creates or overwrites the LanceDB table on each run — not incremental [US-L10]
-- [x] Unit tests exist for indexer and retriever using fixture YAML data — `npm test` does not depend on the real mustard data store [US-L10]
-- [x] Embedding runs locally in-process — no HTTP calls to external embedding APIs (verifiable by absence of fetch/axios calls in embedding module) [US-L10]
-- [x] `package.json` includes a transformers.js package and a LanceDB package as dependencies [US-L10]
-- [x] `src/server/synthesiser.ts` exports a `Synthesiser` interface with a method accepting `intent` (string) and `records` (array of retrieved records), returning `Promise<LenseResponse>` [US-L11]
-- [x] `src/server/synthesiser.ts` exports a `CliSynthesiser` class or function that implements the `Synthesiser` interface by wrapping `invokeClaude` [US-L11]
-- [x] The synthesis prompt injects retrieved records inline with their text and metadata — no file-reading instructions, no data store path reference, no `allowedTools` or `addDirs` in the `invokeClaude` call [US-L11]
-- [x] User intent is wrapped in `<user-intent>` delimiters in the synthesis prompt (existing prompt injection resistance preserved) [US-L11]
-- [x] Retrieved records injected into the prompt are wrapped in explicit delimiters (e.g., `<record>...</record>`) to distinguish data from instructions [US-L11]
-- [x] Error paths return generic messages and log details server-side only — raw LLM output is never included in client-facing error responses [US-L11]
-- [x] Unit tests verify `CliSynthesiser` with mocked `invokeClaude`: success path returns `LenseResponse`, error path returns generic error without leaking raw output [US-L11]
-- [x] `POST /api/lense` returns `Content-Type: text/event-stream` [US-L12]
-- [x] The SSE stream emits named events in order: `retrieving`, `thinking`, `result` [US-L12]
-- [x] The `result` event `data` field parses as JSON with a `components` array matching the existing `LenseResponse` shape [US-L12]
-- [x] An `error` event is emitted on stream failure with a generic error message (no stack traces, no raw LLM output) [US-L12]
-- [x] Intent validation (type check, empty check, max length) returns HTTP 400 JSON response before opening the SSE stream [US-L12]
-- [x] `POST /api/reindex` triggers a full vector index rebuild and returns HTTP 200 with `{ "status": "ok", "records": <count> }` on success [US-L12]
-- [x] `POST /api/reindex` returns HTTP 500 with a structured JSON error body (not a raw stack trace) when indexing fails [US-L12]
-- [x] Server entry point (`src/server/index.ts`) triggers vector index build on startup before accepting requests [US-L12]
-- [x] Unit tests mock retriever and synthesiser and verify the SSE event sequence (`retrieving` → `thinking` → `result`) [US-L12]
-- [x] Unit test verifies `POST /api/reindex` returns 200 with record count [US-L12]
-- [x] `smoke:lense` script updated to read the SSE stream and extract the `result` event instead of calling `res.json()` [US-L12]
-- [x] Diagnostic timing is logged server-side for retrieval and synthesis stages (console output includes retrieval and synthesis durations) [US-L12]
-- [x] Frontend sends `POST` to `/api/lense` and reads the response as an SSE stream [US-L13]
-- [x] "Finding records..." text is visible in the DOM during the `retrieving` stage [US-L13]
-- [x] "Thinking..." text is visible in the DOM during the `thinking` stage [US-L13]
-- [x] Stage transitions have CSS `animation` or `transition` properties (verifiable by computed style or class presence) [US-L13]
-- [x] Result components render when the `result` SSE event arrives (same component rendering pipeline as before) [US-L13]
-- [x] An `error` SSE event renders an error message in the DOM (not a browser alert or console-only error) [US-L13]
-- [x] New query clears previous results before showing stage indicators (always-replace behavior preserved) [US-L13]
-- [x] Input value resets to empty string after submit (existing behavior preserved) [US-L13]
-- [x] Playwright E2E test mocks the SSE endpoint and verifies: stage indicator appears during processing, at least one result component renders after the `result` event [US-L13]
-- [x] Playwright E2E test verifies an `error` SSE event renders an error message in the DOM [US-L13]
-- [x] "Using the Lense" documentation updated to describe the stage-based loading experience (stage names and what they mean) [US-L13]
-- [x] `AGENTS.md` reflects new RAG modules (`src/server/rag/`), synthesiser (`src/server/synthesiser.ts`), SSE streaming on `POST /api/lense`, and `POST /api/reindex` endpoint introduced in this phase [phase]
+- [ ] `GET /api/records` returns HTTP 200 with `Content-Type: application/json` containing a JSON array [US-U1]
+- [ ] `GET /api/records?type=todo` returns only records where `log_type` equals `todo` [US-U1]
+- [ ] `GET /api/records` (no type parameter) returns records from all log types [US-U1]
+- [ ] Each record object in the response contains fields: `id`, `log_type`, `capture_date_local`, `text`, `person`, `status`, `due_date_local`, `category`, `theme`, `period`, `tags` [US-U1]
+- [ ] Records are sorted by `capture_date_local` descending (newest first) [US-U1]
+- [ ] The data directory is read from `MUSTARD_DATA_DIR` env var, defaulting to `~/dev/mustard/data/` when unset [US-U1]
+- [ ] The RAG indexer (`src/server/rag/indexer.ts`) reads from `MUSTARD_DATA_DIR` env var when set (shared configuration with the browse API) [US-U1]
+- [ ] `GET /api/records?type=nonexistent_type` returns HTTP 200 with an empty JSON array `[]` [US-U1]
+- [ ] A data reader module exists (e.g. `src/server/data/reader.ts`) that exports a function for reading and parsing YAML records from the configured data directory [US-U1]
+- [ ] `.env.example` documents `MUSTARD_DATA_DIR` with a description and default value [US-U1]
+- [ ] Unit tests for the browse endpoint exist and pass using fixture YAML data — `npm test` does not depend on the real mustard data store [US-U1]
+- [ ] `GET /api/records` returns HTTP 500 with a structured JSON error body (not a raw stack trace or unhandled exception) when YAML file reading fails [US-U1]
+- [ ] The `type` query parameter is used as an in-memory filter on parsed records — not interpolated into file system paths, shell commands, or directory names [US-U1]
+- [ ] The app renders a two-column layout: CRUD panel on the left, lense on the right [US-U2]
+- [ ] A toggle button in the DOM collapses and expands the CRUD panel [US-U2]
+- [ ] When collapsed, the lense region fills the full viewport width (panel region not visible) [US-U2]
+- [ ] When expanded, the CRUD panel occupies approximately 40% of the viewport width [US-U2]
+- [ ] The lense input and result rendering remain functional in both collapsed and expanded panel states [US-U2]
+- [ ] The visible app title reads "Mustard" (not "Mustard Lense") [US-U2]
+- [ ] At viewport widths below 768px, the CRUD panel is collapsed by default [US-U2]
+- [ ] CRUD panel components exist in a dedicated directory (e.g. `src/components/panel/`) [US-U2]
+- [ ] Playwright E2E test verifies: both panel and lense regions are present in the DOM, toggle button collapses and expands the panel, lense input accepts text input after toggle [US-U2]
+- [ ] User guide page documents the split-screen layout, panel toggle, type tabs, and list view field descriptions (at `docs/manual/layout.md` or equivalent path) [US-U2]
+- [ ] Four tab elements render in the CRUD panel header with labels: "Todos", "People", "Ideas", "Daily Logs" [US-U3]
+- [ ] Clicking a tab triggers a fetch to `GET /api/records?type=<log_type>` where log_type is `todo`, `people_note`, `idea`, or `daily_log` respectively [US-U3]
+- [ ] The active tab is visually distinguished (verifiable by CSS class or `aria-selected` attribute) [US-U3]
+- [ ] The "Todos" tab is active by default on first load [US-U3]
+- [ ] Each tab displays a record count badge showing the number of records for that type [US-U3]
+- [ ] A loading indicator is visible in the panel body while records are being fetched [US-U3]
+- [ ] Unit tests verify tab rendering and active state toggling [US-U3]
+- [ ] Todo list items display: status indicator (visual icon or badge), text (truncated to ~80 chars with ellipsis), and `due_date_local` when present [US-U4]
+- [ ] People list items display: `person` name (bold), text (truncated to ~80 chars), and `capture_date_local` [US-U4]
+- [ ] Idea list items display: `status` badge and text (truncated to ~80 chars) [US-U4]
+- [ ] Daily log list items display: `capture_date_local`, `theme` (when present), and text (truncated to ~80 chars) [US-U4]
+- [ ] List views use CSS custom properties from `tokens.css` for spacing, typography, and colors [US-U4]
+- [ ] When a tab has zero records, a friendly empty-state message is displayed in the panel body (not a blank panel) [US-U4]
+- [ ] List items render record text via React JSX expressions (textContent), not `dangerouslySetInnerHTML` [US-U4]
+- [ ] Playwright E2E test verifies: at least one list item renders in a tab, list items contain expected field elements for that record type (mocked API response) [US-U4]
+- [ ] `AGENTS.md` reflects new browse API endpoint (`GET /api/records`), data reader module, CRUD panel components, split-screen layout, and `MUSTARD_DATA_DIR` configuration introduced in this phase [phase]
 
 ### Golden principles (phase-relevant)
-- **Great Commission ambition + nonprofit stewardship** — zero recurring cost architecture: local embedding (transformers.js), local vector store (LanceDB), no external APIs for retrieval. Every dollar is donor-trust money.
-- **Faithful stewardship** — RAG retrieval quality is the highest-leverage code in this phase; k=5 validated by POC benchmarking. Get the embedding and retrieval right.
-- **People first** — SSE stage events give honest, purposeful feedback; "Finding records..." and "Thinking..." respect user attention more than a static spinner.
-- **Clarity over complexity** — server-start indexing + manual reindex over file-system watchers; synthesis interface is minimal (one method). No premature abstraction.
-- **Continuous improvement** — synthesis interface enables future SDK swap without rework; RAG pipeline enables future dynamic-k, metadata filtering, and full-scan optimizations.
+- **People first** — split-screen layout and type-specific views respect Jaco's time; data is scannable at a glance, not buried behind AI queries
+- **Clarity over complexity** — tab-per-type mirrors the on-disk data structure; direct YAML file reading with no ORM; configurable data path via a single env var
+- **Faithful stewardship** — unit tests and E2E tests from day one; shared `MUSTARD_DATA_DIR` ensures browse API and RAG indexer always read from the same source
+- **Continuous improvement** — the CRUD panel architecture is designed to extend with write operations, detail drawer, and capture form in subsequent phases

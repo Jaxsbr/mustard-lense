@@ -136,3 +136,28 @@ test('lense input shows error on HTTP 400 validation', async ({ page }) => {
 
   await expect(page.locator('.lense-error')).toBeVisible({ timeout: 5000 })
 })
+
+test('split-screen layout shows panel and lense regions', async ({ page }) => {
+  await page.goto('/')
+
+  // Both regions are present
+  const panel = page.locator('[data-testid="crud-panel"]')
+  const lense = page.locator('[data-testid="lense-region"]')
+  await expect(panel).toBeVisible()
+  await expect(lense).toBeVisible()
+
+  // Toggle collapses the panel
+  const toggle = page.locator('[data-testid="panel-toggle"]')
+  await toggle.click()
+  await expect(panel).toHaveClass(/crud-panel--collapsed/)
+
+  // Toggle expands the panel
+  await toggle.click()
+  await expect(panel).not.toHaveClass(/crud-panel--collapsed/)
+
+  // Lense input remains functional after toggle
+  const input = page.locator('input[type="text"]')
+  await expect(input).toBeVisible()
+  await input.fill('test query')
+  await expect(input).toHaveValue('test query')
+})

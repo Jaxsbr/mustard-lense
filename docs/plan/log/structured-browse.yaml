@@ -92,3 +92,10 @@ entries:
     result: "pass"
     notes: "Concerns: 1) readRecords reads all then filters, 2) fetchAllCounts doubles API calls. Nit: ARCHITECTURE.md stale planned comments."
     tokens: ~
+  - task: 17
+    time: "2026-03-22T09:09:00Z"
+    story: "phase"
+    description: "[review] handle-pr-review pr=4 — triaged 3 findings: 1 fixed (counts caching), 1 fixed (architecture comments), 1 skipped (readRecords scalability). All quality checks pass."
+    result: "pass"
+    notes: "Fixed counts caching (fetchAllCounts only runs once). Updated stale ARCHITECTURE.md comments. 49 tests pass."
+    tokens: ~

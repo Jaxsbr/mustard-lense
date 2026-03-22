@@ -95,7 +95,7 @@ export function createApp(deps: AppDependencies) {
 
   app.post('/api/records', (req, res) => {
     try {
-      const { log_type, text, ...optionalFields } = req.body ?? {}
+      const { log_type, text, person, status, due_date_local, category, theme, period } = req.body ?? {}
 
       if (!validateLogType(log_type)) {
         res.status(400).json({ error: 'Missing or invalid log_type. Must be one of: todo, people_note, idea, daily_log.' })
@@ -106,7 +106,7 @@ export function createApp(deps: AppDependencies) {
         return
       }
 
-      const input: CreateRecordInput = { log_type, text, ...optionalFields }
+      const input: CreateRecordInput = { log_type, text, person, status, due_date_local, category, theme, period }
       const record = deps.createRecord(input)
       res.status(201).json(record)
 
@@ -131,7 +131,8 @@ export function createApp(deps: AppDependencies) {
         return
       }
 
-      const input: UpdateRecordInput = req.body ?? {}
+      const { text: bodyText, person, status, due_date_local, category, theme, period } = req.body ?? {}
+      const input: UpdateRecordInput = { text: bodyText, person, status, due_date_local, category, theme, period }
       if (input.text !== undefined && !validateText(input.text)) {
         res.status(400).json({ error: 'Text field must be a non-empty string within length limits.' })
         return

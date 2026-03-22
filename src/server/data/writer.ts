@@ -132,6 +132,7 @@ export function updateRecord(id: string, input: UpdateRecordInput, dataDir?: str
   }
 }
 
+// O(n) scan — acceptable at current scale. Natural upgrade: in-memory ID→filepath index populated at startup/reindex.
 function findRecordFile(id: string, dataDir: string): string | null {
   const files = findYamlFiles(dataDir)
   for (const filePath of files) {

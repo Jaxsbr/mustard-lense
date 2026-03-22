@@ -24,8 +24,8 @@ export function ListControls({ sort, onSortChange, limit, onLimitChange, totalRe
           onChange={(e) => onSortChange(e.target.value as SortOption)}
           data-testid="sort-select"
         >
-          <option value="newest">📅 Date desc</option>
-          <option value="oldest">📅 Date asc</option>
+          <option value="newest">⬇ Date desc</option>
+          <option value="oldest">⬆ Date asc</option>
         </select>
         {showStatusFilter && (
           <select

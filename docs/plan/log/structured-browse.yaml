@@ -74,7 +74,14 @@ entries:
   - task: 11
     time: "2026-03-22T09:28:00Z"
     story: "US-U4"
-    description: "Implement type-specific list views: TodoListItem, PeopleListItem, IdeaListItem, DailyLogListItem. Design tokens, E2E test with mocked API."
+    description: "Implement type-specific list views: TodoListItem, PeopleListItem, IdeaListItem, DailyLogListItem."
     result: "pass"
     notes: "49 tests. ✓ US-U4 complete"
+    tokens: ~
+  - task: 12
+    time: "2026-03-22T09:32:00Z"
+    story: "phase"
+    description: "Update AGENTS.md with all new modules. Phase completion gate: all 39 criteria met, verify passes, AGENTS.md consistent, error-path tests exist."
+    result: "pass"
+    notes: "Phase complete. 49 tests. 4 stories shipped. Evidence: all done-when criteria checked."
     tokens: ~

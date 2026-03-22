@@ -50,7 +50,7 @@ Introduce a structured browse panel alongside the existing lense, creating the u
 - [x] When a tab has zero records, a friendly empty-state message is displayed in the panel body (not a blank panel) [US-U4]
 - [x] List items render record text via React JSX expressions (textContent), not `dangerouslySetInnerHTML` [US-U4]
 - [x] Playwright E2E test verifies: at least one list item renders in a tab, list items contain expected field elements for that record type (mocked API response) [US-U4]
-- [ ] `AGENTS.md` reflects new browse API endpoint (`GET /api/records`), data reader module, CRUD panel components, split-screen layout, and `MUSTARD_DATA_DIR` configuration introduced in this phase [phase]
+- [x] `AGENTS.md` reflects new browse API endpoint (`GET /api/records`), data reader module, CRUD panel components, split-screen layout, and `MUSTARD_DATA_DIR` configuration introduced in this phase [phase]
 
 ### Golden principles (phase-relevant)
 - **People first** — split-screen layout and type-specific views respect Jaco's time; data is scannable at a glance, not buried behind AI queries

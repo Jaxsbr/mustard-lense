@@ -1,9 +1,27 @@
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import type { LenseResponse } from './shared/schema.js'
 import { ResultRenderer } from './components/ResultRenderer.js'
 import './App.css'
 
 type Stage = 'idle' | 'retrieving' | 'thinking'
+
+interface StageLogEntry {
+  label: string
+  detail: string
+}
+
+function ElapsedTimer() {
+  const startRef = useRef(Date.now())
+  const [elapsed, setElapsed] = useState(0)
+
+  useEffect(() => {
+    const id = setInterval(() => setElapsed(Date.now() - startRef.current), 100)
+    return () => clearInterval(id)
+  }, [])
+
+  const seconds = (elapsed / 1000).toFixed(1)
+  return <span className="lense-elapsed">{seconds}s</span>
+}
 
 function parseSSEEvents(text: string): Array<{ event: string; data: string }> {
   const events: Array<{ event: string; data: string }> = []
@@ -24,6 +42,7 @@ function parseSSEEvents(text: string): Array<{ event: string; data: string }> {
 function App() {
   const [intent, setIntent] = useState('')
   const [stage, setStage] = useState<Stage>('idle')
+  const [stageLog, setStageLog] = useState<StageLogEntry[]>([])
   const [results, setResults] = useState<LenseResponse | null>(null)
   const [error, setError] = useState<string | null>(null)
 
@@ -35,6 +54,7 @@ function App() {
     setIntent('')
     setResults(null)
     setError(null)
+    setStageLog([])
     setStage('retrieving')
 
     try {
@@ -70,6 +90,11 @@ function App() {
             if (evt.event === 'retrieving') {
               setStage('retrieving')
             } else if (evt.event === 'thinking') {
+              const info = JSON.parse(evt.data) as { retrieveMs?: number; recordCount?: number }
+              setStageLog(prev => [...prev, {
+                label: 'Retrieved',
+                detail: `${info.recordCount ?? '?'} records in ${info.retrieveMs ?? '?'}ms`,
+              }])
               setStage('thinking')
             } else if (evt.event === 'result') {
               const data: LenseResponse = JSON.parse(evt.data)
@@ -110,10 +135,16 @@ function App() {
 
       {loading && (
         <div className="lense-stage" aria-label="Processing stage">
+          {stageLog.map((entry, i) => (
+            <div key={i} className="lense-stage-done">
+              <span className="lense-stage-check">&#10003;</span>
+              <span>{entry.label} &mdash; {entry.detail}</span>
+            </div>
+          ))}
           <div className="lense-stage-indicator">
             <div className="lense-spinner" />
             <span className="lense-stage-text" key={stage}>
-              {stage === 'retrieving' ? 'Finding records...' : 'Thinking...'}
+              {stage === 'retrieving' ? 'Finding records...' : <>Thinking... <ElapsedTimer /></>}
             </span>
           </div>
         </div>

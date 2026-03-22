@@ -46,8 +46,8 @@ export function createApp(deps: AppDependencies) {
       const retrieveMs = Date.now() - startRetrieve
       console.log(`[lense] retrieval: ${retrieveMs}ms (${records.length} records)`)
 
-      // Stage: thinking
-      sendEvent('thinking', '{}')
+      // Stage: thinking — include retrieval stats so the client can show them
+      sendEvent('thinking', JSON.stringify({ retrieveMs, recordCount: records.length }))
       const startSynth = Date.now()
       const result = await deps.synthesiser.synthesise(intent, records)
       const synthMs = Date.now() - startSynth

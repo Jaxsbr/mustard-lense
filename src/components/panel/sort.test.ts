@@ -41,6 +41,26 @@ describe('sortRecords', () => {
     sortRecords(records, 'oldest')
     expect(records.map((r) => r.id)).toEqual(original.map((r) => r.id))
   })
+
+  it('sorts todos by due_date_local when present (newest)', () => {
+    const todos = [
+      makeRecord({ id: 'a', capture_date_local: '2026-03-01', due_date_local: '2026-04-01' }),
+      makeRecord({ id: 'b', capture_date_local: '2026-03-15', due_date_local: '2026-03-20' }),
+      makeRecord({ id: 'c', capture_date_local: '2026-03-10', due_date_local: null }),
+    ]
+    const sorted = sortRecords(todos, 'newest')
+    // a (due 04-01) > b (due 03-20) > c (capture 03-10, no due date)
+    expect(sorted.map((r) => r.id)).toEqual(['a', 'b', 'c'])
+  })
+
+  it('sorts todos by due_date_local when present (oldest)', () => {
+    const todos = [
+      makeRecord({ id: 'a', capture_date_local: '2026-03-01', due_date_local: '2026-04-01' }),
+      makeRecord({ id: 'b', capture_date_local: '2026-03-15', due_date_local: '2026-03-20' }),
+    ]
+    const sorted = sortRecords(todos, 'oldest')
+    expect(sorted.map((r) => r.id)).toEqual(['b', 'a'])
+  })
 })
 
 describe('filterByStatus', () => {

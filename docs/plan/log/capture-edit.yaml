@@ -4,49 +4,70 @@ entries:
   - task: 1
     time: "2026-03-22T09:55:00Z"
     story: "phase"
-    description: "Investigation — classify phase as server/schema/cross-cutting. 49 tests. Investigate-first mandate applies. US-U5 first (write API foundation)."
+    description: "Investigation — classify phase as server/schema/cross-cutting. 49 tests."
     result: "pass"
-    notes: "reader.ts has reusable getDataDir/resolveHome. app.ts uses DI. MustardRecord in shared/record.ts. Need log_type→dir mapping."
+    notes: "Investigate-first mandate. US-U5 first."
     tokens: ~
   - task: 2
     time: "2026-03-22T09:58:00Z"
     story: "US-U5"
-    description: "Investigate: write API approach — writer module, endpoints, validation, ID-to-filepath mapping via readRecords scan."
+    description: "Investigate: write API approach."
     result: "pass"
-    notes: "Plan: writer.ts (create/update), app.ts endpoints with allowlist validation, temp dir tests. Queue implement."
+    notes: "Queue implement."
     tokens: ~
   - task: 3
     time: "2026-03-22T10:03:00Z"
     story: "US-U5"
-    description: "Implement: data writer module + POST/PUT endpoints + 14 unit tests (63 total)."
+    description: "Implement: data writer + POST/PUT endpoints + 14 tests (63 total)."
     result: "pass"
-    notes: "writer.ts with YAML serialization, UUID gen, auto-metadata. app.ts with validation + background reindex. ✓ US-U5 complete"
+    notes: "✓ US-U5 complete"
     tokens: ~
   - task: 4
     time: "2026-03-22T10:05:00Z"
     story: "US-U6"
-    description: "Investigate: detail drawer — CrudPanel click handler, slide-over, type-specific forms, E2E."
+    description: "Investigate: detail drawer approach."
     result: "pass"
-    notes: "CrudPanel wraps records in div with key. Need DetailDrawer.tsx + CSS."
+    notes: "Queue implement."
     tokens: ~
   - task: 5
     time: "2026-03-22T10:08:00Z"
     story: "US-U6"
-    description: "Investigate: read CrudPanel, ListItems, types, CSS for wiring plan."
+    description: "Investigate: read existing panel components."
     result: "pass"
     notes: "Queue implement."
     tokens: ~
   - task: 6
     time: "2026-03-22T10:12:00Z"
     story: "US-U6"
-    description: "Implement: DetailDrawer + CSS + CrudPanel wiring + Add button. 63 tests."
+    description: "Implement: DetailDrawer + Add button + CrudPanel wiring."
     result: "pass"
-    notes: "DrawerForm inner component with key-based remount. Slide animation. Type-specific forms. Add button in header."
+    notes: "DrawerForm with key-based remount. Slide animation."
     tokens: ~
   - task: 7
     time: "2026-03-22T10:15:00Z"
     story: "US-U6"
-    description: "E2E tests for drawer + Add button + user guide docs/manual/editing.md."
+    description: "E2E tests + user guide docs/manual/editing.md."
     result: "pass"
-    notes: "3 E2E tests (drawer open/close, Add create mode, save disabled). ✓ US-U6 complete ✓ US-U7 complete"
+    notes: "3 E2E tests. ✓ US-U6 complete ✓ US-U7 complete"
+    tokens: ~
+  - task: 8
+    time: "2026-03-22T10:17:00Z"
+    story: "US-U8"
+    description: "Investigate: sort/limit controls."
+    result: "pass"
+    notes: "Queue implement."
+    tokens: ~
+  - task: 9
+    time: "2026-03-22T10:18:00Z"
+    story: "US-U8"
+    description: "Queue implement task."
+    result: "pass"
+    notes: "Queue implement."
+    tokens: ~
+  - task: 10
+    time: "2026-03-22T10:22:00Z"
+    story: "US-U8"
+    description: "Implement: ListControls, sort logic, localStorage, 5 sort tests, E2E, layout doc. 68 tests."
+    result: "pass"
+    notes: "✓ US-U8 complete"
     tokens: ~

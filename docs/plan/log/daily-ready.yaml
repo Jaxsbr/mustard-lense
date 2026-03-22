@@ -8,4 +8,10 @@ entries:
     result: "pass"
     notes: "CSS/JS-only phase. US-D1 first (token foundation). Queue investigate for US-D1."
     tokens: ~
-# Each entry: {task, time, story, description, result, notes, tokens}
+  - task: 2
+    time: "2026-03-23T00:00:00Z"
+    story: "US-D1"
+    description: "Investigate: reviewed original mustard palette, mapped all hardcoded colors in App.css (16 instances), confirmed panel CSS already uses tokens."
+    result: "pass"
+    notes: "Only tokens.css and App.css need changes. Queue implement."
+    tokens: ~

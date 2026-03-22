@@ -7,7 +7,7 @@ config:
   quality_check_suppressions: []
 
 state:
-  task_number: 16
+  task_number: 17
   phase: structured-browse
   phase_complete: true
   review_stage: review_posted
@@ -16,6 +16,6 @@ state:
   pr_number: 4
   status: running
   last_result: pass
-  next_task: null
+  next_task: "[review] handle-pr-review pr=4 auto=true"
   consecutive_fails: 0
   completed_stories: [US-U1, US-U2, US-U3, US-U4]

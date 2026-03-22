@@ -93,6 +93,9 @@ src/
 │   ├── IdeaList.tsx           # idea-list component renderer
 │   ├── Summary.tsx            # summary component renderer
 │   ├── FallbackComponent.tsx  # Fallback for unknown component types
+│   ├── panel/                 # CRUD panel and data reader
+│   │   ├── CrudPanel.tsx      # Collapsible panel container with type tabs and list views
+│   │   └── ...                # Type-specific list view components
 │   ├── components.css         # Shared component styles
 │   └── tokens.css             # Design tokens (CSS variables)
 ├── shared/
@@ -103,6 +106,8 @@ src/
 │   ├── prompt.ts              # Synthesis prompt construction (injects records inline)
 │   ├── synthesiser.ts         # Synthesiser interface + CliSynthesiser (planned for rag-lense)
 │   ├── server.test.ts         # API endpoint unit tests (mocked retriever + synthesiser)
+│   ├── data/                  # CRUD panel and data reader
+│   │   └── reader.ts          # Reads YAML records from configurable data directory
 │   └── rag/                   # (planned for rag-lense phase)
 │       ├── embedder.ts        # Embedding wrapper — transformers.js, all-MiniLM-L6-v2
 │       ├── indexer.ts         # Reads YAML, generates embeddings, writes to LanceDB
@@ -166,6 +171,14 @@ Claude returns a JSON object with a `components` array. Each component has:
 
 The shared schema module (`src/shared/schema.ts`) defines TypeScript interfaces for each component type, used by both server validation and frontend rendering.
 
+### Browse API data flow CRUD panel and data reader
+
+1. Frontend CRUD panel sends `GET /api/records?type=<log_type>` to the API server
+2. Data reader module reads all YAML files from `MUSTARD_DATA_DIR` (defaults to `~/dev/mustard/data/`)
+3. Records are parsed, filtered by `log_type` if specified, sorted by `capture_date_local` descending
+4. JSON array of records returned to the frontend
+5. CRUD panel renders records in type-specific list views within the active tab
+
 ### Future (data write phase)
 
 The lense currently supports read-only queries. Future phases will add write operations (capture, edit, lifecycle management) through the same intent model, using admin CLI mode where needed.
@@ -182,7 +195,7 @@ The lense currently supports read-only queries. Future phases will add write ope
 | System | Purpose | Required |
 |--------|---------|----------|
 | Claude Code CLI (`claude`) | AI synthesis engine (receives pre-retrieved records, returns structured JSON) | Yes (smoke tests require it; unit tests mock synthesiser) |
-| Mustard data store (`~/dev/mustard/data/`) | Record storage (YAML files) | Yes for indexing (read by RAG indexer at startup + reindex); unit tests use fixture data |
+| Mustard data store (`MUSTARD_DATA_DIR`, defaults to `~/dev/mustard/data/`) | Record storage (YAML files) | Yes for indexing and browse API; configurable via `MUSTARD_DATA_DIR` env var; unit tests use fixture data |
 | Express | API server for lense endpoint (SSE) and reindex endpoint | Yes |
 | Playwright | E2E browser testing for lense UI | Yes |
 | transformers.js (`all-MiniLM-L6-v2`) | Local embedding model for RAG pipeline (planned for rag-lense) | Yes — runs in-process, no external API |

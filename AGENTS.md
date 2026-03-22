@@ -1,38 +1,46 @@
-# Mustard Lense
+# Mustard
 
 ## Purpose
-Claude Code integrated interface for the mustard data store, enabling natural conversation for managing and viewing mustard data. Experiments with dynamic UI generation — serving contextual UI based on data and actionable requests. Supports favourite/reusable UI elements that grow the app based on user usage patterns.
+Claude Code integrated interface for the mustard data store, enabling natural conversation for managing and viewing mustard data. Split-screen app: collapsible CRUD panel on the left for structured browse, AI-powered lense on the right for natural language queries. Experiments with dynamic UI generation — serving contextual UI based on data and actionable requests.
 
 ## Directory layout
 
 ```
 mustard-lense/
 ├── src/
-│   ├── App.tsx              # Lense page — input, SSE stage loading, result rendering
-│   ├── App.css              # Lense page styles with stage and result animations
+│   ├── App.tsx              # Split-screen layout — CRUD panel (left) + lense (right)
+│   ├── App.css              # Layout, lense stage, and result animation styles
 │   ├── index.css            # Global reset
 │   ├── main.tsx             # React entry point
 │   ├── components/
 │   │   ├── ResultRenderer.tsx    # Component registry — maps type string to renderer
-│   │   ├── TodoList.tsx          # todo-list component renderer
+│   │   ├── TodoList.tsx          # todo-list component renderer (lense results)
 │   │   ├── LogTimeline.tsx       # log-timeline component renderer
 │   │   ├── PersonNotes.tsx       # person-notes component renderer
 │   │   ├── IdeaList.tsx          # idea-list component renderer
 │   │   ├── Summary.tsx           # summary component renderer
 │   │   ├── FallbackComponent.tsx # Fallback for unknown component types
 │   │   ├── components.css        # Shared component styles
-│   │   └── tokens.css            # Design tokens (CSS variables)
+│   │   ├── tokens.css            # Design tokens (CSS variables)
+│   │   └── panel/
+│   │       ├── CrudPanel.tsx     # Collapsible panel with type tabs and list views
+│   │       ├── CrudPanel.css     # Panel, tab, and list styles
+│   │       ├── CrudPanel.test.tsx # Unit tests for panel tabs and rendering
+│   │       ├── ListItems.tsx     # Type-specific list item components
+│   │       └── ListItems.css     # List item styles using design tokens
 │   ├── shared/
 │   │   └── schema.ts        # Response schema — TypeScript interfaces for component types
 │   ├── server/
-│   │   ├── app.ts            # Express app with POST /api/lense (SSE) and POST /api/reindex
-│   │   ├── index.ts          # Server entry point — builds index on startup, then listens on port 3001
+│   │   ├── app.ts            # Express app: POST /api/lense (SSE), POST /api/reindex, GET /api/records
+│   │   ├── index.ts          # Server entry point — builds index on startup, wires deps, listens on 3001
 │   │   ├── synthesiser.ts    # Synthesiser interface + CliSynthesiser (wraps invokeClaude)
 │   │   ├── synthesiser.test.ts # Unit tests for CliSynthesiser (mocked invokeClaude)
-│   │   ├── server.test.ts    # API endpoint unit tests (mocked retriever + synthesiser)
+│   │   ├── server.test.ts    # API endpoint unit tests (mocked deps)
+│   │   ├── data/
+│   │   │   └── reader.ts     # Reads YAML records from configurable data directory (MUSTARD_DATA_DIR)
 │   │   └── rag/
 │   │       ├── embedder.ts   # Embedding wrapper — transformers.js, Xenova/all-MiniLM-L6-v2
-│   │       ├── indexer.ts    # Reads YAML, generates embeddings, writes to LanceDB
+│   │       ├── indexer.ts    # Imports from data/reader, generates embeddings, writes to LanceDB
 │   │       ├── retriever.ts  # Embeds query, similarity search, returns top-k records
 │   │       └── rag.test.ts   # Unit tests for indexer + retriever (fixture data, mocked embedder)
 │   ├── lib/
@@ -43,12 +51,14 @@ mustard-lense/
 │       ├── admin.ts          # On-demand smoke test — admin mode
 │       └── lense.ts          # On-demand smoke test — lense E2E (reads SSE stream)
 ├── e2e/
-│   └── lense.spec.ts        # Playwright E2E tests (mocked SSE endpoint)
+│   └── lense.spec.ts        # Playwright E2E tests (mocked SSE endpoint + mocked records API)
 ├── docs/
 │   ├── architecture/ARCHITECTURE.md
 │   ├── briefs/              # Phase briefs from spec-author
+│   ├── manual/layout.md     # User guide — split-screen layout, tabs, list views
 │   ├── plan/                # Build loop state
 │   └── product/             # PRD and specs
+├── .env.example             # Documents MUSTARD_DATA_DIR env var
 ├── index.html               # SPA shell with viewport meta
 ├── vite.config.ts           # Dev server port 5234, Vite proxy /api -> 3001
 ├── playwright.config.ts     # Playwright E2E config
@@ -66,20 +76,38 @@ mustard-lense/
 | `src/lib/claude-cli.ts` | CLI module | Exports `invokeClaude`, `ClaudeResult`, `ClaudeMode` |
 | `src/lib/claude-cli.test.ts` | Tests | Mocked unit tests — no real CLI invoked |
 | `src/shared/schema.ts` | Schema | Response schema — 5 component types, shared by server and frontend |
-| `src/server/app.ts` | API server | Express app with POST /api/lense (SSE) and POST /api/reindex. Uses dependency injection (createApp). |
-| `src/server/index.ts` | Entry point | Builds vector index on startup, wires real dependencies, starts server |
+| `src/server/app.ts` | API server | Express app: POST /api/lense (SSE), POST /api/reindex, GET /api/records. Uses dependency injection (createApp). |
+| `src/server/index.ts` | Entry point | Builds vector index on startup, wires real dependencies (including readRecords), starts server |
+| `src/server/data/reader.ts` | Data reader | Reads YAML records from `MUSTARD_DATA_DIR` (default `~/dev/mustard/data/`). Exports `readRecords`, `getDataDir`, `MustardRecord` interface. Shared by browse API and RAG indexer. |
 | `src/server/synthesiser.ts` | Synthesis | Synthesiser interface + CliSynthesiser — wraps invokeClaude with inline records |
 | `src/server/synthesiser.test.ts` | Tests | CliSynthesiser tests — mocked invokeClaude, success + error paths |
 | `src/server/rag/embedder.ts` | RAG | Singleton embedding pipeline — transformers.js, Xenova/all-MiniLM-L6-v2, 384d vectors |
-| `src/server/rag/indexer.ts` | RAG | Reads YAML from configurable path, embeds text, writes to LanceDB with metadata |
+| `src/server/rag/indexer.ts` | RAG | Imports readRecords from data/reader, embeds text, writes to LanceDB with metadata |
 | `src/server/rag/retriever.ts` | RAG | Embeds query, performs LanceDB vector search, returns top-k records (default k=5) |
 | `src/server/rag/rag.test.ts` | Tests | Indexer + retriever tests with fixture YAML data, mocked embedder + LanceDB |
-| `src/server/server.test.ts` | Tests | API endpoint tests with mocked retriever + synthesiser — verifies SSE event sequence |
+| `src/server/server.test.ts` | Tests | API endpoint tests with mocked deps — verifies SSE events, browse endpoint, reindex |
 | `src/components/ResultRenderer.tsx` | Registry | Maps component type string to React renderer |
 | `src/components/*.tsx` | Renderers | Template components for each mustard data type |
-| `src/App.tsx` | UI | Lense page — input, SSE stage indicators ("Finding records...", "Thinking..."), animated results |
+| `src/components/panel/CrudPanel.tsx` | CRUD panel | Collapsible panel with type tabs (Todos, People, Ideas, Daily Logs), fetches records, count badges |
+| `src/components/panel/CrudPanel.test.tsx` | Tests | Unit tests for tab rendering, active state, fetch, loading, empty state |
+| `src/components/panel/ListItems.tsx` | List views | Type-specific list item components: TodoListItem, PeopleListItem, IdeaListItem, DailyLogListItem |
+| `src/App.tsx` | UI | Split-screen layout — CRUD panel (left, collapsible ~40%), lense (right, always visible). Responsive at 768px. |
 | `src/smoke/*.ts` | Smoke tests | On-demand, invoke real CLI/API — NOT run by `npm test` |
-| `e2e/*.spec.ts` | E2E tests | Playwright tests with mocked SSE endpoint — NOT run by `npm test` |
+| `e2e/*.spec.ts` | E2E tests | Playwright tests with mocked SSE + records API — NOT run by `npm test` |
+
+## App layout
+
+- **Split-screen** — CRUD panel on left (~40% width), lense on right (fills remaining). Flex layout.
+- **Panel toggle** — collapses/expands the CRUD panel. Auto-collapses at viewports below 768px.
+- **Title** — "Mustard" (not "Mustard Lense").
+
+## CRUD panel
+
+- **Type tabs** — Todos, People, Ideas, Daily Logs. Each tab fetches `GET /api/records?type=<log_type>`.
+- **Active tab** — distinguished via `aria-selected` attribute and `.crud-panel-tab--active` CSS class.
+- **Count badges** — each tab shows a record count.
+- **Type-specific list views** — TodoListItem (status + text + due date), PeopleListItem (person bold + text + date), IdeaListItem (status + text), DailyLogListItem (date + theme + text).
+- **Empty state** — "No records found." when a tab has zero records.
 
 ## Lense interaction model
 
@@ -89,11 +117,16 @@ mustard-lense/
 - **Template rendering** — Claude returns structured JSON, frontend renders pre-built components (not raw text).
 - **Basic mode only** — the lense reads data, doesn't modify it. No admin permissions needed.
 
+## Data configuration
+
+- **`MUSTARD_DATA_DIR`** — env var for the mustard data directory path. Defaults to `~/dev/mustard/data/`. Used by both the browse API (`GET /api/records`) and the RAG indexer.
+- **`.env.example`** — documents the env var with description and default value.
+
 ## RAG pipeline
 
 - **Embedding** — transformers.js with `Xenova/all-MiniLM-L6-v2` (384d vectors). Local, in-process, zero external API calls.
 - **Vector store** — LanceDB (embedded, no server process). Table created/overwritten on each index run.
-- **Indexing** — reads YAML files from `~/dev/mustard/data/`, embeds `text` field, stores metadata columns (id, log_type, capture_date_local, person, status, due_date_local, category, theme, period, tags). Triggered on server start + POST /api/reindex.
+- **Indexing** — imports `readRecords` from `data/reader.ts`, embeds `text` field, stores metadata columns. Triggered on server start + POST /api/reindex.
 - **Retrieval** — embeds query string, similarity search, returns top-k records (default k=5).
 - **Synthesis** — CliSynthesiser wraps invokeClaude in basic mode. Records injected inline in `<record>` delimiters, intent in `<user-intent>` delimiters. No file access — LLM receives data, not filesystem.
 
@@ -112,8 +145,8 @@ Defined in `src/shared/schema.ts`, used by both server and frontend.
 
 ## Testing
 
-- `npm test` — Vitest unit tests (37 tests: 8 CLI + 11 server + 9 synthesiser + 7 RAG + 2 reserved) with mocked dependencies
-- `npm run test:e2e` — Playwright E2E tests with mocked SSE endpoint
+- `npm test` — Vitest unit tests (49 tests: 8 CLI + 16 server + 9 synthesiser + 7 RAG + 7 panel + 2 reserved) with mocked dependencies
+- `npm run test:e2e` — Playwright E2E tests with mocked SSE endpoint and mocked records API
 - `npm run smoke:basic` / `npm run smoke:admin` — real CLI invocation
 - `npm run smoke:lense` — real E2E through API + RAG + Claude + data store (reads SSE stream)
 - Smoke tests are excluded from Vitest (in `src/smoke/`, not `*.test.ts`)

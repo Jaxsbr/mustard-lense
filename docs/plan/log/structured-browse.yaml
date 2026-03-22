@@ -1,0 +1,101 @@
+phase: "structured-browse"
+started: "2026-03-22T08:46:54Z"
+entries:
+  - task: 1
+    time: "2026-03-22T08:50:00Z"
+    story: "phase"
+    description: "Investigation — classify phase, fix pre-existing lint. US-U1 foundation."
+    result: "pass"
+    notes: "Server/schema/cross-cutting. 37 tests. Investigate-first mandate."
+    tokens: ~
+  - task: 2
+    time: "2026-03-22T08:53:00Z"
+    story: "US-U1"
+    description: "Investigate: data reader approach"
+    result: "pass"
+    notes: "Extract from indexer. Queue implement."
+    tokens: ~
+  - task: 3
+    time: "2026-03-22T08:57:00Z"
+    story: "US-U1"
+    description: "Implement data reader, browse API, MUSTARD_DATA_DIR, .env.example, 5 tests."
+    result: "pass"
+    notes: "42 tests. ✓ US-U1 complete"
+    tokens: ~
+  - task: 4
+    time: "2026-03-22T09:00:00Z"
+    story: "US-U2"
+    description: "Investigate: split-screen layout approach."
+    result: "pass"
+    notes: "10 criteria."
+    tokens: ~
+  - task: 5
+    time: "2026-03-22T09:04:00Z"
+    story: "US-U2"
+    description: "Investigate: App.tsx structure."
+    result: "pass"
+    notes: "Queue implement."
+    tokens: ~
+  - task: 6
+    time: "2026-03-22T09:10:00Z"
+    story: "US-U2"
+    description: "Implement split-screen layout, toggle, responsive, E2E, docs."
+    result: "pass"
+    notes: "42 tests. ✓ US-U2 complete"
+    tokens: ~
+  - task: 7
+    time: "2026-03-22T09:13:00Z"
+    story: "US-U3"
+    description: "Investigate: type tabs approach."
+    result: "pass"
+    notes: "Queue implement."
+    tokens: ~
+  - task: 8
+    time: "2026-03-22T09:15:00Z"
+    story: "US-U3"
+    description: "Investigate: CrudPanel tab extension plan."
+    result: "pass"
+    notes: "Queue implement."
+    tokens: ~
+  - task: 9
+    time: "2026-03-22T09:20:00Z"
+    story: "US-U3"
+    description: "Implement type tabs: 4 tabs with fetch, count badges, loading, active state, 7 unit tests."
+    result: "pass"
+    notes: "49 tests. ✓ US-U3 complete"
+    tokens: ~
+  - task: 10
+    time: "2026-03-22T09:23:00Z"
+    story: "US-U4"
+    description: "Investigate: type-specific list views."
+    result: "pass"
+    notes: "8 criteria. Queue implement."
+    tokens: ~
+  - task: 11
+    time: "2026-03-22T09:28:00Z"
+    story: "US-U4"
+    description: "Implement type-specific list views."
+    result: "pass"
+    notes: "49 tests. ✓ US-U4 complete"
+    tokens: ~
+  - task: 12
+    time: "2026-03-22T09:32:00Z"
+    story: "phase"
+    description: "AGENTS.md update + phase completion gate."
+    result: "pass"
+    notes: "Phase complete. 49 tests. 4 stories shipped."
+    tokens: ~
+  - task: 15
+    time: "2026-03-22T09:07:00Z"
+    story: "phase"
+    description: "[review] review-pr pr=4 — posted COMMENT review with 0 critical, 2 concerns, 1 nit."
+    result: "pass"
+    notes: "Concerns: 1) readRecords reads all then filters, 2) fetchAllCounts doubles API calls. Nit: ARCHITECTURE.md stale planned comments."
+    tokens: ~
+  - task: 17
+    time: "2026-03-22T09:09:00Z"
+    story: "phase"
+    description: "[review] handle-pr-review pr=4 — triaged 3 findings: 1 fixed (counts caching), 1 fixed (architecture comments), 1 skipped (readRecords scalability). All quality checks pass."
+    result: "pass"
+    notes: "Fixed counts caching (fetchAllCounts only runs once). Updated stale ARCHITECTURE.md comments. 49 tests pass."
+    tokens: ~

@@ -2,6 +2,7 @@ import express from 'express'
 import type { RetrievedRecord } from './rag/retriever.js'
 import type { Synthesiser } from './synthesiser.js'
 import type { IndexResult } from './rag/indexer.js'
+import type { MustardRecord } from './data/reader.js'
 
 const MAX_INTENT_LENGTH = 2000
 
@@ -9,6 +10,7 @@ export interface AppDependencies {
   retrieve: (query: string, k?: number) => Promise<RetrievedRecord[]>
   synthesiser: Synthesiser
   buildIndex: (dataPath?: string) => Promise<IndexResult>
+  readRecords: (dataDir?: string) => MustardRecord[]
 }
 
 export function createApp(deps: AppDependencies) {
@@ -72,6 +74,19 @@ export function createApp(deps: AppDependencies) {
       const message = err instanceof Error ? err.message : 'Unknown error'
       console.error('[reindex] error:', message)
       res.status(500).json({ error: 'Reindex failed.' })
+    }
+  })
+
+  app.get('/api/records', (req, res) => {
+    try {
+      const typeFilter = typeof req.query.type === 'string' ? req.query.type : undefined
+      const records = deps.readRecords()
+      const filtered = typeFilter ? records.filter((r) => r.log_type === typeFilter) : records
+      res.json(filtered)
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Unknown error'
+      console.error('[records] error:', message)
+      res.status(500).json({ error: 'Failed to read records.' })
     }
   })
 

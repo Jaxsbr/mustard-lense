@@ -7,15 +7,15 @@ config:
   quality_check_suppressions: []
 
 state:
-  task_number: 19
-  phase: rag-lense
+  task_number: 18
+  phase: structured-browse
   phase_complete: true
   review_stage: review_posted
   review_complete: true
   retro_complete: true
-  pr_number: 3
+  pr_number: 4
   status: running
   last_result: pass
   next_task: null
   consecutive_fails: 0
-  completed_stories: [US-L10, US-L11, US-L12, US-L13]
+  completed_stories: [US-U1, US-U2, US-U3, US-U4]

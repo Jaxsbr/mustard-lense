@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import type { LenseResponse } from './shared/schema.js'
 import { ResultRenderer } from './components/ResultRenderer.js'
+import { CrudPanel } from './components/panel/CrudPanel.js'
 import './App.css'
 
 type Stage = 'idle' | 'retrieving' | 'thinking'
@@ -10,11 +11,27 @@ interface StageLogEntry {
   detail: string
 }
 
+function useMediaQuery(query: string): boolean {
+  const [matches, setMatches] = useState(() =>
+    typeof window !== 'undefined' ? window.matchMedia(query).matches : false,
+  )
+
+  useEffect(() => {
+    const mql = window.matchMedia(query)
+    const handler = (e: MediaQueryListEvent) => setMatches(e.matches)
+    mql.addEventListener('change', handler)
+    return () => mql.removeEventListener('change', handler)
+  }, [query])
+
+  return matches
+}
+
 function ElapsedTimer() {
-  const startRef = useRef(Date.now())
+  const startRef = useRef(0)
   const [elapsed, setElapsed] = useState(0)
 
   useEffect(() => {
+    startRef.current = Date.now()
     const id = setInterval(() => setElapsed(Date.now() - startRef.current), 100)
     return () => clearInterval(id)
   }, [])
@@ -40,11 +57,17 @@ function parseSSEEvents(text: string): Array<{ event: string; data: string }> {
 }
 
 function App() {
+  const isNarrow = useMediaQuery('(max-width: 767px)')
+  const [panelCollapsed, setPanelCollapsed] = useState(isNarrow)
   const [intent, setIntent] = useState('')
   const [stage, setStage] = useState<Stage>('idle')
   const [stageLog, setStageLog] = useState<StageLogEntry[]>([])
   const [results, setResults] = useState<LenseResponse | null>(null)
   const [error, setError] = useState<string | null>(null)
+
+  useEffect(() => {
+    setPanelCollapsed(isNarrow)
+  }, [isNarrow])
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
@@ -118,67 +141,70 @@ function App() {
   const showEmptyState = !loading && !results && !error
 
   return (
-    <main>
-      <h1>Mustard Lense</h1>
+    <div className="app-layout">
+      <CrudPanel collapsed={panelCollapsed} onToggle={() => setPanelCollapsed((c) => !c)} />
+      <main className="lense-main" data-testid="lense-region">
+        <h1>Mustard</h1>
 
-      <form className="lense-form" onSubmit={handleSubmit}>
-        <input
-          type="text"
-          className={`lense-input${loading ? ' lense-input--loading' : ''}`}
-          placeholder="What would you like to see?"
-          value={intent}
-          onChange={(e) => setIntent(e.target.value)}
-          disabled={loading}
-          aria-label="Lense intent input"
-        />
-      </form>
+        <form className="lense-form" onSubmit={handleSubmit}>
+          <input
+            type="text"
+            className={`lense-input${loading ? ' lense-input--loading' : ''}`}
+            placeholder="What would you like to see?"
+            value={intent}
+            onChange={(e) => setIntent(e.target.value)}
+            disabled={loading}
+            aria-label="Lense intent input"
+          />
+        </form>
 
-      {loading && (
-        <div className="lense-stage" aria-label="Processing stage">
-          {stageLog.map((entry, i) => (
-            <div key={i} className="lense-stage-done">
-              <span className="lense-stage-check">&#10003;</span>
-              <span>{entry.label} &mdash; {entry.detail}</span>
+        {loading && (
+          <div className="lense-stage" aria-label="Processing stage">
+            {stageLog.map((entry, i) => (
+              <div key={i} className="lense-stage-done">
+                <span className="lense-stage-check">&#10003;</span>
+                <span>{entry.label} &mdash; {entry.detail}</span>
+              </div>
+            ))}
+            <div className="lense-stage-indicator">
+              <div className="lense-spinner" />
+              <span className="lense-stage-text" key={stage}>
+                {stage === 'retrieving' ? 'Finding records...' : <>Thinking... <ElapsedTimer /></>}
+              </span>
             </div>
-          ))}
-          <div className="lense-stage-indicator">
-            <div className="lense-spinner" />
-            <span className="lense-stage-text" key={stage}>
-              {stage === 'retrieving' ? 'Finding records...' : <>Thinking... <ElapsedTimer /></>}
-            </span>
           </div>
-        </div>
-      )}
+        )}
 
-      {error && (
-        <div className="lense-error" role="alert">
-          {error}
-        </div>
-      )}
+        {error && (
+          <div className="lense-error" role="alert">
+            {error}
+          </div>
+        )}
 
-      {results && (
-        <div className="lense-results">
-          {results.components.map((component, i) => (
-            <div key={i} className="lense-result-item">
-              <ResultRenderer component={component} />
-            </div>
-          ))}
-        </div>
-      )}
+        {results && (
+          <div className="lense-results">
+            {results.components.map((component, i) => (
+              <div key={i} className="lense-result-item">
+                <ResultRenderer component={component} />
+              </div>
+            ))}
+          </div>
+        )}
 
-      {showEmptyState && (
-        <blockquote>
-          <p>
-            He told them another parable: &ldquo;The kingdom of heaven is like a mustard
-            seed, which a man took and planted in his field. Though it is the
-            smallest of all seeds, yet when it grows, it is the largest of garden
-            plants and becomes a tree, so that the birds come and perch in its
-            branches.&rdquo;
-          </p>
-          <footer>&mdash; Matthew 13:31&ndash;32</footer>
-        </blockquote>
-      )}
-    </main>
+        {showEmptyState && (
+          <blockquote>
+            <p>
+              He told them another parable: &ldquo;The kingdom of heaven is like a mustard
+              seed, which a man took and planted in his field. Though it is the
+              smallest of all seeds, yet when it grows, it is the largest of garden
+              plants and becomes a tree, so that the birds come and perch in its
+              branches.&rdquo;
+            </p>
+            <footer>&mdash; Matthew 13:31&ndash;32</footer>
+          </blockquote>
+        )}
+      </main>
+    </div>
   )
 }
 

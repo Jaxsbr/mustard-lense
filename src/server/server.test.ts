@@ -23,12 +23,21 @@ const mockResponse: LenseResponse = {
   components: [{ type: 'summary', data: { title: 'Overview', text: 'All clear.' } }],
 }
 
+const fixtureRecords = [
+  { id: 'todo-1', log_type: 'todo', capture_date_local: '2026-03-15', text: 'Buy groceries', person: null, status: 'open', due_date_local: '2026-03-16', category: null, theme: null, period: null, tags: ['personal'] },
+  { id: 'todo-2', log_type: 'todo', capture_date_local: '2026-03-14', text: 'Review PR', person: null, status: 'done', due_date_local: '2026-03-14', category: null, theme: null, period: null, tags: ['work'] },
+  { id: 'note-1', log_type: 'people_note', capture_date_local: '2026-03-14', text: 'Alice working on design system', person: 'alice', status: null, due_date_local: null, category: null, theme: null, period: null, tags: ['design'] },
+  { id: 'log-1', log_type: 'daily_log', capture_date_local: '2026-03-15', text: 'Productive day', person: null, status: null, due_date_local: null, category: null, theme: 'engineering', period: null, tags: ['dev'] },
+]
+
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 let mockRetrieve: any
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 let mockSynthesise: any
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 let mockBuildIndex: any
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+let mockReadRecords: any
 let deps: AppDependencies
 
 beforeEach(() => {
@@ -37,7 +46,8 @@ beforeEach(() => {
   ])
   mockSynthesise = vi.fn().mockResolvedValue(mockResponse)
   mockBuildIndex = vi.fn().mockResolvedValue({ records: 10 })
-  deps = { retrieve: mockRetrieve, synthesiser: { synthesise: mockSynthesise }, buildIndex: mockBuildIndex }
+  mockReadRecords = vi.fn().mockReturnValue(fixtureRecords)
+  deps = { retrieve: mockRetrieve, synthesiser: { synthesise: mockSynthesise }, buildIndex: mockBuildIndex, readRecords: mockReadRecords }
 })
 
 describe('POST /api/lense', () => {
@@ -190,5 +200,69 @@ describe('POST /api/reindex', () => {
     expect(res.body).toHaveProperty('error')
     expect(res.body.error).not.toContain('LanceDB')
     expect(res.body.error).not.toContain('disk full')
+  })
+})
+
+describe('GET /api/records', () => {
+  it('returns all records as JSON array', async () => {
+    const app = createApp(deps)
+    const res = await request(app)
+      .get('/api/records')
+      .expect(200)
+      .expect('Content-Type', /json/)
+
+    expect(Array.isArray(res.body)).toBe(true)
+    expect(res.body).toHaveLength(4)
+  })
+
+  it('filters records by type query parameter', async () => {
+    const app = createApp(deps)
+    const res = await request(app)
+      .get('/api/records?type=todo')
+      .expect(200)
+
+    expect(res.body).toHaveLength(2)
+    expect(res.body.every((r: { log_type: string }) => r.log_type === 'todo')).toBe(true)
+  })
+
+  it('returns empty array for nonexistent type', async () => {
+    const app = createApp(deps)
+    const res = await request(app)
+      .get('/api/records?type=nonexistent_type')
+      .expect(200)
+
+    expect(res.body).toEqual([])
+  })
+
+  it('returns records with all expected fields', async () => {
+    const app = createApp(deps)
+    const res = await request(app)
+      .get('/api/records')
+      .expect(200)
+
+    const record = res.body[0]
+    expect(record).toHaveProperty('id')
+    expect(record).toHaveProperty('log_type')
+    expect(record).toHaveProperty('capture_date_local')
+    expect(record).toHaveProperty('text')
+    expect(record).toHaveProperty('person')
+    expect(record).toHaveProperty('status')
+    expect(record).toHaveProperty('due_date_local')
+    expect(record).toHaveProperty('category')
+    expect(record).toHaveProperty('theme')
+    expect(record).toHaveProperty('period')
+    expect(record).toHaveProperty('tags')
+  })
+
+  it('returns 500 with structured error when reader throws', async () => {
+    mockReadRecords.mockImplementation(() => { throw new Error('ENOENT: disk error') })
+    const app = createApp(deps)
+    const res = await request(app)
+      .get('/api/records')
+      .expect(500)
+      .expect('Content-Type', /json/)
+
+    expect(res.body).toHaveProperty('error')
+    expect(res.body.error).not.toContain('ENOENT')
   })
 })

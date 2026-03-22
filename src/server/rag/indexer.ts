@@ -1,81 +1,24 @@
-import * as fs from 'node:fs'
-import * as path from 'node:path'
-import { parse as parseYaml } from 'yaml'
 import * as lancedb from '@lancedb/lancedb'
+import * as path from 'node:path'
 import { embed, EMBEDDING_DIM } from './embedder.js'
+import { readRecords, getDataDir } from '../data/reader.js'
+import type { MustardRecord } from '../data/reader.js'
 
-const DEFAULT_DATA_PATH = '~/dev/mustard/data'
 const DB_PATH = path.join('node_modules', '.cache', 'lancedb')
 const TABLE_NAME = 'mustard_records'
-
-export interface MustardRecord {
-  id: string
-  log_type: string
-  capture_date_local: string
-  text: string
-  person: string | null
-  status: string | null
-  due_date_local: string | null
-  category: string | null
-  theme: string | null
-  period: string | null
-  tags: string
-}
 
 export interface IndexResult {
   records: number
 }
 
-function resolveHome(p: string): string {
-  return p.startsWith('~/') ? path.join(process.env.HOME ?? '', p.slice(2)) : p
-}
+export async function buildIndex(dataPath?: string): Promise<IndexResult> {
+  const dir = dataPath ?? getDataDir()
+  const records = readRecords(dir)
+  console.log(`[indexer] Found ${records.length} valid records in ${dir}`)
 
-function findYamlFiles(dir: string): string[] {
-  const files: string[] = []
-  if (!fs.existsSync(dir)) return files
-  for (const entry of fs.readdirSync(dir, { recursive: true, withFileTypes: true })) {
-    if (entry.isFile() && entry.name.endsWith('.yaml')) {
-      files.push(path.join(entry.parentPath ?? (entry as { path?: string }).path ?? dir, entry.name))
-    }
-  }
-  return files
-}
-
-function parseRecord(filePath: string): MustardRecord | null {
-  try {
-    const content = fs.readFileSync(filePath, 'utf-8')
-    const doc = parseYaml(content)
-    if (!doc || typeof doc.text !== 'string' || !doc.id) return null
-    return {
-      id: String(doc.id),
-      log_type: String(doc.log_type ?? ''),
-      capture_date_local: String(doc.capture_date_local ?? ''),
-      text: doc.text,
-      person: doc.person ?? null,
-      status: doc.status ?? null,
-      due_date_local: doc.due_date_local ?? null,
-      category: doc.category ?? null,
-      theme: doc.theme ?? null,
-      period: doc.period ?? null,
-      tags: Array.isArray(doc.meta?.tags) ? doc.meta.tags.join(', ') : '',
-    }
-  } catch {
-    console.warn(`Failed to parse YAML: ${filePath}`)
-    return null
-  }
-}
-
-export async function buildIndex(dataPath: string = DEFAULT_DATA_PATH): Promise<IndexResult> {
-  const resolved = resolveHome(dataPath)
-  const files = findYamlFiles(resolved)
-  console.log(`[indexer] Found ${files.length} YAML files in ${resolved}`)
-
-  if (files.length === 0) {
+  if (records.length === 0) {
     return { records: 0 }
   }
-
-  const records = files.map(parseRecord).filter((r): r is MustardRecord => r !== null)
-  console.log(`[indexer] Parsed ${records.length} valid records`)
 
   // TODO: batch embedding when data store scales beyond ~100 records
   const rows = []
@@ -93,7 +36,7 @@ export async function buildIndex(dataPath: string = DEFAULT_DATA_PATH): Promise<
       category: record.category ?? '',
       theme: record.theme ?? '',
       period: record.period ?? '',
-      tags: record.tags,
+      tags: record.tags.join(', '),
     })
   }
 
@@ -111,3 +54,4 @@ export async function buildIndex(dataPath: string = DEFAULT_DATA_PATH): Promise<
 }
 
 export { DB_PATH, TABLE_NAME, EMBEDDING_DIM }
+export type { MustardRecord }

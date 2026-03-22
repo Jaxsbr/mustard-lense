@@ -27,7 +27,7 @@ entries:
     story: "US-U2"
     description: "Investigate: split-screen layout approach."
     result: "pass"
-    notes: "10 criteria. Flex layout, CrudPanel container."
+    notes: "10 criteria."
     tokens: ~
   - task: 5
     time: "2026-03-22T09:04:00Z"
@@ -48,14 +48,14 @@ entries:
     story: "US-U3"
     description: "Investigate: type tabs approach."
     result: "pass"
-    notes: "7 criteria. Queue implement."
+    notes: "Queue implement."
     tokens: ~
   - task: 8
     time: "2026-03-22T09:15:00Z"
     story: "US-U3"
     description: "Investigate: CrudPanel tab extension plan."
     result: "pass"
-    notes: "aria-selected, fetch, count badges. Queue implement."
+    notes: "Queue implement."
     tokens: ~
   - task: 9
     time: "2026-03-22T09:20:00Z"
@@ -67,7 +67,14 @@ entries:
   - task: 10
     time: "2026-03-22T09:23:00Z"
     story: "US-U4"
-    description: "Investigation — US-U4 type-specific list views. Current list renders plain truncated text. Need type-specific components with design tokens."
+    description: "Investigate: type-specific list views."
     result: "pass"
-    notes: "8 criteria. Queue implement: type-specific list items, design tokens, E2E test."
+    notes: "8 criteria. Queue implement."
+    tokens: ~
+  - task: 11
+    time: "2026-03-22T09:28:00Z"
+    story: "US-U4"
+    description: "Implement type-specific list views: TodoListItem, PeopleListItem, IdeaListItem, DailyLogListItem. Design tokens, E2E test with mocked API."
+    result: "pass"
+    notes: "49 tests. ✓ US-U4 complete"
     tokens: ~

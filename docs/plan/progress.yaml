@@ -12,7 +12,7 @@ state:
   phase_complete: true
   review_stage: review_posted
   review_complete: true
-  retro_complete: false
+  retro_complete: true
   pr_number: 4
   status: running
   last_result: pass

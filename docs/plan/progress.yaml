@@ -7,7 +7,7 @@ config:
   quality_check_suppressions: []
 
 state:
-  task_number: 9
+  task_number: 10
   phase: structured-browse
   phase_complete: false
   review_stage: null
@@ -16,6 +16,6 @@ state:
   pr_number: null
   status: running
   last_result: pass
-  next_task: "[US-U3] Implement type tabs in CrudPanel — 4 tabs (Todos, People, Ideas, Daily Logs), fetch GET /api/records on tab click, active tab styling, count badges, loading indicator, unit tests"
+  next_task: null
   consecutive_fails: 0
-  completed_stories: [US-U1, US-U2]
+  completed_stories: [US-U1, US-U2, US-U3]

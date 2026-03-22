@@ -1,78 +1,54 @@
 ## Phase goal
 
-Add write capability and list controls to the unified mustard app. A write API creates and updates records as YAML files with auto-generated IDs and auto-filled metadata. A slide-over detail drawer lets users view and edit any record by clicking it in the list. A sticky "Add" button in the panel header opens the drawer in create mode with the active tab's type pre-selected — the zero-friction capture path that makes this a daily driver. List view controls add sort options (date, status) and a configurable record limit (default 25), with per-tab preferences persisted in localStorage.
+Port the original mustard app's warm visual identity into the React app and add dark mode. Replace the cool blue-grey palette with warm gold, type-specific colors, and success/error tokens at the design-token level. Add dark mode with system preference detection, toggle, and localStorage persistence. Give each record type its own color identity in the CRUD panel. Update production port to 7777 so mustard-lense replaces the legacy mustard app on the same port.
 
 ### Dependencies
 - structured-browse (archived)
 
 ### Stories in scope
-- US-U5 — Record write API (create and update)
-- US-U6 — Detail drawer for viewing and editing records
-- US-U7 — Quick capture with sticky Add button
-- US-U8 — List view controls (sort, limit, persisted preferences)
+- US-D1 — Warm gold design token port
+- US-D2 — Dark mode
+- US-D3 — Type-specific CRUD panel colors
 
 ### Done-when (observable)
-- [x] `POST /api/records` with valid `{ "log_type": "todo", "text": "Buy milk" }` returns HTTP 201 with a JSON object containing `id`, `log_type`, `text`, `capture_date_local`, `source`, and `meta` fields [US-U5]
-- [x] The created record is written as a YAML file in the correct subdirectory: `todos/` for `todo`, `people_notes/` for `people_note`, `ideas/` for `idea`, `daily_logs/` for `daily_log` [US-U5]
-- [x] `POST /api/records` returns 400 when `log_type` is missing from the request body [US-U5]
-- [x] `POST /api/records` returns 400 when `text` is missing or empty from the request body [US-U5]
-- [x] `POST /api/records` returns 400 when `log_type` is not one of `todo`, `people_note`, `idea`, `daily_log` [US-U5]
-- [x] The server auto-generates a UUID `id` on create (verifiable by presence of UUID-format string in response) [US-U5]
-- [x] The server auto-fills `capture_date_local` to today's date (YYYY-MM-DD format) on create [US-U5]
-- [x] The server auto-fills `source: "mustard-app"` and `meta: { tags: [] }` on create [US-U5]
-- [x] Optional fields (`person`, `status`, `due_date_local`, `category`, `theme`, `period`) are written to the YAML file when provided in the request body [US-U5]
-- [x] `PUT /api/records/:id` with valid body returns HTTP 200 with the full updated record [US-U5]
-- [x] `PUT /api/records/:id` updates the existing YAML file in place (verifiable by reading the file after update) [US-U5]
-- [x] `PUT /api/records/:id` returns 404 when the record ID is not found [US-U5]
-- [x] After a successful create or update, the server triggers a background reindex (verifiable by server log output indicating reindex started) [US-U5]
-- [x] A data writer module exists (e.g. `src/server/data/writer.ts`) that exports functions for creating and updating YAML record files [US-U5]
-- [x] Unit tests exist for both `POST /api/records` and `PUT /api/records/:id` using a temporary directory — `npm test` does not depend on the real data store [US-U5]
-- [x] `POST /api/records` validates `log_type` against a known allowlist (`todo`, `people_note`, `idea`, `daily_log`) — unknown types are rejected with 400 before any file write [US-U5]
-- [x] `POST /api/records` validates `text` is a non-empty string with a maximum length before writing (prevents empty or excessively large files) [US-U5]
-- [x] `PUT /api/records/:id` validates the `id` parameter format before attempting file lookup — no user-provided values are interpolated into file paths via string concatenation (use ID-to-filepath mapping from the data reader) [US-U5]
-- [x] `POST /api/records` returns 500 with a structured JSON error body (not a raw stack trace) when YAML file writing fails [US-U5]
-- [x] `PUT /api/records/:id` returns 500 with a structured JSON error body (not a raw stack trace) when YAML file writing fails [US-U5]
-- [x] Clicking a list item in the CRUD panel opens a slide-over drawer element in the DOM [US-U6]
-- [x] The drawer overlays from the right side and does not cover the full viewport — the list remains partially visible behind it [US-U6]
-- [x] Drawer open/close has a CSS slide animation (verifiable by presence of `transition` or `animation` CSS property) [US-U6]
-- [x] The drawer displays all fields for the selected record in editable form inputs [US-U6]
-- [x] Todo records show: `text` (textarea), `status` (dropdown: open/done/parked), `due_date_local` (date input) [US-U6]
-- [x] People note records show: `text` (textarea), `person` (text input) [US-U6]
-- [x] Idea records show: `text` (textarea), `status` (dropdown: open/done/parked) [US-U6]
-- [x] Daily log records show: `text` (textarea), `theme` (text input) [US-U6]
-- [x] The `text` field renders as a `<textarea>` element (not a single-line `<input>`) [US-U6]
-- [x] The `log_type` and `id` fields are displayed but not editable in edit mode (read-only or disabled) [US-U6]
-- [x] A "Save" button sends `PUT /api/records/:id` with the form data [US-U6]
-- [x] On successful save, the drawer closes, the list refreshes to show updated data, and tab count updates [US-U6]
-- [x] A "Close" button (or click-outside) dismisses the drawer without saving [US-U6]
-- [x] The detail drawer form renders all user-provided text via React `value` attributes or JSX text nodes, not `dangerouslySetInnerHTML` [US-U6]
-- [x] Playwright E2E test verifies: clicking a list item opens the drawer, drawer displays record fields, close button dismisses the drawer (mocked API) [US-U6]
-- [x] User guide page "Editing Records" exists (at `docs/manual/editing.md` or equivalent) documenting the detail drawer, save/close actions, type-specific form fields, and the Add button capture flow [US-U6]
-- [x] An "Add" button (or "+" affordance) is visible in the CRUD panel header without scrolling [US-U7]
-- [x] Clicking "Add" opens the detail drawer in create mode (empty form, no record data pre-populated) [US-U7]
-- [x] The `log_type` field is pre-set to the active tab's type (e.g., `todo` when on the Todos tab) [US-U7]
-- [x] The `log_type` field is changeable in create mode via a dropdown [US-U7]
-- [x] The `text` textarea is auto-focused when the drawer opens in create mode [US-U7]
-- [x] A "Save" button sends `POST /api/records` with the form data [US-U7]
-- [x] On successful save, the drawer closes, the panel list refreshes to include the new record, and tab count updates [US-U7]
-- [x] The "Save" button is disabled when the `text` field is empty [US-U7]
-- [x] Playwright E2E test verifies: clicking Add opens drawer in create mode, log_type is pre-selected from active tab, save button is disabled when text is empty (mocked API) [US-U7]
-- [x] A sort dropdown is visible above the record list in the CRUD panel body with options: "Newest first" (default), "Oldest first" [US-U8]
-- [x] The Todos tab sort dropdown includes an additional option: "Status (open first)" which orders records as open → parked → done [US-U8]
-- [x] Selecting a sort option re-orders the displayed list client-side without an additional API call [US-U8]
-- [x] A "Show" control (dropdown or numeric input) is visible above the list, defaulting to 25 [US-U8]
-- [x] The list displays at most the number of records specified by the "Show" control [US-U8]
-- [x] When more records exist than the limit, a "Show all" or "Load more" affordance is visible below the list [US-U8]
-- [x] Sort selection is persisted in `localStorage` per tab (e.g., key `mustard-sort-todo`) [US-U8]
-- [x] Limit value is persisted in `localStorage` per tab (e.g., key `mustard-limit-todo`) [US-U8]
-- [x] On page reload, persisted sort and limit preferences are restored for each tab [US-U8]
-- [x] Unit tests verify sort logic: date ascending, date descending, and status grouping (open → parked → done) for todos [US-U8]
-- [x] Playwright E2E test verifies: sort dropdown changes list order, limit control caps the number of visible list items (mocked API) [US-U8]
-- [x] `AGENTS.md` reflects new write API endpoints (`POST /api/records`, `PUT /api/records/:id`), data writer module, detail drawer component, Add button, list view controls, and localStorage preferences introduced in this phase [phase]
-- [x] User guide page "App Layout" updated to document sort and limit controls with per-tab persistence [US-U8]
+- [ ] `tokens.css` `:root` declares `--lense-color-accent` with value `#c8982c` (warm gold, replacing `#4f6d7a`) [US-D1]
+- [ ] `tokens.css` `:root` declares `--lense-color-accent-light` with a warm-tinted value derived from `#c8982c` (not the previous cool `#e8f0f3`) [US-D1]
+- [ ] `tokens.css` `:root` declares `--lense-color-bg` with value `#faf9f6` (warm off-white, replacing `#ffffff`) [US-D1]
+- [ ] `tokens.css` `:root` declares `--lense-color-bg-subtle` with a warm-tinted value (replacing `#f9fafb`) [US-D1]
+- [ ] `tokens.css` `:root` declares `--lense-color-type-todo: #4a7fc4` [US-D1]
+- [ ] `tokens.css` `:root` declares `--lense-color-type-people: #7b5ea7` [US-D1]
+- [ ] `tokens.css` `:root` declares `--lense-color-type-daily: #e07850` [US-D1]
+- [ ] `tokens.css` `:root` declares `--lense-color-type-idea: #2d9574` [US-D1]
+- [ ] `tokens.css` `:root` declares `--lense-color-success-bg` and `--lense-color-success-text` tokens [US-D1]
+- [ ] `tokens.css` `:root` declares `--lense-color-error-bg` and `--lense-color-error-text` tokens [US-D1]
+- [ ] Zero matches for literal `#4f6d7a` in any file under `src/` (`rg '#4f6d7a' src/` returns no results) [US-D1]
+- [ ] All color values in `App.css` reference `var(--lense-*)` tokens — no hardcoded hex color values remain outside `@keyframes` blocks (verifiable by `rg '#[0-9a-fA-F]{3,8}' src/App.css` returning only `@keyframes` context or zero matches) [US-D1]
+- [ ] `npm run build` exits 0 [US-D1]
+- [ ] `npm run typecheck` exits 0 [US-D1]
+- [ ] `tokens.css` contains a `[data-theme="dark"]` selector block that overrides all `--lense-color-*` variables with dark-adapted values [US-D2]
+- [ ] `tokens.css` contains a `@media (prefers-color-scheme: dark)` block using `html:not([data-theme="light"])` selector as system-preference fallback [US-D2]
+- [ ] The `[data-theme="dark"]` block defines adjusted values for at minimum: `--lense-color-bg`, `--lense-color-bg-subtle`, `--lense-color-text`, `--lense-color-text-muted`, `--lense-color-border`, `--lense-color-accent`, `--lense-color-accent-light`, `--lense-color-shadow`, all four `--lense-color-type-*` tokens, `--lense-color-success-bg`, `--lense-color-success-text`, `--lense-color-error-bg`, `--lense-color-error-text`, `--lense-color-status-open`, `--lense-color-status-done`, `--lense-color-status-parked` [US-D2]
+- [ ] A theme toggle `<button>` element exists in the app DOM with an accessible label (e.g., `aria-label` containing "theme") [US-D2]
+- [ ] Clicking the theme toggle sets the `data-theme` attribute on the `<html>` element to `"dark"` or `"light"` [US-D2]
+- [ ] Theme preference is stored in `localStorage` under key `mustard-theme` — `localStorage.getItem('mustard-theme')` returns the selected value after toggle interaction [US-D2]
+- [ ] `index.html` contains an inline `<script>` block (before the React bundle `<script>`) that reads `mustard-theme` from `localStorage` and sets `data-theme` on `document.documentElement` — prevents flash of wrong theme on page load [US-D2]
+- [ ] Dark mode covers all surfaces: lense cards (`.lense-card`), CRUD panel (`.crud-panel`), detail drawer (`.detail-drawer`), list items (`.list-item`), tabs (`.crud-panel-tab`), list controls (`.list-controls-select`), blockquote/verse, error display (`.lense-error`), and stage indicators (`.lense-spinner`, `.lense-stage-text`) all derive colors from `var(--lense-*)` tokens — no hardcoded hex colors that bypass dark mode in `components.css`, `CrudPanel.css`, `DetailDrawer.css`, `ListItems.css`, `ListControls.css`, or `App.css` [US-D2]
+- [ ] Playwright E2E test verifies: theme toggle button exists in DOM, clicking toggle changes `data-theme` attribute value on `document.documentElement` [US-D2]
+- [ ] User guide "App Layout" page (`docs/manual/layout.md`) documents the theme toggle and dark mode behavior (system preference, manual override, persistence) [US-D2]
+- [ ] Active tab's bottom border (`border-bottom-color`) uses the type-specific color token — e.g., Todos tab active uses `--lense-color-type-todo` (`#4a7fc4`), People tab active uses `--lense-color-type-people` (`#7b5ea7`), etc. — not a single `--lense-color-accent` for all tabs (verifiable by Playwright computed style or CSS class-per-type pattern in `CrudPanel.css`) [US-D3]
+- [ ] Active tab count badge (`.crud-panel-tab--active .crud-panel-tab-count`) background uses a tinted variant of the type-specific color (not the generic `--lense-color-accent-light`) [US-D3]
+- [ ] List items in the CRUD panel have a visible type-colored left indicator — a left border, accent stripe, or equivalent element using the type-specific color token (verifiable by inspecting `.list-item` computed styles or a CSS class per type in `ListItems.css`) [US-D3]
+- [ ] Type-specific colors render correctly in dark mode — `[data-theme="dark"]` values for `--lense-color-type-*` tokens are applied (verifiable by setting `data-theme="dark"` and checking computed styles) [US-D3]
+- [ ] Playwright E2E test verifies: active Todos tab has a border color matching `--lense-color-type-todo`, switching to People tab changes border color to match `--lense-color-type-people` [US-D3]
+- [ ] Express server (`src/server/index.ts` or `src/server/app.ts`) serves Vite production build static files from `dist/` when not in dev mode, so the full app (API + frontend) runs on a single port [phase] (enables port 7777 replacement of legacy mustard)
+- [ ] `ARCHITECTURE.md` production port entry updated from 5678 to 7777 [phase]
+- [ ] `package.json` defines a `start` script (or equivalent) that builds and starts the production server [phase]
+- [ ] `AGENTS.md` reflects: new design tokens (`--lense-color-type-*`, `--lense-color-success-*`, `--lense-color-error-*`), dark mode CSS architecture (`[data-theme]` + `prefers-color-scheme`), theme toggle UI element, production port 7777, and dark mode behavior [phase]
+- [ ] `npm test` exits 0 with all existing unit tests passing [phase]
+- [ ] `npm run test:e2e` exits 0 with all E2E tests passing (existing + new dark mode and type color tests) [phase]
 
 ### Golden principles (phase-relevant)
-- **People first** — capture is the MLP-critical moment; auto-focus, type pre-selection, and one-click Add make the path from intent to saved record as short as possible
-- **Faithful stewardship** — auto-filled metadata (source, capture_date, meta) removes friction fields without losing data lineage; relaxed validation puts UX proof before schema hardening
-- **Safety and ethics** — ID-to-filepath mapping prevents path traversal; log_type allowlist prevents arbitrary directory writes; all form text rendered safely via React value binding
-- **Clarity over complexity** — client-side sorting avoids extra API calls; localStorage persistence is simple and requires no backend state; the drawer is one component shared between create and edit
+- **People first** — warm gold creates emotional familiarity ("this is MY tool"); dark mode respects comfort at any time of day; type-specific colors provide instant recognition
+- **Faithful stewardship** — token-level change minimizes per-file edits and maximizes consistency; the original mustard's proven dark mode pattern is adapted, not reinvented
+- **Clarity over complexity** — CSS custom properties absorb the palette shift; no JavaScript color manipulation; `[data-theme]` + `prefers-color-scheme` is a well-understood pattern
+- **Continuous improvement** — the token system compounds: future components automatically inherit the warm palette and dark mode; production port 7777 positions mustard-lense as the daily driver

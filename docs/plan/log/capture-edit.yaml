@@ -25,7 +25,7 @@ entries:
   - task: 4
     time: "2026-03-22T10:05:00Z"
     story: "US-U6"
-    description: "Investigate: detail drawer component — click handler, slide-over, type-specific form fields, E2E tests."
+    description: "Investigate: detail drawer — CrudPanel click handler, slide-over, type-specific forms, E2E."
     result: "pass"
-    notes: "Queue investigate. CrudPanel needs onClick, DetailDrawer new component, type-specific forms."
+    notes: "CrudPanel wraps records in div with key. Need DetailDrawer.tsx + CSS. Forms: todo(text,status,due), people(text,person), idea(text,status), daily(text,theme). Queue implement."
     tokens: ~

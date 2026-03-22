@@ -4,56 +4,63 @@ entries:
   - task: 1
     time: "2026-03-22T08:50:00Z"
     story: "phase"
-    description: "Investigation — classify phase as server/schema/cross-cutting (new API endpoint, data reader module, frontend layout). 4 stories (US-U1→U4), 39 criteria. Pre-existing lint fix (Date.now purity). Verify passes (37 tests). US-U1 is foundation — queue investigate for data reader approach."
+    description: "Investigation — classify phase, fix pre-existing lint. US-U1 foundation."
     result: "pass"
-    notes: "Phase type: server/schema/cross-cutting (investigate-first mandate). Indexer has MustardRecord interface and YAML parsing — reusable. DEFAULT_DATA_PATH hardcoded, needs MUSTARD_DATA_DIR env var. No data/ dir or panel/ dir yet."
+    notes: "Server/schema/cross-cutting. 37 tests. Investigate-first mandate."
     tokens: ~
   - task: 2
     time: "2026-03-22T08:53:00Z"
     story: "US-U1"
     description: "Investigate: data reader approach"
     result: "pass"
-    notes: "Plan confirmed. Queue implement."
+    notes: "Extract from indexer. Queue implement."
     tokens: ~
   - task: 3
     time: "2026-03-22T08:57:00Z"
     story: "US-U1"
-    description: "Create data reader module, browse API endpoint, MUSTARD_DATA_DIR support, .env.example, 5 browse tests."
+    description: "Implement data reader, browse API, MUSTARD_DATA_DIR, .env.example, 5 tests."
     result: "pass"
     notes: "42 tests. ✓ US-U1 complete"
     tokens: ~
   - task: 4
     time: "2026-03-22T09:00:00Z"
     story: "US-U2"
-    description: "Investigation — US-U2 split-screen layout."
+    description: "Investigate: split-screen layout approach."
     result: "pass"
-    notes: "10 criteria. Queued investigate."
+    notes: "10 criteria. Flex layout, CrudPanel container."
     tokens: ~
   - task: 5
     time: "2026-03-22T09:04:00Z"
     story: "US-U2"
-    description: "Investigate: App.tsx structure and layout plan."
+    description: "Investigate: App.tsx structure."
     result: "pass"
-    notes: "Plan confirmed. Queue implement."
+    notes: "Queue implement."
     tokens: ~
   - task: 6
     time: "2026-03-22T09:10:00Z"
     story: "US-U2"
-    description: "Implement split-screen layout: CrudPanel.tsx, flex layout, toggle, responsive, E2E, docs."
+    description: "Implement split-screen layout, toggle, responsive, E2E, docs."
     result: "pass"
     notes: "42 tests. ✓ US-U2 complete"
     tokens: ~
   - task: 7
     time: "2026-03-22T09:13:00Z"
     story: "US-U3"
-    description: "Investigation — US-U3 type tabs. CrudPanel needs tabs, fetch, count badges, loading, unit tests."
+    description: "Investigate: type tabs approach."
     result: "pass"
-    notes: "7 criteria. Queue investigate + implement."
+    notes: "7 criteria. Queue implement."
     tokens: ~
   - task: 8
     time: "2026-03-22T09:15:00Z"
     story: "US-U3"
-    description: "Investigate: CrudPanel has placeholder body. Need to add tab bar with 4 tabs, useState for active tab, useEffect for fetch, loading state, count badges. Unit tests via vitest + testing-library or inline component tests."
+    description: "Investigate: CrudPanel tab extension plan."
     result: "pass"
-    notes: "Approach: extend CrudPanel.tsx with tab state + fetch. Need Vite proxy already handles /api. Use aria-selected for active tab. Queue implement."
+    notes: "aria-selected, fetch, count badges. Queue implement."
+    tokens: ~
+  - task: 9
+    time: "2026-03-22T09:20:00Z"
+    story: "US-U3"
+    description: "Implement type tabs: 4 tabs with fetch, count badges, loading, active state, 7 unit tests. Added @testing-library/react + jsdom."
+    result: "pass"
+    notes: "49 tests (up from 42). ✓ US-U3 complete"
     tokens: ~

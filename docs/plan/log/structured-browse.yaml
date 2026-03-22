@@ -36,3 +36,10 @@ entries:
     result: "pass"
     notes: "Current App.tsx: form + stage + results + empty state. E2E tests target input[type=text] and .lense-results. Need CrudPanel.tsx in components/panel/."
     tokens: ~
+  - task: 6
+    time: "2026-03-22T09:10:00Z"
+    story: "US-U2"
+    description: "Implement split-screen layout: CrudPanel.tsx with toggle, flex layout in App.tsx, responsive collapse at 768px, title to Mustard, E2E test, docs/manual/layout.md."
+    result: "pass"
+    notes: "42 tests still pass. All 10 US-U2 criteria met. ✓ US-U2 complete"
+    tokens: ~

@@ -6,13 +6,16 @@ import { readRecords } from './data/reader.js'
 
 const PORT = parseInt(process.env.PORT ?? '3001', 10)
 
-async function start() {
-  console.log('[server] Building vector index...')
-  const indexResult = await buildIndex()
-  console.log(`[server] Index built: ${indexResult.records} records`)
+let indexReady = false
 
+const guardedRetrieve: typeof retrieve = async (query, k) => {
+  if (!indexReady) throw new Error('Vector index is still building. Try again shortly.')
+  return retrieve(query, k)
+}
+
+async function start() {
   const app = createApp({
-    retrieve,
+    retrieve: guardedRetrieve,
     synthesiser: new CliSynthesiser(),
     buildIndex,
     readRecords,
@@ -21,6 +24,11 @@ async function start() {
   app.listen(PORT, () => {
     console.log(`Lense API server listening on port ${PORT}`)
   })
+
+  console.log('[server] Building vector index...')
+  const indexResult = await buildIndex()
+  indexReady = true
+  console.log(`[server] Index built: ${indexResult.records} records`)
 }
 
 start().catch((err) => {

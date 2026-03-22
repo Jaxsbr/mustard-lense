@@ -8,3 +8,10 @@ entries:
     result: "pass"
     notes: "Phase type: server/schema/cross-cutting (investigate-first mandate). Indexer has MustardRecord interface and YAML parsing — reusable. DEFAULT_DATA_PATH hardcoded, needs MUSTARD_DATA_DIR env var. No data/ dir or panel/ dir yet."
     tokens: ~
+  - task: 2
+    time: "2026-03-22T08:53:00Z"
+    story: "US-U1"
+    description: "Investigate: data reader approach — indexer has reusable MustardRecord, findYamlFiles, parseRecord, resolveHome. Extract to shared data/reader.ts. DI pattern in app.ts supports new endpoint. 37 tests, fixture approach reusable."
+    result: "pass"
+    notes: "Plan: extract reader module, add MUSTARD_DATA_DIR env var, update indexer imports, add GET /api/records to app.ts, add .env.example, add tests."
+    tokens: ~

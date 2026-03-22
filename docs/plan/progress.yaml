@@ -7,7 +7,7 @@ config:
   quality_check_suppressions: []
 
 state:
-  task_number: 2
+  task_number: 3
   phase: structured-browse
   phase_complete: false
   review_stage: null
@@ -16,6 +16,6 @@ state:
   pr_number: null
   status: running
   last_result: pass
-  next_task: "[US-U1] Investigate: data reader module approach — check existing indexer YAML parsing, MustardRecord interface reuse, MUSTARD_DATA_DIR env var integration, test fixture structure"
+  next_task: "[US-U1] Create src/server/data/reader.ts — extract YAML parsing from indexer, add MUSTARD_DATA_DIR env var, export readRecords and getDataDir functions"
   consecutive_fails: 0
   completed_stories: []

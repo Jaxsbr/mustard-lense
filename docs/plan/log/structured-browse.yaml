@@ -22,3 +22,10 @@ entries:
     result: "pass"
     notes: "42 tests pass (up from 37). All 13 US-U1 criteria met. ✓ US-U1 complete"
     tokens: ~
+  - task: 4
+    time: "2026-03-22T09:00:00Z"
+    story: "US-U2"
+    description: "Investigation — US-U1 complete. US-U2 next: split-screen layout. Queue investigate for current App.tsx structure and layout approach."
+    result: "pass"
+    notes: "US-U2 has 10 criteria: two-column layout, toggle, collapse/expand, 40% width, lense always visible, title change, responsive, panel dir, E2E test, user guide."
+    tokens: ~

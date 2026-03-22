@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import type { MustardRecord } from '../../shared/record.js'
 import { TABS } from './types.js'
 import { ListItem } from './ListItems.js'
+import { DetailDrawer } from './DetailDrawer.js'
 import './CrudPanel.css'
 
 interface CrudPanelProps {
@@ -15,6 +16,9 @@ export function CrudPanel({ collapsed, onToggle }: CrudPanelProps) {
   const [counts, setCounts] = useState<Record<string, number>>({})
   const [countsLoaded, setCountsLoaded] = useState(false)
   const [loading, setLoading] = useState(false)
+  const [drawerOpen, setDrawerOpen] = useState(false)
+  const [drawerMode, setDrawerMode] = useState<'edit' | 'create'>('edit')
+  const [selectedRecord, setSelectedRecord] = useState<MustardRecord | null>(null)
 
   const abortRef = useRef<AbortController | null>(null)
 
@@ -71,6 +75,48 @@ export function CrudPanel({ collapsed, onToggle }: CrudPanelProps) {
     setActiveTab(type)
   }
 
+  function handleRecordClick(record: MustardRecord) {
+    setSelectedRecord(record)
+    setDrawerMode('edit')
+    setDrawerOpen(true)
+  }
+
+  function handleAddClick() {
+    setSelectedRecord(null)
+    setDrawerMode('create')
+    setDrawerOpen(true)
+  }
+
+  function handleDrawerClose() {
+    setDrawerOpen(false)
+    setSelectedRecord(null)
+  }
+
+  async function handleDrawerSave(data: Partial<MustardRecord> & { log_type: string }) {
+    try {
+      if (drawerMode === 'edit' && data.id) {
+        const res = await fetch(`/api/records/${data.id}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data),
+        })
+        if (!res.ok) return
+      } else {
+        const res = await fetch('/api/records', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data),
+        })
+        if (!res.ok) return
+      }
+      handleDrawerClose()
+      setCountsLoaded(false)
+      fetchRecords(activeTab)
+    } catch {
+      // save failed — drawer stays open
+    }
+  }
+
   return (
     <aside className={`crud-panel${collapsed ? ' crud-panel--collapsed' : ''}`} data-testid="crud-panel">
       <div className="crud-panel-header">
@@ -83,6 +129,16 @@ export function CrudPanel({ collapsed, onToggle }: CrudPanelProps) {
           {collapsed ? '☰' : '✕'}
         </button>
         {!collapsed && <span className="crud-panel-title">Browse</span>}
+        {!collapsed && (
+          <button
+            className="crud-panel-add"
+            onClick={handleAddClick}
+            aria-label="Add record"
+            data-testid="panel-add"
+          >
+            +
+          </button>
+        )}
       </div>
       {!collapsed && (
         <>
@@ -111,7 +167,7 @@ export function CrudPanel({ collapsed, onToggle }: CrudPanelProps) {
             {!loading && records.length > 0 && (
               <div className="crud-panel-list" data-testid="panel-list">
                 {records.map((record) => (
-                  <div key={record.id} data-testid="panel-list-item">
+                  <div key={record.id} data-testid="panel-list-item" onClick={() => handleRecordClick(record)} style={{ cursor: 'pointer' }}>
                     <ListItem record={record} type={activeTab} />
                   </div>
                 ))}
@@ -120,6 +176,14 @@ export function CrudPanel({ collapsed, onToggle }: CrudPanelProps) {
           </div>
         </>
       )}
+      <DetailDrawer
+        record={selectedRecord}
+        mode={drawerMode}
+        defaultLogType={activeTab}
+        open={drawerOpen}
+        onClose={handleDrawerClose}
+        onSave={handleDrawerSave}
+      />
     </aside>
   )
 }

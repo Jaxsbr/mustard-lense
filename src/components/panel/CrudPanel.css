@@ -40,6 +40,28 @@
   font-weight: 600;
   font-size: var(--lense-font-size-base);
   color: var(--lense-color-text);
+  flex: 1;
+}
+
+.crud-panel-add {
+  background: var(--lense-color-accent);
+  color: white;
+  border: none;
+  border-radius: var(--lense-radius);
+  width: 28px;
+  height: 28px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: opacity 0.2s;
+  flex-shrink: 0;
+}
+
+.crud-panel-add:hover {
+  opacity: 0.85;
 }
 
 /* Tabs */

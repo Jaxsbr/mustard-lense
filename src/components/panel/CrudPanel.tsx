@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from 'react'
+import { ListItem } from './ListItems.js'
 import './CrudPanel.css'
 
 interface MustardRecord {
@@ -114,13 +115,13 @@ export function CrudPanel({ collapsed, onToggle }: CrudPanelProps) {
               <p className="crud-panel-empty" data-testid="panel-empty">No records found.</p>
             )}
             {!loading && records.length > 0 && (
-              <ul className="crud-panel-list" data-testid="panel-list">
+              <div className="crud-panel-list" data-testid="panel-list">
                 {records.map((record) => (
-                  <li key={record.id} className="crud-panel-list-item" data-testid="panel-list-item">
-                    {record.text.length > 80 ? record.text.slice(0, 80) + '…' : record.text}
-                  </li>
+                  <div key={record.id} data-testid="panel-list-item">
+                    <ListItem record={record} type={activeTab} />
+                  </div>
                 ))}
-              </ul>
+              </div>
             )}
           </div>
         </>

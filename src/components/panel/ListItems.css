@@ -1,0 +1,63 @@
+.list-item {
+  display: flex;
+  align-items: baseline;
+  gap: var(--lense-spacing-sm);
+  padding: var(--lense-spacing-sm) 0;
+  border-bottom: 1px solid var(--lense-color-border);
+  font-size: var(--lense-font-size-sm);
+  color: var(--lense-color-text);
+  line-height: 1.4;
+}
+
+.list-item:last-child {
+  border-bottom: none;
+}
+
+.list-status {
+  flex-shrink: 0;
+  font-size: var(--lense-font-size-sm);
+  font-weight: 600;
+  min-width: 1.2em;
+  text-align: center;
+}
+
+.list-status--open {
+  color: var(--lense-color-status-open);
+}
+
+.list-status--done {
+  color: var(--lense-color-status-done);
+}
+
+.list-status--parked {
+  color: var(--lense-color-status-parked);
+}
+
+.list-text {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.list-person {
+  font-weight: 600;
+  flex-shrink: 0;
+  color: var(--lense-color-text);
+}
+
+.list-date {
+  flex-shrink: 0;
+  font-size: 0.75rem;
+  color: var(--lense-color-text-muted);
+}
+
+.list-theme {
+  flex-shrink: 0;
+  font-size: 0.75rem;
+  color: var(--lense-color-accent);
+  background: var(--lense-color-accent-light);
+  padding: 0 var(--lense-spacing-xs);
+  border-radius: 4px;
+}

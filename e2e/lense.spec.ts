@@ -161,3 +161,40 @@ test('split-screen layout shows panel and lense regions', async ({ page }) => {
   await input.fill('test query')
   await expect(input).toHaveValue('test query')
 })
+
+test('CRUD panel renders type-specific list items from mocked API', async ({ page }) => {
+  const todoRecords = [
+    { id: 'todo-1', log_type: 'todo', capture_date_local: '2026-03-15', text: 'Buy groceries for the week', person: null, status: 'open', due_date_local: '2026-03-16', category: null, theme: null, period: null, tags: [] },
+    { id: 'todo-2', log_type: 'todo', capture_date_local: '2026-03-14', text: 'Review PR', person: null, status: 'done', due_date_local: null, category: null, theme: null, period: null, tags: [] },
+  ]
+
+  const allRecords = [
+    ...todoRecords,
+    { id: 'note-1', log_type: 'people_note', capture_date_local: '2026-03-14', text: 'Alice on design system', person: 'alice', status: null, due_date_local: null, category: null, theme: null, period: null, tags: [] },
+  ]
+
+  await page.route('**/api/records*', async (route) => {
+    const url = new URL(route.request().url())
+    const type = url.searchParams.get('type')
+    const records = type ? allRecords.filter((r) => r.log_type === type) : allRecords
+    await route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify(records),
+    })
+  })
+
+  await page.goto('/')
+
+  // Wait for list items to render (Todos tab active by default)
+  await expect(page.locator('[data-testid="list-item-todo"]').first()).toBeVisible({ timeout: 5000 })
+
+  // At least one list item rendered
+  const items = page.locator('[data-testid="panel-list-item"]')
+  expect(await items.count()).toBeGreaterThanOrEqual(1)
+
+  // Todo list items have expected fields (status indicator and text)
+  const firstTodo = page.locator('[data-testid="list-item-todo"]').first()
+  await expect(firstTodo.locator('.list-status')).toBeVisible()
+  await expect(firstTodo.locator('.list-text')).toBeVisible()
+})

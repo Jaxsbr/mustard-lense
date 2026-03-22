@@ -42,13 +42,92 @@
   color: var(--lense-color-text);
 }
 
+/* Tabs */
+.crud-panel-tabs {
+  display: flex;
+  border-bottom: 1px solid var(--lense-color-border);
+  overflow-x: auto;
+}
+
+.crud-panel-tab {
+  flex: 1;
+  padding: var(--lense-spacing-sm) var(--lense-spacing-xs);
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  cursor: pointer;
+  font-size: var(--lense-font-size-sm);
+  color: var(--lense-color-text-muted);
+  white-space: nowrap;
+  transition: color 0.2s, border-color 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--lense-spacing-xs);
+}
+
+.crud-panel-tab:hover {
+  color: var(--lense-color-text);
+}
+
+.crud-panel-tab--active {
+  color: var(--lense-color-accent);
+  border-bottom-color: var(--lense-color-accent);
+  font-weight: 600;
+}
+
+.crud-panel-tab-count {
+  background: var(--lense-color-bg-subtle);
+  border-radius: 10px;
+  padding: 0 6px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--lense-color-text-muted);
+  min-width: 18px;
+  text-align: center;
+}
+
+.crud-panel-tab--active .crud-panel-tab-count {
+  background: var(--lense-color-accent-light);
+  color: var(--lense-color-accent);
+}
+
+/* Body */
 .crud-panel-body {
   flex: 1;
   overflow-y: auto;
   padding: var(--lense-spacing-md);
 }
 
-.crud-panel-placeholder {
+.crud-panel-loading {
   color: var(--lense-color-text-muted);
   font-size: var(--lense-font-size-sm);
+  text-align: center;
+  padding: var(--lense-spacing-lg) 0;
+}
+
+.crud-panel-empty {
+  color: var(--lense-color-text-muted);
+  font-size: var(--lense-font-size-sm);
+  text-align: center;
+  padding: var(--lense-spacing-lg) 0;
+}
+
+/* List */
+.crud-panel-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.crud-panel-list-item {
+  padding: var(--lense-spacing-sm) 0;
+  border-bottom: 1px solid var(--lense-color-border);
+  font-size: var(--lense-font-size-sm);
+  color: var(--lense-color-text);
+  line-height: 1.4;
+}
+
+.crud-panel-list-item:last-child {
+  border-bottom: none;
 }

@@ -93,8 +93,10 @@ src/
 │   ├── IdeaList.tsx           # idea-list component renderer
 │   ├── Summary.tsx            # summary component renderer
 │   ├── FallbackComponent.tsx  # Fallback for unknown component types
-│   ├── panel/                 # CRUD panel and data reader
+│   ├── panel/                 # CRUD panel — browse, edit, capture
 │   │   ├── CrudPanel.tsx      # Collapsible panel container with type tabs and list views
+│   │   ├── DetailDrawer.tsx   # (planned for capture-edit phase) Slide-over drawer for view/edit/create
+│   │   ├── ListControls.tsx   # (planned for capture-edit phase) Sort dropdown + limit control
 │   │   └── ...                # Type-specific list view components
 │   ├── components.css         # Shared component styles
 │   └── tokens.css             # Design tokens (CSS variables)
@@ -106,8 +108,9 @@ src/
 │   ├── prompt.ts              # Synthesis prompt construction (injects records inline)
 │   ├── synthesiser.ts         # Synthesiser interface + CliSynthesiser (planned for rag-lense)
 │   ├── server.test.ts         # API endpoint unit tests (mocked retriever + synthesiser)
-│   ├── data/                  # CRUD panel and data reader
-│   │   └── reader.ts          # Reads YAML records from configurable data directory
+│   ├── data/                  # Data access layer (read + write)
+│   │   ├── reader.ts          # Reads YAML records from configurable data directory
+│   │   └── writer.ts          # (planned for capture-edit phase) Creates and updates YAML record files
 │   └── rag/                   # (planned for rag-lense phase)
 │       ├── embedder.ts        # Embedding wrapper — transformers.js, all-MiniLM-L6-v2
 │       ├── indexer.ts         # Reads YAML, generates embeddings, writes to LanceDB
@@ -179,9 +182,20 @@ The shared schema module (`src/shared/schema.ts`) defines TypeScript interfaces 
 4. JSON array of records returned to the frontend
 5. CRUD panel renders records in type-specific list views within the active tab
 
-### Future (data write phase)
+### Write API data flow (planned for capture-edit phase)
 
-The lense currently supports read-only queries. Future phases will add write operations (capture, edit, lifecycle management) through the same intent model, using admin CLI mode where needed.
+1. User fills in the detail drawer form (edit or create mode) and clicks "Save"
+2. Frontend sends `PUT /api/records/:id` (edit) or `POST /api/records` (create) with form data as JSON
+3. Server validates required fields (`log_type`, `text`) and `log_type` against known allowlist
+4. For create: server auto-generates UUID `id`, sets `capture_date_local` to today, fills `source` and `meta`
+5. Data writer module serializes the record to YAML and writes to the correct subdirectory (ID-to-filepath mapping, no path interpolation from user input)
+6. Server returns the full record (201 for create, 200 for update)
+7. Server triggers background reindex so the lense picks up the change
+8. Frontend closes the drawer, refreshes the panel list and tab counts
+
+### Future (beyond capture-edit)
+
+Metadata-filtered retrieval, data repo separation (`mustard-data`), old mustard archival, and mustard-capture skill deletion are planned for subsequent phases.
 
 ## Hosting
 

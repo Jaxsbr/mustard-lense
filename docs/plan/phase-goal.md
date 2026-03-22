@@ -1,59 +1,78 @@
 ## Phase goal
 
-Introduce a structured browse panel alongside the existing lense, creating the unified mustard split-screen layout. A collapsible CRUD panel on the left provides tab-based navigation across four record types (Todos, People, Ideas, Daily Logs) with type-specific compact list views. The lense on the right remains always visible. A new read API endpoint serves records directly from YAML files, with the data directory configurable via `MUSTARD_DATA_DIR` env var (shared with the RAG indexer). Browse only — no write operations, no detail drawer, no capture form.
+Add write capability and list controls to the unified mustard app. A write API creates and updates records as YAML files with auto-generated IDs and auto-filled metadata. A slide-over detail drawer lets users view and edit any record by clicking it in the list. A sticky "Add" button in the panel header opens the drawer in create mode with the active tab's type pre-selected — the zero-friction capture path that makes this a daily driver. List view controls add sort options (date, status) and a configurable record limit (default 25), with per-tab preferences persisted in localStorage.
 
 ### Dependencies
-- rag-lense
+- structured-browse (archived)
 
 ### Stories in scope
-- US-U1 — Record browse API with configurable data directory
-- US-U2 — Split-screen layout with collapsible CRUD panel
-- US-U3 — Type tabs in CRUD panel
-- US-U4 — Type-specific list views
+- US-U5 — Record write API (create and update)
+- US-U6 — Detail drawer for viewing and editing records
+- US-U7 — Quick capture with sticky Add button
+- US-U8 — List view controls (sort, limit, persisted preferences)
 
 ### Done-when (observable)
-- [x] `GET /api/records` returns HTTP 200 with `Content-Type: application/json` containing a JSON array [US-U1]
-- [x] `GET /api/records?type=todo` returns only records where `log_type` equals `todo` [US-U1]
-- [x] `GET /api/records` (no type parameter) returns records from all log types [US-U1]
-- [x] Each record object in the response contains fields: `id`, `log_type`, `capture_date_local`, `text`, `person`, `status`, `due_date_local`, `category`, `theme`, `period`, `tags` [US-U1]
-- [x] Records are sorted by `capture_date_local` descending (newest first) [US-U1]
-- [x] The data directory is read from `MUSTARD_DATA_DIR` env var, defaulting to `~/dev/mustard/data/` when unset [US-U1]
-- [x] The RAG indexer (`src/server/rag/indexer.ts`) reads from `MUSTARD_DATA_DIR` env var when set (shared configuration with the browse API) [US-U1]
-- [x] `GET /api/records?type=nonexistent_type` returns HTTP 200 with an empty JSON array `[]` [US-U1]
-- [x] A data reader module exists (e.g. `src/server/data/reader.ts`) that exports a function for reading and parsing YAML records from the configured data directory [US-U1]
-- [x] `.env.example` documents `MUSTARD_DATA_DIR` with a description and default value [US-U1]
-- [x] Unit tests for the browse endpoint exist and pass using fixture YAML data — `npm test` does not depend on the real mustard data store [US-U1]
-- [x] `GET /api/records` returns HTTP 500 with a structured JSON error body (not a raw stack trace or unhandled exception) when YAML file reading fails [US-U1]
-- [x] The `type` query parameter is used as an in-memory filter on parsed records — not interpolated into file system paths, shell commands, or directory names [US-U1]
-- [x] The app renders a two-column layout: CRUD panel on the left, lense on the right [US-U2]
-- [x] A toggle button in the DOM collapses and expands the CRUD panel [US-U2]
-- [x] When collapsed, the lense region fills the full viewport width (panel region not visible) [US-U2]
-- [x] When expanded, the CRUD panel occupies approximately 40% of the viewport width [US-U2]
-- [x] The lense input and result rendering remain functional in both collapsed and expanded panel states [US-U2]
-- [x] The visible app title reads "Mustard" (not "Mustard Lense") [US-U2]
-- [x] At viewport widths below 768px, the CRUD panel is collapsed by default [US-U2]
-- [x] CRUD panel components exist in a dedicated directory (e.g. `src/components/panel/`) [US-U2]
-- [x] Playwright E2E test verifies: both panel and lense regions are present in the DOM, toggle button collapses and expands the panel, lense input accepts text input after toggle [US-U2]
-- [x] User guide page documents the split-screen layout, panel toggle, type tabs, and list view field descriptions (at `docs/manual/layout.md` or equivalent path) [US-U2]
-- [x] Four tab elements render in the CRUD panel header with labels: "Todos", "People", "Ideas", "Daily Logs" [US-U3]
-- [x] Clicking a tab triggers a fetch to `GET /api/records?type=<log_type>` where log_type is `todo`, `people_note`, `idea`, or `daily_log` respectively [US-U3]
-- [x] The active tab is visually distinguished (verifiable by CSS class or `aria-selected` attribute) [US-U3]
-- [x] The "Todos" tab is active by default on first load [US-U3]
-- [x] Each tab displays a record count badge showing the number of records for that type [US-U3]
-- [x] A loading indicator is visible in the panel body while records are being fetched [US-U3]
-- [x] Unit tests verify tab rendering and active state toggling [US-U3]
-- [x] Todo list items display: status indicator (visual icon or badge), text (truncated to ~80 chars with ellipsis), and `due_date_local` when present [US-U4]
-- [x] People list items display: `person` name (bold), text (truncated to ~80 chars), and `capture_date_local` [US-U4]
-- [x] Idea list items display: `status` badge and text (truncated to ~80 chars) [US-U4]
-- [x] Daily log list items display: `capture_date_local`, `theme` (when present), and text (truncated to ~80 chars) [US-U4]
-- [x] List views use CSS custom properties from `tokens.css` for spacing, typography, and colors [US-U4]
-- [x] When a tab has zero records, a friendly empty-state message is displayed in the panel body (not a blank panel) [US-U4]
-- [x] List items render record text via React JSX expressions (textContent), not `dangerouslySetInnerHTML` [US-U4]
-- [x] Playwright E2E test verifies: at least one list item renders in a tab, list items contain expected field elements for that record type (mocked API response) [US-U4]
-- [x] `AGENTS.md` reflects new browse API endpoint (`GET /api/records`), data reader module, CRUD panel components, split-screen layout, and `MUSTARD_DATA_DIR` configuration introduced in this phase [phase]
+- [x] `POST /api/records` with valid `{ "log_type": "todo", "text": "Buy milk" }` returns HTTP 201 with a JSON object containing `id`, `log_type`, `text`, `capture_date_local`, `source`, and `meta` fields [US-U5]
+- [x] The created record is written as a YAML file in the correct subdirectory: `todos/` for `todo`, `people_notes/` for `people_note`, `ideas/` for `idea`, `daily_logs/` for `daily_log` [US-U5]
+- [x] `POST /api/records` returns 400 when `log_type` is missing from the request body [US-U5]
+- [x] `POST /api/records` returns 400 when `text` is missing or empty from the request body [US-U5]
+- [x] `POST /api/records` returns 400 when `log_type` is not one of `todo`, `people_note`, `idea`, `daily_log` [US-U5]
+- [x] The server auto-generates a UUID `id` on create (verifiable by presence of UUID-format string in response) [US-U5]
+- [x] The server auto-fills `capture_date_local` to today's date (YYYY-MM-DD format) on create [US-U5]
+- [x] The server auto-fills `source: "mustard-app"` and `meta: { tags: [] }` on create [US-U5]
+- [x] Optional fields (`person`, `status`, `due_date_local`, `category`, `theme`, `period`) are written to the YAML file when provided in the request body [US-U5]
+- [x] `PUT /api/records/:id` with valid body returns HTTP 200 with the full updated record [US-U5]
+- [x] `PUT /api/records/:id` updates the existing YAML file in place (verifiable by reading the file after update) [US-U5]
+- [x] `PUT /api/records/:id` returns 404 when the record ID is not found [US-U5]
+- [x] After a successful create or update, the server triggers a background reindex (verifiable by server log output indicating reindex started) [US-U5]
+- [x] A data writer module exists (e.g. `src/server/data/writer.ts`) that exports functions for creating and updating YAML record files [US-U5]
+- [x] Unit tests exist for both `POST /api/records` and `PUT /api/records/:id` using a temporary directory — `npm test` does not depend on the real data store [US-U5]
+- [x] `POST /api/records` validates `log_type` against a known allowlist (`todo`, `people_note`, `idea`, `daily_log`) — unknown types are rejected with 400 before any file write [US-U5]
+- [x] `POST /api/records` validates `text` is a non-empty string with a maximum length before writing (prevents empty or excessively large files) [US-U5]
+- [x] `PUT /api/records/:id` validates the `id` parameter format before attempting file lookup — no user-provided values are interpolated into file paths via string concatenation (use ID-to-filepath mapping from the data reader) [US-U5]
+- [x] `POST /api/records` returns 500 with a structured JSON error body (not a raw stack trace) when YAML file writing fails [US-U5]
+- [x] `PUT /api/records/:id` returns 500 with a structured JSON error body (not a raw stack trace) when YAML file writing fails [US-U5]
+- [x] Clicking a list item in the CRUD panel opens a slide-over drawer element in the DOM [US-U6]
+- [x] The drawer overlays from the right side and does not cover the full viewport — the list remains partially visible behind it [US-U6]
+- [x] Drawer open/close has a CSS slide animation (verifiable by presence of `transition` or `animation` CSS property) [US-U6]
+- [x] The drawer displays all fields for the selected record in editable form inputs [US-U6]
+- [x] Todo records show: `text` (textarea), `status` (dropdown: open/done/parked), `due_date_local` (date input) [US-U6]
+- [x] People note records show: `text` (textarea), `person` (text input) [US-U6]
+- [x] Idea records show: `text` (textarea), `status` (dropdown: open/done/parked) [US-U6]
+- [x] Daily log records show: `text` (textarea), `theme` (text input) [US-U6]
+- [x] The `text` field renders as a `<textarea>` element (not a single-line `<input>`) [US-U6]
+- [x] The `log_type` and `id` fields are displayed but not editable in edit mode (read-only or disabled) [US-U6]
+- [x] A "Save" button sends `PUT /api/records/:id` with the form data [US-U6]
+- [x] On successful save, the drawer closes, the list refreshes to show updated data, and tab count updates [US-U6]
+- [x] A "Close" button (or click-outside) dismisses the drawer without saving [US-U6]
+- [x] The detail drawer form renders all user-provided text via React `value` attributes or JSX text nodes, not `dangerouslySetInnerHTML` [US-U6]
+- [x] Playwright E2E test verifies: clicking a list item opens the drawer, drawer displays record fields, close button dismisses the drawer (mocked API) [US-U6]
+- [x] User guide page "Editing Records" exists (at `docs/manual/editing.md` or equivalent) documenting the detail drawer, save/close actions, type-specific form fields, and the Add button capture flow [US-U6]
+- [x] An "Add" button (or "+" affordance) is visible in the CRUD panel header without scrolling [US-U7]
+- [x] Clicking "Add" opens the detail drawer in create mode (empty form, no record data pre-populated) [US-U7]
+- [x] The `log_type` field is pre-set to the active tab's type (e.g., `todo` when on the Todos tab) [US-U7]
+- [x] The `log_type` field is changeable in create mode via a dropdown [US-U7]
+- [x] The `text` textarea is auto-focused when the drawer opens in create mode [US-U7]
+- [x] A "Save" button sends `POST /api/records` with the form data [US-U7]
+- [x] On successful save, the drawer closes, the panel list refreshes to include the new record, and tab count updates [US-U7]
+- [x] The "Save" button is disabled when the `text` field is empty [US-U7]
+- [x] Playwright E2E test verifies: clicking Add opens drawer in create mode, log_type is pre-selected from active tab, save button is disabled when text is empty (mocked API) [US-U7]
+- [x] A sort dropdown is visible above the record list in the CRUD panel body with options: "Newest first" (default), "Oldest first" [US-U8]
+- [x] The Todos tab sort dropdown includes an additional option: "Status (open first)" which orders records as open → parked → done [US-U8]
+- [x] Selecting a sort option re-orders the displayed list client-side without an additional API call [US-U8]
+- [x] A "Show" control (dropdown or numeric input) is visible above the list, defaulting to 25 [US-U8]
+- [x] The list displays at most the number of records specified by the "Show" control [US-U8]
+- [x] When more records exist than the limit, a "Show all" or "Load more" affordance is visible below the list [US-U8]
+- [x] Sort selection is persisted in `localStorage` per tab (e.g., key `mustard-sort-todo`) [US-U8]
+- [x] Limit value is persisted in `localStorage` per tab (e.g., key `mustard-limit-todo`) [US-U8]
+- [x] On page reload, persisted sort and limit preferences are restored for each tab [US-U8]
+- [x] Unit tests verify sort logic: date ascending, date descending, and status grouping (open → parked → done) for todos [US-U8]
+- [x] Playwright E2E test verifies: sort dropdown changes list order, limit control caps the number of visible list items (mocked API) [US-U8]
+- [x] `AGENTS.md` reflects new write API endpoints (`POST /api/records`, `PUT /api/records/:id`), data writer module, detail drawer component, Add button, list view controls, and localStorage preferences introduced in this phase [phase]
+- [x] User guide page "App Layout" updated to document sort and limit controls with per-tab persistence [US-U8]
 
 ### Golden principles (phase-relevant)
-- **People first** — split-screen layout and type-specific views respect Jaco's time; data is scannable at a glance, not buried behind AI queries
-- **Clarity over complexity** — tab-per-type mirrors the on-disk data structure; direct YAML file reading with no ORM; configurable data path via a single env var
-- **Faithful stewardship** — unit tests and E2E tests from day one; shared `MUSTARD_DATA_DIR` ensures browse API and RAG indexer always read from the same source
-- **Continuous improvement** — the CRUD panel architecture is designed to extend with write operations, detail drawer, and capture form in subsequent phases
+- **People first** — capture is the MLP-critical moment; auto-focus, type pre-selection, and one-click Add make the path from intent to saved record as short as possible
+- **Faithful stewardship** — auto-filled metadata (source, capture_date, meta) removes friction fields without losing data lineage; relaxed validation puts UX proof before schema hardening
+- **Safety and ethics** — ID-to-filepath mapping prevents path traversal; log_type allowlist prevents arbitrary directory writes; all form text rendered safely via React value binding
+- **Clarity over complexity** — client-side sorting avoids extra API calls; localStorage persistence is simple and requires no backend state; the drawer is one component shared between create and edit

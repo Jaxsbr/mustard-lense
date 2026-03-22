@@ -38,6 +38,10 @@ let mockSynthesise: any
 let mockBuildIndex: any
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 let mockReadRecords: any
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+let mockCreateRecord: any
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+let mockUpdateRecord: any
 let deps: AppDependencies
 
 beforeEach(() => {
@@ -47,7 +51,33 @@ beforeEach(() => {
   mockSynthesise = vi.fn().mockResolvedValue(mockResponse)
   mockBuildIndex = vi.fn().mockResolvedValue({ records: 10 })
   mockReadRecords = vi.fn().mockReturnValue(fixtureRecords)
-  deps = { retrieve: mockRetrieve, synthesiser: { synthesise: mockSynthesise }, buildIndex: mockBuildIndex, readRecords: mockReadRecords }
+  mockCreateRecord = vi.fn().mockReturnValue({
+    id: 'aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee',
+    log_type: 'todo',
+    capture_date_local: '2026-03-22',
+    text: 'Buy milk',
+    person: null,
+    status: null,
+    due_date_local: null,
+    category: null,
+    theme: null,
+    period: null,
+    tags: [],
+  })
+  mockUpdateRecord = vi.fn().mockReturnValue({
+    id: 'todo-1',
+    log_type: 'todo',
+    capture_date_local: '2026-03-15',
+    text: 'Buy groceries updated',
+    person: null,
+    status: 'done',
+    due_date_local: '2026-03-16',
+    category: null,
+    theme: null,
+    period: null,
+    tags: ['personal'],
+  })
+  deps = { retrieve: mockRetrieve, synthesiser: { synthesise: mockSynthesise }, buildIndex: mockBuildIndex, readRecords: mockReadRecords, createRecord: mockCreateRecord, updateRecord: mockUpdateRecord }
 })
 
 describe('POST /api/lense', () => {
@@ -264,5 +294,163 @@ describe('GET /api/records', () => {
 
     expect(res.body).toHaveProperty('error')
     expect(res.body.error).not.toContain('ENOENT')
+  })
+})
+
+describe('POST /api/records', () => {
+  it('returns 201 with created record on valid input', async () => {
+    const app = createApp(deps)
+    const res = await request(app)
+      .post('/api/records')
+      .send({ log_type: 'todo', text: 'Buy milk' })
+      .expect(201)
+      .expect('Content-Type', /json/)
+
+    expect(res.body).toHaveProperty('id')
+    expect(res.body).toHaveProperty('log_type', 'todo')
+    expect(res.body).toHaveProperty('text', 'Buy milk')
+    expect(res.body).toHaveProperty('capture_date_local')
+    expect(res.body).toHaveProperty('tags')
+    expect(mockCreateRecord).toHaveBeenCalledWith(expect.objectContaining({ log_type: 'todo', text: 'Buy milk' }))
+  })
+
+  it('returns 400 when log_type is missing', async () => {
+    const app = createApp(deps)
+    const res = await request(app)
+      .post('/api/records')
+      .send({ text: 'Buy milk' })
+      .expect(400)
+      .expect('Content-Type', /json/)
+
+    expect(res.body.error).toMatch(/log_type/i)
+  })
+
+  it('returns 400 when text is missing', async () => {
+    const app = createApp(deps)
+    const res = await request(app)
+      .post('/api/records')
+      .send({ log_type: 'todo' })
+      .expect(400)
+      .expect('Content-Type', /json/)
+
+    expect(res.body.error).toMatch(/text/i)
+  })
+
+  it('returns 400 when text is empty string', async () => {
+    const app = createApp(deps)
+    await request(app)
+      .post('/api/records')
+      .send({ log_type: 'todo', text: '' })
+      .expect(400)
+  })
+
+  it('returns 400 when log_type is invalid', async () => {
+    const app = createApp(deps)
+    const res = await request(app)
+      .post('/api/records')
+      .send({ log_type: 'invalid_type', text: 'test' })
+      .expect(400)
+
+    expect(res.body.error).toMatch(/log_type/i)
+  })
+
+  it('returns 500 with structured error when writer throws', async () => {
+    mockCreateRecord.mockImplementation(() => { throw new Error('ENOSPC: disk full') })
+    const app = createApp(deps)
+    const res = await request(app)
+      .post('/api/records')
+      .send({ log_type: 'todo', text: 'test' })
+      .expect(500)
+      .expect('Content-Type', /json/)
+
+    expect(res.body).toHaveProperty('error')
+    expect(res.body.error).not.toContain('ENOSPC')
+  })
+
+  it('triggers background reindex after successful create', async () => {
+    const app = createApp(deps)
+    await request(app)
+      .post('/api/records')
+      .send({ log_type: 'todo', text: 'test' })
+      .expect(201)
+
+    // Allow background promise to settle
+    await new Promise((r) => setTimeout(r, 10))
+    expect(mockBuildIndex).toHaveBeenCalled()
+  })
+
+  it('passes optional fields to createRecord', async () => {
+    const app = createApp(deps)
+    await request(app)
+      .post('/api/records')
+      .send({ log_type: 'todo', text: 'test', status: 'open', due_date_local: '2026-04-01' })
+      .expect(201)
+
+    expect(mockCreateRecord).toHaveBeenCalledWith(expect.objectContaining({ status: 'open', due_date_local: '2026-04-01' }))
+  })
+})
+
+describe('PUT /api/records/:id', () => {
+  it('returns 200 with updated record', async () => {
+    const app = createApp(deps)
+    const res = await request(app)
+      .put('/api/records/aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee')
+      .send({ text: 'Buy groceries updated', status: 'done' })
+      .expect(200)
+      .expect('Content-Type', /json/)
+
+    expect(res.body).toHaveProperty('id')
+    expect(mockUpdateRecord).toHaveBeenCalledWith('aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee', expect.objectContaining({ text: 'Buy groceries updated', status: 'done' }))
+  })
+
+  it('returns 404 when record not found', async () => {
+    mockUpdateRecord.mockReturnValueOnce(null)
+    const app = createApp(deps)
+    const res = await request(app)
+      .put('/api/records/aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee')
+      .send({ text: 'updated' })
+      .expect(404)
+
+    expect(res.body.error).toMatch(/not found/i)
+  })
+
+  it('returns 400 for invalid ID format', async () => {
+    const app = createApp(deps)
+    await request(app)
+      .put('/api/records/not-a-valid-uuid')
+      .send({ text: 'hacked' })
+      .expect(400)
+  })
+
+  it('returns 400 when text is empty', async () => {
+    const app = createApp(deps)
+    await request(app)
+      .put('/api/records/aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee')
+      .send({ text: '' })
+      .expect(400)
+  })
+
+  it('returns 500 with structured error when writer throws', async () => {
+    mockUpdateRecord.mockImplementation(() => { throw new Error('ENOSPC: disk full') })
+    const app = createApp(deps)
+    const res = await request(app)
+      .put('/api/records/aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee')
+      .send({ text: 'test' })
+      .expect(500)
+      .expect('Content-Type', /json/)
+
+    expect(res.body).toHaveProperty('error')
+    expect(res.body.error).not.toContain('ENOSPC')
+  })
+
+  it('triggers background reindex after successful update', async () => {
+    const app = createApp(deps)
+    await request(app)
+      .put('/api/records/aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee')
+      .send({ text: 'updated' })
+      .expect(200)
+
+    await new Promise((r) => setTimeout(r, 10))
+    expect(mockBuildIndex).toHaveBeenCalled()
   })
 })

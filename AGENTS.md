@@ -23,21 +23,29 @@ mustard-lense/
 │   │   ├── components.css        # Shared component styles
 │   │   ├── tokens.css            # Design tokens (CSS variables)
 │   │   └── panel/
-│   │       ├── CrudPanel.tsx     # Collapsible panel with type tabs and list views
-│   │       ├── CrudPanel.css     # Panel, tab, and list styles
+│   │       ├── CrudPanel.tsx     # Collapsible panel with type tabs, list views, drawer, sort/limit
+│   │       ├── CrudPanel.css     # Panel, tab, list, and add button styles
 │   │       ├── CrudPanel.test.tsx # Unit tests for panel tabs and rendering
+│   │       ├── DetailDrawer.tsx  # Slide-over drawer for viewing/editing/creating records
+│   │       ├── DetailDrawer.css  # Drawer, form, and backdrop styles
+│   │       ├── ListControls.tsx  # Sort dropdown + limit control above record list
+│   │       ├── ListControls.css  # Controls bar styles
 │   │       ├── ListItems.tsx     # Type-specific list item components
-│   │       └── ListItems.css     # List item styles using design tokens
+│   │       ├── ListItems.css     # List item styles using design tokens
+│   │       ├── sort.ts           # Sort logic — newest, oldest, status (open first)
+│   │       ├── sort.test.ts      # Unit tests for sort logic
+│   │       └── types.ts          # Tab definitions and PanelRecord type alias
 │   ├── shared/
 │   │   └── schema.ts        # Response schema — TypeScript interfaces for component types
 │   ├── server/
-│   │   ├── app.ts            # Express app: POST /api/lense (SSE), POST /api/reindex, GET /api/records
+│   │   ├── app.ts            # Express app: POST /api/lense (SSE), POST /api/reindex, GET /api/records, POST /api/records, PUT /api/records/:id
 │   │   ├── index.ts          # Server entry point — builds index on startup, wires deps, listens on 3001
 │   │   ├── synthesiser.ts    # Synthesiser interface + CliSynthesiser (wraps invokeClaude)
 │   │   ├── synthesiser.test.ts # Unit tests for CliSynthesiser (mocked invokeClaude)
 │   │   ├── server.test.ts    # API endpoint unit tests (mocked deps)
 │   │   ├── data/
-│   │   │   └── reader.ts     # Reads YAML records from configurable data directory (MUSTARD_DATA_DIR)
+│   │   │   ├── reader.ts     # Reads YAML records from configurable data directory (MUSTARD_DATA_DIR)
+│   │   │   └── writer.ts     # Creates and updates YAML record files with UUID generation
 │   │   └── rag/
 │   │       ├── embedder.ts   # Embedding wrapper — transformers.js, Xenova/all-MiniLM-L6-v2
 │   │       ├── indexer.ts    # Imports from data/reader, generates embeddings, writes to LanceDB
@@ -76,21 +84,26 @@ mustard-lense/
 | `src/lib/claude-cli.ts` | CLI module | Exports `invokeClaude`, `ClaudeResult`, `ClaudeMode` |
 | `src/lib/claude-cli.test.ts` | Tests | Mocked unit tests — no real CLI invoked |
 | `src/shared/schema.ts` | Schema | Response schema — 5 component types, shared by server and frontend |
-| `src/server/app.ts` | API server | Express app: POST /api/lense (SSE), POST /api/reindex, GET /api/records. Uses dependency injection (createApp). |
-| `src/server/index.ts` | Entry point | Builds vector index on startup, wires real dependencies (including readRecords), starts server |
-| `src/server/data/reader.ts` | Data reader | Reads YAML records from `MUSTARD_DATA_DIR` (default `~/dev/mustard/data/`). Exports `readRecords`, `getDataDir`, `MustardRecord` interface. Shared by browse API and RAG indexer. |
+| `src/server/app.ts` | API server | Express app: POST /api/lense (SSE), POST /api/reindex, GET /api/records, POST /api/records, PUT /api/records/:id. Uses dependency injection (createApp). |
+| `src/server/index.ts` | Entry point | Builds vector index on startup, wires real dependencies (readRecords, createRecord, updateRecord), starts server |
+| `src/server/data/reader.ts` | Data reader | Reads YAML records from `MUSTARD_DATA_DIR` (default `~/dev/mustard/data/`). Exports `readRecords`, `getDataDir`, `findYamlFiles`. Shared by browse API, RAG indexer, and writer. |
+| `src/server/data/writer.ts` | Data writer | Creates and updates YAML record files. Exports `createRecord`, `updateRecord`, `validateLogType`, `validateText`. UUID generation, auto-filled metadata, log_type-to-subdirectory mapping. |
 | `src/server/synthesiser.ts` | Synthesis | Synthesiser interface + CliSynthesiser — wraps invokeClaude with inline records |
 | `src/server/synthesiser.test.ts` | Tests | CliSynthesiser tests — mocked invokeClaude, success + error paths |
 | `src/server/rag/embedder.ts` | RAG | Singleton embedding pipeline — transformers.js, Xenova/all-MiniLM-L6-v2, 384d vectors |
 | `src/server/rag/indexer.ts` | RAG | Imports readRecords from data/reader, embeds text, writes to LanceDB with metadata |
 | `src/server/rag/retriever.ts` | RAG | Embeds query, performs LanceDB vector search, returns top-k records (default k=5) |
 | `src/server/rag/rag.test.ts` | Tests | Indexer + retriever tests with fixture YAML data, mocked embedder + LanceDB |
-| `src/server/server.test.ts` | Tests | API endpoint tests with mocked deps — verifies SSE events, browse endpoint, reindex |
+| `src/server/server.test.ts` | Tests | API endpoint tests with mocked deps — verifies SSE events, browse endpoint, reindex, create, update |
 | `src/components/ResultRenderer.tsx` | Registry | Maps component type string to React renderer |
 | `src/components/*.tsx` | Renderers | Template components for each mustard data type |
-| `src/components/panel/CrudPanel.tsx` | CRUD panel | Collapsible panel with type tabs (Todos, People, Ideas, Daily Logs), fetches records, count badges |
+| `src/components/panel/CrudPanel.tsx` | CRUD panel | Collapsible panel with type tabs, list views, detail drawer, sort/limit controls, Add button, localStorage prefs |
 | `src/components/panel/CrudPanel.test.tsx` | Tests | Unit tests for tab rendering, active state, fetch, loading, empty state |
+| `src/components/panel/DetailDrawer.tsx` | Detail drawer | Slide-over drawer for viewing/editing/creating records, type-specific form fields |
+| `src/components/panel/ListControls.tsx` | List controls | Sort dropdown (newest, oldest, status) + limit control (default 25) + Show all |
 | `src/components/panel/ListItems.tsx` | List views | Type-specific list item components: TodoListItem, PeopleListItem, IdeaListItem, DailyLogListItem |
+| `src/components/panel/sort.ts` | Sort logic | Sort functions: newest first, oldest first, status grouping (open → parked → done) |
+| `src/components/panel/sort.test.ts` | Tests | Unit tests for sort logic: date asc, date desc, status grouping |
 | `src/App.tsx` | UI | Split-screen layout — CRUD panel (left, collapsible ~40%), lense (right, always visible). Responsive at 768px. |
 | `src/smoke/*.ts` | Smoke tests | On-demand, invoke real CLI/API — NOT run by `npm test` |
 | `e2e/*.spec.ts` | E2E tests | Playwright tests with mocked SSE + records API — NOT run by `npm test` |
@@ -108,6 +121,26 @@ mustard-lense/
 - **Count badges** — each tab shows a record count.
 - **Type-specific list views** — TodoListItem (status + text + due date), PeopleListItem (person bold + text + date), IdeaListItem (status + text), DailyLogListItem (date + theme + text).
 - **Empty state** — "No records found." when a tab has zero records.
+- **Add button** — "+" in panel header, opens detail drawer in create mode with active tab type pre-selected.
+- **Sort controls** — dropdown above list: "Newest first" (default), "Oldest first", "Status (open first)" (todo only). Client-side sort, no API call.
+- **Limit control** — "Show" dropdown (default 25) with "Show all" link when more records exist.
+- **localStorage persistence** — sort and limit prefs saved per tab: `mustard-sort-{type}`, `mustard-limit-{type}`.
+
+## Detail drawer
+
+- **Slide-over** — overlays from the right, 400px wide (max 80vw). CSS slide transition.
+- **Edit mode** — click a list item. Shows all fields in editable form inputs. `log_type` and `id` are read-only.
+- **Create mode** — click Add button. Empty form, `log_type` changeable via dropdown, `text` auto-focused.
+- **Type-specific fields** — todo: text (textarea), status (dropdown), due_date (date input). people_note: text, person. idea: text, status. daily_log: text, theme.
+- **Save** — PUT `/api/records/:id` (edit) or POST `/api/records` (create). Drawer closes, list refreshes, counts update.
+- **Close** — button or backdrop click. No save.
+- **Validation** — Save disabled when text is empty.
+
+## Write API
+
+- **POST /api/records** — creates a record. Requires `log_type` (allowlist: todo, people_note, idea, daily_log) and `text` (non-empty, max 10000 chars). Auto-generates UUID `id`, `capture_date_local` (today), `source: mustard-app`, `meta: { tags: [] }`. Returns 201. Triggers background reindex.
+- **PUT /api/records/:id** — updates a record by ID. UUID format validated. Uses ID-to-filepath scan (no path interpolation). Returns 200. Returns 404 if not found. Triggers background reindex.
+- **Validation** — log_type allowlist, text non-empty + max length, UUID format on PUT. 400 for invalid input, 500 with structured error on write failure.
 
 ## Lense interaction model
 
@@ -145,7 +178,7 @@ Defined in `src/shared/schema.ts`, used by both server and frontend.
 
 ## Testing
 
-- `npm test` — Vitest unit tests (49 tests: 8 CLI + 16 server + 9 synthesiser + 7 RAG + 7 panel + 2 reserved) with mocked dependencies
+- `npm test` — Vitest unit tests (68 tests: 8 CLI + 30 server + 9 synthesiser + 7 RAG + 7 panel + 5 sort + 2 reserved) with mocked dependencies
 - `npm run test:e2e` — Playwright E2E tests with mocked SSE endpoint and mocked records API
 - `npm run smoke:basic` / `npm run smoke:admin` — real CLI invocation
 - `npm run smoke:lense` — real E2E through API + RAG + Claude + data store (reads SSE stream)

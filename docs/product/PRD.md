@@ -306,7 +306,7 @@ As a user, I want to see real processing stages ("Finding records...", "Thinking
 
 ---
 
-### US-U1 — Record browse API with configurable data directory
+### US-U1 — Record browse API with configurable data directory [Shipped]
 
 As Jaco, I want an API endpoint that returns my mustard records filtered by type, reading from a configurable data directory, so that the CRUD panel can display my data without depending on the RAG pipeline.
 
@@ -326,7 +326,7 @@ As Jaco, I want an API endpoint that returns my mustard records filtered by type
 
 ---
 
-### US-U2 — Split-screen layout with collapsible CRUD panel
+### US-U2 — Split-screen layout with collapsible CRUD panel [Shipped]
 
 As Jaco, I want a split-screen layout with a collapsible structured panel on the left and the lense on the right, so that I can browse my data and query the lense side-by-side in one tool.
 
@@ -349,7 +349,7 @@ As Jaco, I want a split-screen layout with a collapsible structured panel on the
 
 ---
 
-### US-U3 — Type tabs in CRUD panel
+### US-U3 — Type tabs in CRUD panel [Shipped]
 
 As Jaco, I want tabs in the CRUD panel for Todos, People, Ideas, and Daily Logs, so that I can quickly switch between record types without leaving the panel.
 
@@ -372,7 +372,7 @@ As Jaco, I want tabs in the CRUD panel for Todos, People, Ideas, and Daily Logs,
 
 ---
 
-### US-U4 — Type-specific list views
+### US-U4 — Type-specific list views [Shipped]
 
 As Jaco, I want each tab in the CRUD panel to render a compact, scannable list view tailored to that record type, so that I can quickly find and review records without opening each one.
 
@@ -395,6 +395,105 @@ As Jaco, I want each tab in the CRUD panel to render a compact, scannable list v
 
 ---
 
+### US-U5 — Record write API (create and update)
+
+As Jaco, I want API endpoints that create and update mustard records as YAML files, so that the CRUD panel can write data without depending on the old Flask app.
+
+**Acceptance criteria**:
+- `POST /api/records` creates a new YAML file in the correct subdirectory based on `log_type` (e.g., `todos/`, `people_notes/`, `ideas/`, `daily_logs/`)
+- The request body includes at minimum `log_type` and `text`; returns 400 if either is missing
+- `log_type` must be one of `todo`, `people_note`, `idea`, `daily_log`; returns 400 for unknown types
+- The server auto-generates a unique `id` (UUID) and sets `capture_date_local` to today's date on create
+- The server auto-fills `source: mustard-app` and `meta: { tags: [] }` on create so the user never deals with them
+- All other fields (`person`, `status`, `due_date_local`, `category`, `theme`, `period`) are optional and written if provided
+- `POST /api/records` returns 201 with the full created record (including generated fields)
+- `PUT /api/records/:id` updates an existing record's YAML file in place
+- `PUT /api/records/:id` returns 200 with the full updated record
+- `PUT /api/records/:id` returns 404 when the record ID is not found
+- After a successful create or update, the server triggers a background reindex so the lense picks up the change (response does not wait for reindex to complete)
+- Unit tests exist for both endpoints using a temporary directory (no real data store dependency)
+
+**User guidance:** N/A — internal API consumed by the detail drawer and capture form.
+
+**Design rationale:** Writing YAML directly (not through the old Flask app) makes mustard-lense self-sufficient for data mutation. Auto-filling `source`, `meta`, and `capture_date_local` removes friction fields that users never want to think about. Background reindex ensures the lense stays current without blocking the write response.
+
+---
+
+### US-U6 — Detail drawer for viewing and editing records
+
+As Jaco, I want to click a record in the list and have a slide-over drawer open with the full editable form, so that I can view and update any record without leaving the browse panel.
+
+**Acceptance criteria**:
+- Clicking a list item in the CRUD panel opens a slide-over drawer that overlays from the right
+- The drawer shows all fields for the record in editable form inputs
+- Form fields are type-specific: todo shows `text`, `status` (dropdown: open/done/parked), `due_date_local` (date picker); people_note shows `text`, `person`; idea shows `text`, `status`; daily_log shows `text`, `theme`
+- The `text` field uses a textarea (not a single-line input) to accommodate multi-line content
+- The `log_type` and `id` fields are displayed but not editable in edit mode
+- A "Save" button sends `PUT /api/records/:id` with the form data
+- On successful save, the drawer closes, the list refreshes to show updated data, and the tab count updates
+- A "Close" button (or click outside the drawer) dismisses the drawer without saving
+- The list remains visible behind the drawer for context (drawer does not cover the full viewport)
+- Drawer open/close has a CSS slide animation (not instant appear/disappear)
+- Form fields render user-provided text via React JSX expressions (value attribute or textContent), not `dangerouslySetInnerHTML`
+- Playwright E2E test verifies: clicking a list item opens the drawer, drawer displays record fields, close button dismisses the drawer (mocked API)
+
+**User guidance:**
+- Discovery: Click any record in the CRUD panel list to open the detail drawer
+- Manual section: new page: "Editing Records"
+- Key steps: 1. Click a record in any tab — the detail drawer slides in from the right. 2. Edit the fields you want to change (text, status, due date, etc.). 3. Click "Save" to persist changes — the drawer closes and the list updates.
+
+**Design rationale:** A slide-over drawer (not a modal or full-page view) keeps the list visible for context — the user can see which record they selected and what's around it. Type-specific form fields surface only what's relevant per record type, reducing cognitive load.
+
+---
+
+### US-U7 — Quick capture with sticky Add button
+
+As Jaco, I want a sticky "Add" button in the CRUD panel header that opens the detail drawer in create mode with the active tab's type pre-selected, so that capturing a new record is one click away without scrolling or switching context.
+
+**Acceptance criteria**:
+- An "Add" button (or "+" affordance) is always visible in the CRUD panel header, without scrolling
+- Clicking "Add" opens the detail drawer in create mode (empty form)
+- The `log_type` field is pre-set to the active tab's type (e.g., clicking Add while on the Todos tab pre-selects `todo`)
+- The `log_type` field is changeable in create mode via a dropdown, in case the user wants a different type
+- The `text` field is auto-focused when the drawer opens in create mode, so the user can start typing immediately
+- A "Save" button sends `POST /api/records` with the form data
+- On successful save, the drawer closes, the panel list refreshes to include the new record, and the tab count updates
+- Validation: the "Save" button is disabled when `text` is empty
+- Playwright E2E test verifies: clicking Add opens drawer in create mode, log_type is pre-selected from active tab, save button is disabled when text is empty (mocked API)
+
+**User guidance:**
+- Discovery: The "Add" button is always visible in the CRUD panel header — top-left of the app
+- Manual section: existing page: "Editing Records"
+- Key steps: 1. Click the "+" button in the panel header — the detail drawer opens with an empty form, type pre-set to the active tab. 2. Type your note, idea, or todo in the text field (auto-focused). 3. Click "Save" — the record is created and appears in the list.
+
+**Design rationale:** One-click capture with type pre-selection and auto-focus on the text field makes the path from "I want to capture something" to "it's saved" as short as possible. This is the MLP-critical moment — if this doesn't feel faster than a text file, the unification fails.
+
+---
+
+### US-U8 — List view controls (sort, limit, persisted preferences)
+
+As Jaco, I want sort and limit controls on the list view so that I can order records by date or status and cap the visible list at a manageable size, with my preferences remembered between sessions.
+
+**Acceptance criteria**:
+- A sort dropdown appears in the CRUD panel body (above the list) with options: "Newest first" (default), "Oldest first"
+- The Todos tab has an additional sort option: "Status (open first)" which groups open, then parked, then done
+- Selecting a sort option re-orders the displayed list client-side (no additional API call)
+- A "Show" control (dropdown or numeric input) sets the maximum number of records displayed, defaulting to 25
+- When more records exist than the limit, a "Show all" or "Load more" affordance is visible below the list
+- Sort selection and limit value are persisted in `localStorage` per tab (e.g., Todos sorted by status persists independently from People sorted by date)
+- On page reload, the persisted sort and limit preferences are restored for each tab
+- Unit tests verify sort logic: date ascending, date descending, status grouping for todos
+- Playwright E2E test verifies: sort dropdown changes list order, limit control caps visible items (mocked API)
+
+**User guidance:**
+- Discovery: Sort and limit controls appear above the record list in each tab
+- Manual section: existing page: "App Layout"
+- Key steps: 1. Use the sort dropdown to reorder records — "Newest first", "Oldest first", or "Status" for todos. 2. Adjust the "Show" control to limit visible records (default 25). 3. Your preferences are saved automatically — they'll be there next time you open the app.
+
+**Design rationale:** Client-side sorting avoids extra API calls and keeps the interaction instant. Per-tab persistence in localStorage means Jaco's Todos tab stays sorted by status while People stays sorted by date — each tab remembers its own context. A default limit of 25 keeps the panel scannable as the data store grows.
+
+---
+
 ## Implementation phases
 
 | Phase | Name | Stories | Status |
@@ -402,7 +501,8 @@ As Jaco, I want each tab in the CRUD panel to render a compact, scannable list v
 | 1 | Foundation | US-L1, US-L2, US-L3, US-L4, US-L5 | Shipped |
 | 2 | Intelligent Lense | US-L6, US-L7, US-L8, US-L9 | Shipped |
 | 3 | RAG Lense | US-L10, US-L11, US-L12, US-L13 | Shipped |
-| 4 | Structured Browse | US-U1, US-U2, US-U3, US-U4 | Planned |
+| 4 | Structured Browse | US-U1, US-U2, US-U3, US-U4 | Shipped |
+| 5 | Capture & Edit | US-U5, US-U6, US-U7, US-U8 | Planned |
 
 ### Phase 1 — Foundation
 
@@ -626,3 +726,85 @@ Introduce a structured browse panel alongside the existing lense, creating the u
 - **Clarity over complexity** — tab-per-type mirrors the on-disk data structure; direct YAML file reading with no ORM; configurable data path via a single env var
 - **Faithful stewardship** — unit tests and E2E tests from day one; shared `MUSTARD_DATA_DIR` ensures browse API and RAG indexer always read from the same source
 - **Continuous improvement** — the CRUD panel architecture is designed to extend with write operations, detail drawer, and capture form in subsequent phases
+
+### Phase 5 — Capture & Edit
+
+Add write capability and list controls to the unified mustard app. A write API creates and updates records as YAML files with auto-generated IDs and auto-filled metadata. A slide-over detail drawer lets users view and edit any record by clicking it in the list. A sticky "Add" button in the panel header opens the drawer in create mode with the active tab's type pre-selected — the zero-friction capture path that makes this a daily driver. List view controls add sort options (date, status) and a configurable record limit (default 25), with per-tab preferences persisted in localStorage.
+
+**Done-when (observable):**
+
+- [ ] `POST /api/records` with valid `{ "log_type": "todo", "text": "Buy milk" }` returns HTTP 201 with a JSON object containing `id`, `log_type`, `text`, `capture_date_local`, `source`, and `meta` fields [US-U5]
+- [ ] The created record is written as a YAML file in the correct subdirectory: `todos/` for `todo`, `people_notes/` for `people_note`, `ideas/` for `idea`, `daily_logs/` for `daily_log` [US-U5]
+- [ ] `POST /api/records` returns 400 when `log_type` is missing from the request body [US-U5]
+- [ ] `POST /api/records` returns 400 when `text` is missing or empty from the request body [US-U5]
+- [ ] `POST /api/records` returns 400 when `log_type` is not one of `todo`, `people_note`, `idea`, `daily_log` [US-U5]
+- [ ] The server auto-generates a UUID `id` on create (verifiable by presence of UUID-format string in response) [US-U5]
+- [ ] The server auto-fills `capture_date_local` to today's date (YYYY-MM-DD format) on create [US-U5]
+- [ ] The server auto-fills `source: "mustard-app"` and `meta: { tags: [] }` on create [US-U5]
+- [ ] Optional fields (`person`, `status`, `due_date_local`, `category`, `theme`, `period`) are written to the YAML file when provided in the request body [US-U5]
+- [ ] `PUT /api/records/:id` with valid body returns HTTP 200 with the full updated record [US-U5]
+- [ ] `PUT /api/records/:id` updates the existing YAML file in place (verifiable by reading the file after update) [US-U5]
+- [ ] `PUT /api/records/:id` returns 404 when the record ID is not found [US-U5]
+- [ ] After a successful create or update, the server triggers a background reindex (verifiable by server log output indicating reindex started) [US-U5]
+- [ ] A data writer module exists (e.g. `src/server/data/writer.ts`) that exports functions for creating and updating YAML record files [US-U5]
+- [ ] Unit tests exist for both `POST /api/records` and `PUT /api/records/:id` using a temporary directory — `npm test` does not depend on the real data store [US-U5]
+- [ ] `POST /api/records` validates `log_type` against a known allowlist (`todo`, `people_note`, `idea`, `daily_log`) — unknown types are rejected with 400 before any file write [US-U5]
+- [ ] `POST /api/records` validates `text` is a non-empty string with a maximum length before writing (prevents empty or excessively large files) [US-U5]
+- [ ] `PUT /api/records/:id` validates the `id` parameter format before attempting file lookup — no user-provided values are interpolated into file paths via string concatenation (use ID-to-filepath mapping from the data reader) [US-U5]
+- [ ] `POST /api/records` returns 500 with a structured JSON error body (not a raw stack trace) when YAML file writing fails [US-U5]
+- [ ] `PUT /api/records/:id` returns 500 with a structured JSON error body (not a raw stack trace) when YAML file writing fails [US-U5]
+- [ ] Clicking a list item in the CRUD panel opens a slide-over drawer element in the DOM [US-U6]
+- [ ] The drawer overlays from the right side and does not cover the full viewport — the list remains partially visible behind it [US-U6]
+- [ ] Drawer open/close has a CSS slide animation (verifiable by presence of `transition` or `animation` CSS property) [US-U6]
+- [ ] The drawer displays all fields for the selected record in editable form inputs [US-U6]
+- [ ] Todo records show: `text` (textarea), `status` (dropdown: open/done/parked), `due_date_local` (date input) [US-U6]
+- [ ] People note records show: `text` (textarea), `person` (text input) [US-U6]
+- [ ] Idea records show: `text` (textarea), `status` (dropdown: open/done/parked) [US-U6]
+- [ ] Daily log records show: `text` (textarea), `theme` (text input) [US-U6]
+- [ ] The `text` field renders as a `<textarea>` element (not a single-line `<input>`) [US-U6]
+- [ ] The `log_type` and `id` fields are displayed but not editable in edit mode (read-only or disabled) [US-U6]
+- [ ] A "Save" button sends `PUT /api/records/:id` with the form data [US-U6]
+- [ ] On successful save, the drawer closes, the list refreshes to show updated data, and tab count updates [US-U6]
+- [ ] A "Close" button (or click-outside) dismisses the drawer without saving [US-U6]
+- [ ] The detail drawer form renders all user-provided text via React `value` attributes or JSX text nodes, not `dangerouslySetInnerHTML` [US-U6]
+- [ ] Playwright E2E test verifies: clicking a list item opens the drawer, drawer displays record fields, close button dismisses the drawer (mocked API) [US-U6]
+- [ ] User guide page "Editing Records" exists (at `docs/manual/editing.md` or equivalent) documenting the detail drawer, save/close actions, type-specific form fields, and the Add button capture flow [US-U6]
+- [ ] An "Add" button (or "+" affordance) is visible in the CRUD panel header without scrolling [US-U7]
+- [ ] Clicking "Add" opens the detail drawer in create mode (empty form, no record data pre-populated) [US-U7]
+- [ ] The `log_type` field is pre-set to the active tab's type (e.g., `todo` when on the Todos tab) [US-U7]
+- [ ] The `log_type` field is changeable in create mode via a dropdown [US-U7]
+- [ ] The `text` textarea is auto-focused when the drawer opens in create mode [US-U7]
+- [ ] A "Save" button sends `POST /api/records` with the form data [US-U7]
+- [ ] On successful save, the drawer closes, the panel list refreshes to include the new record, and tab count updates [US-U7]
+- [ ] The "Save" button is disabled when the `text` field is empty [US-U7]
+- [ ] Playwright E2E test verifies: clicking Add opens drawer in create mode, log_type is pre-selected from active tab, save button is disabled when text is empty (mocked API) [US-U7]
+- [ ] A sort dropdown is visible above the record list in the CRUD panel body with options: "Newest first" (default), "Oldest first" [US-U8]
+- [ ] The Todos tab sort dropdown includes an additional option: "Status (open first)" which orders records as open → parked → done [US-U8]
+- [ ] Selecting a sort option re-orders the displayed list client-side without an additional API call [US-U8]
+- [ ] A "Show" control (dropdown or numeric input) is visible above the list, defaulting to 25 [US-U8]
+- [ ] The list displays at most the number of records specified by the "Show" control [US-U8]
+- [ ] When more records exist than the limit, a "Show all" or "Load more" affordance is visible below the list [US-U8]
+- [ ] Sort selection is persisted in `localStorage` per tab (e.g., key `mustard-sort-todo`) [US-U8]
+- [ ] Limit value is persisted in `localStorage` per tab (e.g., key `mustard-limit-todo`) [US-U8]
+- [ ] On page reload, persisted sort and limit preferences are restored for each tab [US-U8]
+- [ ] Unit tests verify sort logic: date ascending, date descending, and status grouping (open → parked → done) for todos [US-U8]
+- [ ] Playwright E2E test verifies: sort dropdown changes list order, limit control caps the number of visible list items (mocked API) [US-U8]
+- [ ] `AGENTS.md` reflects new write API endpoints (`POST /api/records`, `PUT /api/records/:id`), data writer module, detail drawer component, Add button, list view controls, and localStorage preferences introduced in this phase [phase]
+- [ ] User guide page "App Layout" updated to document sort and limit controls with per-tab persistence [US-U8]
+
+**AGENTS.md sections affected:**
+- File ownership map (new data writer module, detail drawer component, list controls)
+- Directory layout (new `src/server/data/writer.ts`, new `src/components/panel/DetailDrawer.tsx`)
+- Behavior rules (new `POST /api/records`, `PUT /api/records/:id` endpoints, detail drawer interaction, Add button, sort/limit controls)
+- Testing conventions (new test files for write API, drawer, sort logic)
+
+**User documentation:**
+- New "Editing Records" page at `docs/manual/editing.md` documenting detail drawer, save/close, type-specific forms, and Add button capture flow
+- Updated "App Layout" page with sort and limit controls documentation
+
+**Golden principles (phase-relevant):**
+- **People first** — capture is the MLP-critical moment; auto-focus, type pre-selection, and one-click Add make the path from intent to saved record as short as possible
+- **Faithful stewardship** — auto-filled metadata (source, capture_date, meta) removes friction fields without losing data lineage; relaxed validation puts UX proof before schema hardening
+- **Safety and ethics** — ID-to-filepath mapping prevents path traversal; log_type allowlist prevents arbitrary directory writes; all form text rendered safely via React value binding
+- **Clarity over complexity** — client-side sorting avoids extra API calls; localStorage persistence is simple and requires no backend state; the drawer is one component shared between create and edit
+- **Continuous improvement** — background reindex after writes keeps the lense current; per-tab sort/limit preferences compound into a personalized daily-driver experience

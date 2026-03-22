@@ -1,0 +1,94 @@
+phase: "capture-edit"
+started: "2026-03-22T09:51:34Z"
+entries:
+  - task: 1
+    time: "2026-03-22T09:55:00Z"
+    story: "phase"
+    description: "Investigation — classify phase, 49 tests."
+    result: "pass"
+    notes: "Server/schema/cross-cutting. Investigate-first."
+    tokens: ~
+  - task: 2
+    time: "2026-03-22T09:58:00Z"
+    story: "US-U5"
+    description: "Investigate: write API approach."
+    result: "pass"
+    notes: "Queue implement."
+    tokens: ~
+  - task: 3
+    time: "2026-03-22T10:03:00Z"
+    story: "US-U5"
+    description: "Implement: data writer + POST/PUT endpoints + 14 tests (63 total)."
+    result: "pass"
+    notes: "✓ US-U5 complete"
+    tokens: ~
+  - task: 4
+    time: "2026-03-22T10:05:00Z"
+    story: "US-U6"
+    description: "Investigate: detail drawer approach."
+    result: "pass"
+    notes: "Queue implement."
+    tokens: ~
+  - task: 5
+    time: "2026-03-22T10:08:00Z"
+    story: "US-U6"
+    description: "Investigate: read existing panel components."
+    result: "pass"
+    notes: "Queue implement."
+    tokens: ~
+  - task: 6
+    time: "2026-03-22T10:12:00Z"
+    story: "US-U6"
+    description: "Implement: DetailDrawer + Add button + CrudPanel wiring."
+    result: "pass"
+    notes: "DrawerForm with key-based remount. Slide animation."
+    tokens: ~
+  - task: 7
+    time: "2026-03-22T10:15:00Z"
+    story: "US-U6"
+    description: "E2E tests + user guide docs/manual/editing.md."
+    result: "pass"
+    notes: "3 E2E tests. ✓ US-U6 complete ✓ US-U7 complete"
+    tokens: ~
+  - task: 8
+    time: "2026-03-22T10:17:00Z"
+    story: "US-U8"
+    description: "Investigate: sort/limit controls."
+    result: "pass"
+    notes: "Queue implement."
+    tokens: ~
+  - task: 9
+    time: "2026-03-22T10:18:00Z"
+    story: "US-U8"
+    description: "Queue implement."
+    result: "pass"
+    notes: "Queue implement."
+    tokens: ~
+  - task: 10
+    time: "2026-03-22T10:22:00Z"
+    story: "US-U8"
+    description: "Implement: ListControls, sort, localStorage, 5 tests, E2E, layout doc. 68 tests."
+    result: "pass"
+    notes: "✓ US-U8 complete"
+    tokens: ~
+  - task: 11
+    time: "2026-03-22T10:25:00Z"
+    story: "phase"
+    description: "AGENTS.md update + phase completion gate."
+    result: "pass"
+    notes: "Phase complete. 4 stories shipped."
+    tokens: ~
+  - task: 13
+    time: "2026-03-22T10:30:00Z"
+    story: "phase"
+    description: "[review] review-pr pr=5 — posted COMMENT review with 0 critical, 2 concerns, 1 observation."
+    result: "pass"
+    notes: "Concerns: explicit field destructuring on POST/PUT. Observation: O(n) findRecordFile scan."
+    tokens: ~
+  - task: 14
+    time: "2026-03-22T10:35:00Z"
+    story: "phase"
+    description: "[review] handle-pr-review pr=5 — triaged 3 findings: 2 fixed (field destructuring), 1 addressed (comment). All quality checks pass."
+    result: "pass"
+    notes: "68 tests pass. Review complete."
+    tokens: ~

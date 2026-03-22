@@ -3,6 +3,7 @@ import { retrieve } from './rag/retriever.js'
 import { buildIndex } from './rag/indexer.js'
 import { CliSynthesiser } from './synthesiser.js'
 import { readRecords } from './data/reader.js'
+import { createRecord, updateRecord } from './data/writer.js'
 
 const PORT = parseInt(process.env.PORT ?? '3001', 10)
 
@@ -19,6 +20,8 @@ async function start() {
     synthesiser: new CliSynthesiser(),
     buildIndex,
     readRecords,
+    createRecord,
+    updateRecord,
   })
 
   app.listen(PORT, () => {

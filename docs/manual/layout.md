@@ -35,3 +35,34 @@ Each tab renders a compact list view designed for quick scanning:
 - Text fields are truncated to ~80 characters with an ellipsis.
 - Key identifying fields (person name, status, due date) are shown prominently.
 - Empty tabs display a friendly message instead of a blank panel.
+
+## Sort and limit controls
+
+Above the record list, a controls bar provides sorting and limiting options:
+
+### Sort options
+
+- **Newest first** (default) — records sorted by capture date, most recent at the top.
+- **Oldest first** — records sorted by capture date, oldest at the top.
+
+### Status filter (Todos only)
+
+The Todos tab has a status filter dropdown next to the sort dropdown:
+
+- **All** (default) — show all todos regardless of status.
+- **Open** — show only open todos.
+- **Done** — show only completed todos.
+- **Parked** — show only parked todos.
+
+The filter is applied before sorting and limiting, so you can combine e.g. "Open" filter with "Oldest first" sort to see your oldest open todos.
+
+### Record limit
+
+- A **Show** dropdown sets how many records are visible at once (default: 25).
+- When more records exist than the limit, a **Show all** link appears below the list.
+
+### Per-tab persistence
+
+Sort, filter, and limit preferences are saved per tab in your browser's localStorage. For example, if you filter Todos to "Open" and sort People by newest, each tab remembers its own settings. Preferences persist across page reloads.
+
+Storage keys: `mustard-sort-{type}`, `mustard-filter-{type}`, `mustard-limit-{type}`.

@@ -238,6 +238,59 @@ test('clicking a list item opens the detail drawer with record fields', async ({
   await expect(drawer).not.toBeVisible()
 })
 
+test('sort dropdown changes list order and limit caps visible items', async ({ page }) => {
+  // Create enough records to test limiting
+  const manyRecords = Array.from({ length: 30 }, (_, i) => ({
+    id: `todo-${String(i).padStart(3, '0')}`,
+    log_type: 'todo',
+    capture_date_local: `2026-03-${String(i + 1).padStart(2, '0')}`,
+    text: `Todo item ${i}`,
+    person: null,
+    status: i < 10 ? 'open' : i < 20 ? 'parked' : 'done',
+    due_date_local: null,
+    category: null,
+    theme: null,
+    period: null,
+    tags: [],
+  }))
+
+  await page.route('**/api/records*', async (route) => {
+    const url = new URL(route.request().url())
+    const type = url.searchParams.get('type')
+    const records = type ? manyRecords.filter((r) => r.log_type === type) : manyRecords
+    await route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify(records),
+    })
+  })
+
+  await page.goto('/')
+  await expect(page.locator('[data-testid="list-controls"]')).toBeVisible({ timeout: 5000 })
+
+  // Sort dropdown is visible
+  const sortSelect = page.locator('[data-testid="sort-select"]')
+  await expect(sortSelect).toBeVisible()
+
+  // Default is newest first — change to oldest
+  await sortSelect.selectOption('oldest')
+
+  // Limit dropdown is visible
+  const limitSelect = page.locator('[data-testid="limit-select"]')
+  await expect(limitSelect).toBeVisible()
+
+  // Default limit is 25 — list should show 25 items (not all 30)
+  const items = page.locator('[data-testid="panel-list-item"]')
+  await expect(items).toHaveCount(25)
+
+  // "Show all" button should be visible since 30 > 25
+  await expect(page.locator('[data-testid="show-all-button"]')).toBeVisible()
+
+  // Change limit to 10
+  await limitSelect.selectOption('10')
+  await expect(items).toHaveCount(10)
+})
+
 test('clicking Add opens drawer in create mode with active tab type pre-selected', async ({ page }) => {
   await setupRecordsRoute(page)
   await page.goto('/')

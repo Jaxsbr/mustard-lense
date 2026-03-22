@@ -1,13 +1,36 @@
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import type { MustardRecord } from '../../shared/record.js'
 import { TABS } from './types.js'
 import { ListItem } from './ListItems.js'
 import { DetailDrawer } from './DetailDrawer.js'
+import { ListControls } from './ListControls.js'
+import { sortRecords, type SortOption } from './sort.js'
 import './CrudPanel.css'
 
 interface CrudPanelProps {
   collapsed: boolean
   onToggle: () => void
+}
+
+const DEFAULT_LIMIT = 25
+
+function getStoredSort(type: string): SortOption {
+  try {
+    const stored = localStorage.getItem(`mustard-sort-${type}`)
+    if (stored === 'newest' || stored === 'oldest' || stored === 'status') return stored
+  } catch { /* localStorage unavailable */ }
+  return 'newest'
+}
+
+function getStoredLimit(type: string): number {
+  try {
+    const stored = localStorage.getItem(`mustard-limit-${type}`)
+    if (stored) {
+      const n = Number(stored)
+      if (n > 0) return n
+    }
+  } catch { /* localStorage unavailable */ }
+  return DEFAULT_LIMIT
 }
 
 export function CrudPanel({ collapsed, onToggle }: CrudPanelProps) {
@@ -19,8 +42,24 @@ export function CrudPanel({ collapsed, onToggle }: CrudPanelProps) {
   const [drawerOpen, setDrawerOpen] = useState(false)
   const [drawerMode, setDrawerMode] = useState<'edit' | 'create'>('edit')
   const [selectedRecord, setSelectedRecord] = useState<MustardRecord | null>(null)
+  const [sortPrefs, setSortPrefs] = useState<Record<string, SortOption>>(() => {
+    const prefs: Record<string, SortOption> = {}
+    for (const tab of TABS) prefs[tab.type] = getStoredSort(tab.type)
+    return prefs
+  })
+  const [limitPrefs, setLimitPrefs] = useState<Record<string, number>>(() => {
+    const prefs: Record<string, number> = {}
+    for (const tab of TABS) prefs[tab.type] = getStoredLimit(tab.type)
+    return prefs
+  })
 
   const abortRef = useRef<AbortController | null>(null)
+
+  const currentSort = sortPrefs[activeTab] ?? 'newest'
+  const currentLimit = limitPrefs[activeTab] ?? DEFAULT_LIMIT
+
+  const sortedRecords = useMemo(() => sortRecords(records, currentSort), [records, currentSort])
+  const visibleRecords = useMemo(() => sortedRecords.slice(0, currentLimit), [sortedRecords, currentLimit])
 
   const fetchRecords = useCallback(async (type: string) => {
     abortRef.current?.abort()
@@ -73,6 +112,16 @@ export function CrudPanel({ collapsed, onToggle }: CrudPanelProps) {
 
   function handleTabClick(type: string) {
     setActiveTab(type)
+  }
+
+  function handleSortChange(sort: SortOption) {
+    setSortPrefs((prev) => ({ ...prev, [activeTab]: sort }))
+    try { localStorage.setItem(`mustard-sort-${activeTab}`, sort) } catch { /* noop */ }
+  }
+
+  function handleLimitChange(limit: number) {
+    setLimitPrefs((prev) => ({ ...prev, [activeTab]: limit }))
+    try { localStorage.setItem(`mustard-limit-${activeTab}`, String(limit)) } catch { /* noop */ }
   }
 
   function handleRecordClick(record: MustardRecord) {
@@ -165,13 +214,23 @@ export function CrudPanel({ collapsed, onToggle }: CrudPanelProps) {
               <p className="crud-panel-empty" data-testid="panel-empty">No records found.</p>
             )}
             {!loading && records.length > 0 && (
-              <div className="crud-panel-list" data-testid="panel-list">
-                {records.map((record) => (
-                  <div key={record.id} data-testid="panel-list-item" onClick={() => handleRecordClick(record)} style={{ cursor: 'pointer' }}>
-                    <ListItem record={record} type={activeTab} />
-                  </div>
-                ))}
-              </div>
+              <>
+                <ListControls
+                  sort={currentSort}
+                  onSortChange={handleSortChange}
+                  limit={currentLimit}
+                  onLimitChange={handleLimitChange}
+                  totalRecords={records.length}
+                  showStatusSort={activeTab === 'todo'}
+                />
+                <div className="crud-panel-list" data-testid="panel-list">
+                  {visibleRecords.map((record) => (
+                    <div key={record.id} data-testid="panel-list-item" onClick={() => handleRecordClick(record)} style={{ cursor: 'pointer' }}>
+                      <ListItem record={record} type={activeTab} />
+                    </div>
+                  ))}
+                </div>
+              </>
             )}
           </div>
         </>

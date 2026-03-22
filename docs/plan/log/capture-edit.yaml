@@ -22,3 +22,10 @@ entries:
     result: "pass"
     notes: "writer.ts with YAML serialization, UUID gen, auto-metadata. app.ts with validation + background reindex. ✓ US-U5 complete"
     tokens: ~
+  - task: 4
+    time: "2026-03-22T10:05:00Z"
+    story: "US-U6"
+    description: "Investigate: detail drawer component — click handler, slide-over, type-specific form fields, E2E tests."
+    result: "pass"
+    notes: "Queue investigate. CrudPanel needs onClick, DetailDrawer new component, type-specific forms."
+    tokens: ~

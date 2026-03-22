@@ -60,7 +60,14 @@ entries:
   - task: 9
     time: "2026-03-22T09:20:00Z"
     story: "US-U3"
-    description: "Implement type tabs: 4 tabs with fetch, count badges, loading, active state, 7 unit tests. Added @testing-library/react + jsdom."
+    description: "Implement type tabs: 4 tabs with fetch, count badges, loading, active state, 7 unit tests."
     result: "pass"
-    notes: "49 tests (up from 42). ✓ US-U3 complete"
+    notes: "49 tests. ✓ US-U3 complete"
+    tokens: ~
+  - task: 10
+    time: "2026-03-22T09:23:00Z"
+    story: "US-U4"
+    description: "Investigation — US-U4 type-specific list views. Current list renders plain truncated text. Need type-specific components with design tokens."
+    result: "pass"
+    notes: "8 criteria. Queue implement: type-specific list items, design tokens, E2E test."
     tokens: ~

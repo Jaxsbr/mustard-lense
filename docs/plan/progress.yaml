@@ -7,7 +7,7 @@ config:
   quality_check_suppressions: []
 
 state:
-  task_number: 12
+  task_number: 13
   phase: structured-browse
   phase_complete: false
   review_stage: null
@@ -16,6 +16,6 @@ state:
   pr_number: null
   status: running
   last_result: pass
-  next_task: null
+  next_task: "[phase] Update AGENTS.md with new browse API, data reader, CRUD panel, split-screen layout, MUSTARD_DATA_DIR"
   consecutive_fails: 0
   completed_stories: [US-U1, US-U2, US-U3, US-U4]

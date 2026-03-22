@@ -395,7 +395,7 @@ As Jaco, I want each tab in the CRUD panel to render a compact, scannable list v
 
 ---
 
-### US-U5 — Record write API (create and update)
+### US-U5 — Record write API (create and update) [Shipped]
 
 As Jaco, I want API endpoints that create and update mustard records as YAML files, so that the CRUD panel can write data without depending on the old Flask app.
 
@@ -419,7 +419,7 @@ As Jaco, I want API endpoints that create and update mustard records as YAML fil
 
 ---
 
-### US-U6 — Detail drawer for viewing and editing records
+### US-U6 — Detail drawer for viewing and editing records [Shipped]
 
 As Jaco, I want to click a record in the list and have a slide-over drawer open with the full editable form, so that I can view and update any record without leaving the browse panel.
 
@@ -446,7 +446,7 @@ As Jaco, I want to click a record in the list and have a slide-over drawer open 
 
 ---
 
-### US-U7 — Quick capture with sticky Add button
+### US-U7 — Quick capture with sticky Add button [Shipped]
 
 As Jaco, I want a sticky "Add" button in the CRUD panel header that opens the detail drawer in create mode with the active tab's type pre-selected, so that capturing a new record is one click away without scrolling or switching context.
 
@@ -470,7 +470,7 @@ As Jaco, I want a sticky "Add" button in the CRUD panel header that opens the de
 
 ---
 
-### US-U8 — List view controls (sort, limit, persisted preferences)
+### US-U8 — List view controls (sort, limit, persisted preferences) [Shipped]
 
 As Jaco, I want sort and limit controls on the list view so that I can order records by date or status and cap the visible list at a manageable size, with my preferences remembered between sessions.
 
@@ -494,6 +494,72 @@ As Jaco, I want sort and limit controls on the list view so that I can order rec
 
 ---
 
+### Daily-Ready Visual Identity
+
+Warm gold palette, dark mode, and type-specific colors that transform the app from a clinical prototype into an emotionally familiar daily driver. Token-level change — components using `var(--lense-*)` shift automatically.
+
+### US-D1 — Warm gold design token port
+
+As Jaco, I want the app's cool blue-grey palette replaced with the original mustard's warm gold palette and type-specific colors, so that the app feels emotionally familiar — "this is MY tool" — rather than a clinical prototype.
+
+**Acceptance criteria**:
+- `tokens.css` `:root` block defines warm gold accent (`#c8982c`), warm background (`#faf9f6`), type-specific colors (todo `#4a7fc4`, people `#7b5ea7`, daily `#e07850`, idea `#2d9574`), success tokens, and error tokens
+- All hardcoded color values in `App.css` that reference the old blue-grey palette (`#4f6d7a`) are replaced with `var(--lense-*)` token references
+- All other hardcoded hex colors in `App.css` are tokenized so dark mode can override them
+- Lense cards, panel, drawer, tabs, controls, list items, and blockquote/verse pick up the new palette via token inheritance
+- `npm run build` and `npm run typecheck` exit 0
+
+**User guidance:**
+- Discovery: Visual change — the app looks warm and gold instead of cool blue-grey on next load
+- Manual section: N/A — visual change, no new user-facing feature to document
+- Key steps: 1. Open the app — notice the warm gold accent color, warm off-white background, and type-specific colors. 2. All existing interactions work the same — only the palette has changed.
+
+**Design rationale:** Token-level change centralizes the palette shift in `tokens.css`. Components using `var(--lense-*)` shift automatically without per-file edits. Hardcoded colors in `App.css` must also move to tokens as a prerequisite for dark mode.
+
+---
+
+### US-D2 — Dark mode
+
+As Jaco, I want a dark mode that follows system preference by default, with a toggle to override and localStorage persistence, so that the app is comfortable at any time of day without flash-of-wrong-theme on load.
+
+**Acceptance criteria**:
+- `tokens.css` contains a `[data-theme="dark"]` block overriding all `--lense-color-*` variables with dark palette values
+- `tokens.css` contains a `@media (prefers-color-scheme: dark) { html:not([data-theme="light"]) }` block as system-preference fallback
+- A theme toggle button is visible in the app UI with an accessible label
+- Clicking the toggle sets `data-theme` on `<html>` and stores the preference in `localStorage` under key `mustard-theme`
+- On page load, theme is applied from localStorage before React hydration (inline script in `index.html`, no flash)
+- Dark mode covers all surfaces: lense cards, CRUD panel, drawer, list items, tabs, controls, blockquote/verse, error states, stage indicators
+- Playwright E2E test verifies toggle existence and `data-theme` attribute change
+
+**User guidance:**
+- Discovery: Theme toggle button visible in the app UI (panel header area)
+- Manual section: existing page: "App Layout"
+- Key steps: 1. Click the theme toggle to switch between light and dark mode. 2. The app remembers your preference across sessions. 3. If you haven't set a preference, the app follows your system's light/dark setting.
+
+**Design rationale:** The `[data-theme] + prefers-color-scheme` dual pattern is proven in the original mustard app. Inline script in `index.html` applies theme before React renders, preventing flash-of-wrong-theme — the kind of polish detail that separates a daily driver from a prototype.
+
+---
+
+### US-D3 — Type-specific CRUD panel colors
+
+As Jaco, I want each record type to have its own color identity in the CRUD panel — active tab border, count badge, and list item indicators — so that I can instantly recognize which type I'm working with, matching the original mustard's type color pattern.
+
+**Acceptance criteria**:
+- Active tab's bottom border uses the type-specific color (e.g., Todos tab uses `--lense-color-type-todo`)
+- Active tab's count badge background uses a tinted variant of the type-specific color
+- List items have a subtle type-colored left indicator (border or accent)
+- Type-specific colors work correctly in both light and dark modes
+- Playwright E2E test verifies active tab border color varies by type
+
+**User guidance:**
+- Discovery: Visual change — each tab and list view in the CRUD panel now has its own color identity
+- Manual section: existing page: "App Layout"
+- Key steps: 1. Click through the tabs — Todos (blue), People (purple), Ideas (green), Daily Logs (orange). 2. Notice the active tab border, count badge, and list item indicators match the type color. 3. Toggle dark mode — type colors adapt to the dark palette.
+
+**Design rationale:** Type-specific colors provide instant visual recognition — "I know I'm looking at todos because it's blue." This pattern is proven in the original mustard app. Colors are defined as tokens so dark mode variants work automatically.
+
+---
+
 ## Implementation phases
 
 | Phase | Name | Stories | Status |
@@ -502,7 +568,8 @@ As Jaco, I want sort and limit controls on the list view so that I can order rec
 | 2 | Intelligent Lense | US-L6, US-L7, US-L8, US-L9 | Shipped |
 | 3 | RAG Lense | US-L10, US-L11, US-L12, US-L13 | Shipped |
 | 4 | Structured Browse | US-U1, US-U2, US-U3, US-U4 | Shipped |
-| 5 | Capture & Edit | US-U5, US-U6, US-U7, US-U8 | Planned |
+| 5 | Capture & Edit | US-U5, US-U6, US-U7, US-U8 | Shipped |
+| 6 | Daily-Ready Visual Identity | US-D1, US-D2, US-D3 | Planned |
 
 ### Phase 1 — Foundation
 
@@ -808,3 +875,61 @@ Add write capability and list controls to the unified mustard app. A write API c
 - **Safety and ethics** — ID-to-filepath mapping prevents path traversal; log_type allowlist prevents arbitrary directory writes; all form text rendered safely via React value binding
 - **Clarity over complexity** — client-side sorting avoids extra API calls; localStorage persistence is simple and requires no backend state; the drawer is one component shared between create and edit
 - **Continuous improvement** — background reindex after writes keeps the lense current; per-tab sort/limit preferences compound into a personalized daily-driver experience
+
+### Phase 6 — Daily-Ready Visual Identity
+
+Port the original mustard app's warm visual identity into the React app and add dark mode. Replace the cool blue-grey palette with warm gold, type-specific colors, and success/error tokens at the design-token level. Add dark mode with system preference detection, toggle, and localStorage persistence. Give each record type its own color identity in the CRUD panel. Update production port to 7777 so mustard-lense replaces the legacy mustard app on the same port.
+
+**Done-when (observable):**
+
+- [ ] `tokens.css` `:root` declares `--lense-color-accent` with value `#c8982c` (warm gold, replacing `#4f6d7a`) [US-D1]
+- [ ] `tokens.css` `:root` declares `--lense-color-accent-light` with a warm-tinted value derived from `#c8982c` (not the previous cool `#e8f0f3`) [US-D1]
+- [ ] `tokens.css` `:root` declares `--lense-color-bg` with value `#faf9f6` (warm off-white, replacing `#ffffff`) [US-D1]
+- [ ] `tokens.css` `:root` declares `--lense-color-bg-subtle` with a warm-tinted value (replacing `#f9fafb`) [US-D1]
+- [ ] `tokens.css` `:root` declares `--lense-color-type-todo: #4a7fc4` [US-D1]
+- [ ] `tokens.css` `:root` declares `--lense-color-type-people: #7b5ea7` [US-D1]
+- [ ] `tokens.css` `:root` declares `--lense-color-type-daily: #e07850` [US-D1]
+- [ ] `tokens.css` `:root` declares `--lense-color-type-idea: #2d9574` [US-D1]
+- [ ] `tokens.css` `:root` declares `--lense-color-success-bg` and `--lense-color-success-text` tokens [US-D1]
+- [ ] `tokens.css` `:root` declares `--lense-color-error-bg` and `--lense-color-error-text` tokens [US-D1]
+- [ ] Zero matches for literal `#4f6d7a` in any file under `src/` (`rg '#4f6d7a' src/` returns no results) [US-D1]
+- [ ] All color values in `App.css` reference `var(--lense-*)` tokens — no hardcoded hex color values remain outside `@keyframes` blocks (verifiable by `rg '#[0-9a-fA-F]{3,8}' src/App.css` returning only `@keyframes` context or zero matches) [US-D1]
+- [ ] `npm run build` exits 0 [US-D1]
+- [ ] `npm run typecheck` exits 0 [US-D1]
+- [ ] `tokens.css` contains a `[data-theme="dark"]` selector block that overrides all `--lense-color-*` variables with dark-adapted values [US-D2]
+- [ ] `tokens.css` contains a `@media (prefers-color-scheme: dark)` block using `html:not([data-theme="light"])` selector as system-preference fallback [US-D2]
+- [ ] The `[data-theme="dark"]` block defines adjusted values for at minimum: `--lense-color-bg`, `--lense-color-bg-subtle`, `--lense-color-text`, `--lense-color-text-muted`, `--lense-color-border`, `--lense-color-accent`, `--lense-color-accent-light`, `--lense-color-shadow`, all four `--lense-color-type-*` tokens, `--lense-color-success-bg`, `--lense-color-success-text`, `--lense-color-error-bg`, `--lense-color-error-text`, `--lense-color-status-open`, `--lense-color-status-done`, `--lense-color-status-parked` [US-D2]
+- [ ] A theme toggle `<button>` element exists in the app DOM with an accessible label (e.g., `aria-label` containing "theme") [US-D2]
+- [ ] Clicking the theme toggle sets the `data-theme` attribute on the `<html>` element to `"dark"` or `"light"` [US-D2]
+- [ ] Theme preference is stored in `localStorage` under key `mustard-theme` — `localStorage.getItem('mustard-theme')` returns the selected value after toggle interaction [US-D2]
+- [ ] `index.html` contains an inline `<script>` block (before the React bundle `<script>`) that reads `mustard-theme` from `localStorage` and sets `data-theme` on `document.documentElement` — prevents flash of wrong theme on page load [US-D2]
+- [ ] Dark mode covers all surfaces: lense cards (`.lense-card`), CRUD panel (`.crud-panel`), detail drawer (`.detail-drawer`), list items (`.list-item`), tabs (`.crud-panel-tab`), list controls (`.list-controls-select`), blockquote/verse, error display (`.lense-error`), and stage indicators (`.lense-spinner`, `.lense-stage-text`) all derive colors from `var(--lense-*)` tokens — no hardcoded hex colors that bypass dark mode in `components.css`, `CrudPanel.css`, `DetailDrawer.css`, `ListItems.css`, `ListControls.css`, or `App.css` [US-D2]
+- [ ] Playwright E2E test verifies: theme toggle button exists in DOM, clicking toggle changes `data-theme` attribute value on `document.documentElement` [US-D2]
+- [ ] User guide "App Layout" page (`docs/manual/layout.md`) documents the theme toggle and dark mode behavior (system preference, manual override, persistence) [US-D2]
+- [ ] Active tab's bottom border (`border-bottom-color`) uses the type-specific color token — e.g., Todos tab active uses `--lense-color-type-todo` (`#4a7fc4`), People tab active uses `--lense-color-type-people` (`#7b5ea7`), etc. — not a single `--lense-color-accent` for all tabs (verifiable by Playwright computed style or CSS class-per-type pattern in `CrudPanel.css`) [US-D3]
+- [ ] Active tab count badge (`.crud-panel-tab--active .crud-panel-tab-count`) background uses a tinted variant of the type-specific color (not the generic `--lense-color-accent-light`) [US-D3]
+- [ ] List items in the CRUD panel have a visible type-colored left indicator — a left border, accent stripe, or equivalent element using the type-specific color token (verifiable by inspecting `.list-item` computed styles or a CSS class per type in `ListItems.css`) [US-D3]
+- [ ] Type-specific colors render correctly in dark mode — `[data-theme="dark"]` values for `--lense-color-type-*` tokens are applied (verifiable by setting `data-theme="dark"` and checking computed styles) [US-D3]
+- [ ] Playwright E2E test verifies: active Todos tab has a border color matching `--lense-color-type-todo`, switching to People tab changes border color to match `--lense-color-type-people` [US-D3]
+- [ ] Express server (`src/server/index.ts` or `src/server/app.ts`) serves Vite production build static files from `dist/` when not in dev mode, so the full app (API + frontend) runs on a single port [phase] (enables port 7777 replacement of legacy mustard)
+- [ ] `ARCHITECTURE.md` production port entry updated from 5678 to 7777 [phase]
+- [ ] `package.json` defines a `start` script (or equivalent) that builds and starts the production server [phase]
+- [ ] `AGENTS.md` reflects: new design tokens (`--lense-color-type-*`, `--lense-color-success-*`, `--lense-color-error-*`), dark mode CSS architecture (`[data-theme]` + `prefers-color-scheme`), theme toggle UI element, production port 7777, and dark mode behavior [phase]
+- [ ] `npm test` exits 0 with all existing unit tests passing [phase]
+- [ ] `npm run test:e2e` exits 0 with all E2E tests passing (existing + new dark mode and type color tests) [phase]
+
+**AGENTS.md sections affected:**
+- File ownership map (theme toggle component, updated tokens.css scope)
+- Directory layout (no new directories — changes are within existing files)
+- Behavior rules (dark mode toggle, theme persistence, system preference detection)
+- App layout (theme toggle button location)
+- Hosting (production port 7777 replacing 5678)
+
+**User documentation:**
+- Updated "App Layout" page (`docs/manual/layout.md`) with theme toggle and dark mode documentation
+
+**Golden principles (phase-relevant):**
+- **People first** — warm gold creates emotional familiarity ("this is MY tool"); dark mode respects comfort at any time of day; type-specific colors provide instant recognition
+- **Faithful stewardship** — token-level change minimizes per-file edits and maximizes consistency; the original mustard's proven dark mode pattern is adapted, not reinvented
+- **Clarity over complexity** — CSS custom properties absorb the palette shift; no JavaScript color manipulation; `[data-theme]` + `prefers-color-scheme` is a well-understood pattern
+- **Continuous improvement** — the token system compounds: future components automatically inherit the warm palette and dark mode; production port 7777 positions mustard-lense as the daily driver

@@ -5,7 +5,7 @@
 ```
 ┌─────────────────────────────────────┐
 │         Browser (React SPA)         │
-│ localhost:5234 (dev) / :5678 (prod) │
+│ localhost:5234 (dev) / :7777 (prod) │
 │                                     │
 │  ┌──────────┐  ┌─────────────────┐  │
 │  │  Lense   │  │    Template     │  │
@@ -95,11 +95,11 @@ src/
 │   ├── FallbackComponent.tsx  # Fallback for unknown component types
 │   ├── panel/                 # CRUD panel — browse, edit, capture
 │   │   ├── CrudPanel.tsx      # Collapsible panel container with type tabs and list views
-│   │   ├── DetailDrawer.tsx   # (planned for capture-edit phase) Slide-over drawer for view/edit/create
-│   │   ├── ListControls.tsx   # (planned for capture-edit phase) Sort dropdown + limit control
+│   │   ├── DetailDrawer.tsx   # Slide-over drawer for view/edit/create records
+│   │   ├── ListControls.tsx   # Sort dropdown + limit control above record list
 │   │   └── ...                # Type-specific list view components
 │   ├── components.css         # Shared component styles
-│   └── tokens.css             # Design tokens (CSS variables)
+│   └── tokens.css             # Design tokens (CSS variables): warm gold palette, type colors, dark mode overrides
 ├── shared/
 │   └── schema.ts             # Response schema — TypeScript interfaces for component types
 ├── server/
@@ -110,7 +110,7 @@ src/
 │   ├── server.test.ts         # API endpoint unit tests (mocked retriever + synthesiser)
 │   ├── data/                  # Data access layer (read + write)
 │   │   ├── reader.ts          # Reads YAML records from configurable data directory
-│   │   └── writer.ts          # (planned for capture-edit phase) Creates and updates YAML record files
+│   │   └── writer.ts          # Creates and updates YAML record files with UUID generation
 │   └── rag/                   # (planned for rag-lense phase)
 │       ├── embedder.ts        # Embedding wrapper — transformers.js, all-MiniLM-L6-v2
 │       ├── indexer.ts         # Reads YAML, generates embeddings, writes to LanceDB
@@ -182,7 +182,7 @@ The shared schema module (`src/shared/schema.ts`) defines TypeScript interfaces 
 4. JSON array of records returned to the frontend
 5. CRUD panel renders records in type-specific list views within the active tab
 
-### Write API data flow (planned for capture-edit phase)
+### Write API data flow
 
 1. User fills in the detail drawer form (edit or create mode) and clicks "Save"
 2. Frontend sends `PUT /api/records/:id` (edit) or `POST /api/records` (create) with form data as JSON
@@ -193,7 +193,21 @@ The shared schema module (`src/shared/schema.ts`) defines TypeScript interfaces 
 7. Server triggers background reindex so the lense picks up the change
 8. Frontend closes the drawer, refreshes the panel list and tab counts
 
-### Future (beyond capture-edit)
+### Design token architecture (planned for daily-ready phase)
+
+The design token system in `tokens.css` uses CSS custom properties (`--lense-*`) consumed by all component stylesheets. Three layers:
+
+1. **`:root` block** — light-mode defaults: warm gold accent (`#c8982c`), type-specific colors (todo blue, people purple, daily orange, idea green), success/error tokens, warm background (`#faf9f6`).
+2. **`[data-theme="dark"]` block** — explicit dark mode overrides for all `--lense-color-*` variables. Applied when the user selects dark mode via the theme toggle.
+3. **`@media (prefers-color-scheme: dark) { html:not([data-theme="light"]) }` block** — system-preference fallback. Applies dark palette when the OS is in dark mode and the user hasn't explicitly chosen light.
+
+Theme persistence: `localStorage` key `mustard-theme`. An inline `<script>` in `index.html` applies the stored theme before React hydrates, preventing flash-of-wrong-theme.
+
+### Production static serving (planned for daily-ready phase)
+
+In production, the Express server serves Vite's `dist/` static files alongside the API endpoints, so the full app runs on a single port (7777). This replaces the legacy mustard Flask app on the same port.
+
+### Future (beyond daily-ready)
 
 Metadata-filtered retrieval, data repo separation (`mustard-data`), old mustard archival, and mustard-capture skill deletion are planned for subsequent phases.
 
@@ -202,7 +216,7 @@ Metadata-filtered retrieval, data repo separation (`mustard-data`), old mustard 
 | Environment | Port | Mechanism |
 |-------------|------|-----------|
 | Development | 5234 | Vite dev server (`npm run dev`) |
-| Production | 5678 | macOS launchd plist serving built assets |
+| Production | 7777 | Express server serving `dist/` static files + API (planned for daily-ready phase, replacing legacy mustard on same port) |
 
 ## Dependencies on external systems
 

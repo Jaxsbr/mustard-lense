@@ -7,7 +7,7 @@ config:
   quality_check_suppressions: []
 
 state:
-  task_number: 11
+  task_number: 12
   phase: structured-browse
   phase_complete: false
   review_stage: null
@@ -16,6 +16,6 @@ state:
   pr_number: null
   status: running
   last_result: pass
-  next_task: "[US-U4] Implement type-specific list views — TodoListItem, PeopleListItem, IdeaListItem, DailyLogListItem with type-specific fields, design tokens, empty state, E2E test"
+  next_task: null
   consecutive_fails: 0
-  completed_stories: [US-U1, US-U2, US-U3]
+  completed_stories: [US-U1, US-U2, US-U3, US-U4]

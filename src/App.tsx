@@ -11,10 +11,11 @@ interface StageLogEntry {
 }
 
 function ElapsedTimer() {
-  const startRef = useRef(Date.now())
+  const startRef = useRef(0)
   const [elapsed, setElapsed] = useState(0)
 
   useEffect(() => {
+    startRef.current = Date.now()
     const id = setInterval(() => setElapsed(Date.now() - startRef.current), 100)
     return () => clearInterval(id)
   }, [])

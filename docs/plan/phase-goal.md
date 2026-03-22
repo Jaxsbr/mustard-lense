@@ -68,7 +68,7 @@ Add write capability and list controls to the unified mustard app. A write API c
 - [x] On page reload, persisted sort and limit preferences are restored for each tab [US-U8]
 - [x] Unit tests verify sort logic: date ascending, date descending, and status grouping (open → parked → done) for todos [US-U8]
 - [x] Playwright E2E test verifies: sort dropdown changes list order, limit control caps the number of visible list items (mocked API) [US-U8]
-- [ ] `AGENTS.md` reflects new write API endpoints (`POST /api/records`, `PUT /api/records/:id`), data writer module, detail drawer component, Add button, list view controls, and localStorage preferences introduced in this phase [phase]
+- [x] `AGENTS.md` reflects new write API endpoints (`POST /api/records`, `PUT /api/records/:id`), data writer module, detail drawer component, Add button, list view controls, and localStorage preferences introduced in this phase [phase]
 - [x] User guide page "App Layout" updated to document sort and limit controls with per-tab persistence [US-U8]
 
 ### Golden principles (phase-relevant)

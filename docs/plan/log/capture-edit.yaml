@@ -4,9 +4,9 @@ entries:
   - task: 1
     time: "2026-03-22T09:55:00Z"
     story: "phase"
-    description: "Investigation — classify phase as server/schema/cross-cutting. 49 tests."
+    description: "Investigation — classify phase, 49 tests."
     result: "pass"
-    notes: "Investigate-first mandate. US-U5 first."
+    notes: "Server/schema/cross-cutting. Investigate-first."
     tokens: ~
   - task: 2
     time: "2026-03-22T09:58:00Z"
@@ -37,7 +37,7 @@ entries:
     notes: "Queue implement."
     tokens: ~
   - task: 6
-    time: "2026-03-22T10:12:00Z"
+    time: "2026-03-22$10:12:00Z"
     story: "US-U6"
     description: "Implement: DetailDrawer + Add button + CrudPanel wiring."
     result: "pass"
@@ -60,14 +60,21 @@ entries:
   - task: 9
     time: "2026-03-22T10:18:00Z"
     story: "US-U8"
-    description: "Queue implement task."
+    description: "Queue implement."
     result: "pass"
     notes: "Queue implement."
     tokens: ~
   - task: 10
     time: "2026-03-22T10:22:00Z"
     story: "US-U8"
-    description: "Implement: ListControls, sort logic, localStorage, 5 sort tests, E2E, layout doc. 68 tests."
+    description: "Implement: ListControls, sort, localStorage, 5 tests, E2E, layout doc. 68 tests."
     result: "pass"
     notes: "✓ US-U8 complete"
+    tokens: ~
+  - task: 11
+    time: "2026-03-22T10:25:00Z"
+    story: "phase"
+    description: "AGENTS.md update + phase completion gate. All 72 done-when criteria met. 68 tests."
+    result: "pass"
+    notes: "Phase complete. 4 stories shipped: US-U5, US-U6, US-U7, US-U8."
     tokens: ~

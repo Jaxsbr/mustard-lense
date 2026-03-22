@@ -44,7 +44,17 @@ Above the record list, a controls bar provides sorting and limiting options:
 
 - **Newest first** (default) — records sorted by capture date, most recent at the top.
 - **Oldest first** — records sorted by capture date, oldest at the top.
-- **Status (open first)** — *Todos tab only*. Groups records as: open → parked → done. Within each group, newest first.
+
+### Status filter (Todos only)
+
+The Todos tab has a status filter dropdown next to the sort dropdown:
+
+- **All** (default) — show all todos regardless of status.
+- **Open** — show only open todos.
+- **Done** — show only completed todos.
+- **Parked** — show only parked todos.
+
+The filter is applied before sorting and limiting, so you can combine e.g. "Open" filter with "Oldest first" sort to see your oldest open todos.
 
 ### Record limit
 
@@ -53,6 +63,6 @@ Above the record list, a controls bar provides sorting and limiting options:
 
 ### Per-tab persistence
 
-Sort and limit preferences are saved per tab in your browser's localStorage. For example, if you sort Todos by status and People by newest, each tab remembers its own setting. Preferences persist across page reloads.
+Sort, filter, and limit preferences are saved per tab in your browser's localStorage. For example, if you filter Todos to "Open" and sort People by newest, each tab remembers its own settings. Preferences persist across page reloads.
 
-Storage keys: `mustard-sort-{type}`, `mustard-limit-{type}`.
+Storage keys: `mustard-sort-{type}`, `mustard-filter-{type}`, `mustard-limit-{type}`.

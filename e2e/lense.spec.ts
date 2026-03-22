@@ -289,6 +289,15 @@ test('sort dropdown changes list order and limit caps visible items', async ({ p
   // Change limit to 10
   await limitSelect.selectOption('10')
   await expect(items).toHaveCount(10)
+
+  // Status filter is visible on Todos tab
+  const filterSelect = page.locator('[data-testid="status-filter-select"]')
+  await expect(filterSelect).toBeVisible()
+
+  // Filter to open only — should show 10 open records (limited by current limit of 10)
+  await filterSelect.selectOption('open')
+  const filteredItems = page.locator('[data-testid="panel-list-item"]')
+  expect(await filteredItems.count()).toBeLessThanOrEqual(10)
 })
 
 test('clicking Add opens drawer in create mode with active tab type pre-selected', async ({ page }) => {

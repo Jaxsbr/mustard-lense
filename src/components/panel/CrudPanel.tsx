@@ -4,7 +4,7 @@ import { TABS } from './types.js'
 import { ListItem } from './ListItems.js'
 import { DetailDrawer } from './DetailDrawer.js'
 import { ListControls } from './ListControls.js'
-import { sortRecords, type SortOption } from './sort.js'
+import { sortRecords, filterByStatus, type SortOption, type StatusFilter } from './sort.js'
 import './CrudPanel.css'
 
 interface CrudPanelProps {
@@ -17,7 +17,7 @@ const DEFAULT_LIMIT = 25
 function getStoredSort(type: string): SortOption {
   try {
     const stored = localStorage.getItem(`mustard-sort-${type}`)
-    if (stored === 'newest' || stored === 'oldest' || stored === 'status') return stored
+    if (stored === 'newest' || stored === 'oldest') return stored
   } catch { /* localStorage unavailable */ }
   return 'newest'
 }
@@ -31,6 +31,14 @@ function getStoredLimit(type: string): number {
     }
   } catch { /* localStorage unavailable */ }
   return DEFAULT_LIMIT
+}
+
+function getStoredFilter(type: string): StatusFilter {
+  try {
+    const stored = localStorage.getItem(`mustard-filter-${type}`)
+    if (stored === 'all' || stored === 'open' || stored === 'done' || stored === 'parked') return stored
+  } catch { /* localStorage unavailable */ }
+  return 'all'
 }
 
 export function CrudPanel({ collapsed, onToggle }: CrudPanelProps) {
@@ -52,13 +60,20 @@ export function CrudPanel({ collapsed, onToggle }: CrudPanelProps) {
     for (const tab of TABS) prefs[tab.type] = getStoredLimit(tab.type)
     return prefs
   })
+  const [filterPrefs, setFilterPrefs] = useState<Record<string, StatusFilter>>(() => {
+    const prefs: Record<string, StatusFilter> = {}
+    for (const tab of TABS) prefs[tab.type] = getStoredFilter(tab.type)
+    return prefs
+  })
 
   const abortRef = useRef<AbortController | null>(null)
 
   const currentSort = sortPrefs[activeTab] ?? 'newest'
   const currentLimit = limitPrefs[activeTab] ?? DEFAULT_LIMIT
+  const currentFilter = filterPrefs[activeTab] ?? 'all'
 
-  const sortedRecords = useMemo(() => sortRecords(records, currentSort), [records, currentSort])
+  const filteredRecords = useMemo(() => filterByStatus(records, currentFilter), [records, currentFilter])
+  const sortedRecords = useMemo(() => sortRecords(filteredRecords, currentSort), [filteredRecords, currentSort])
   const visibleRecords = useMemo(() => sortedRecords.slice(0, currentLimit), [sortedRecords, currentLimit])
 
   const fetchRecords = useCallback(async (type: string) => {
@@ -122,6 +137,11 @@ export function CrudPanel({ collapsed, onToggle }: CrudPanelProps) {
   function handleLimitChange(limit: number) {
     setLimitPrefs((prev) => ({ ...prev, [activeTab]: limit }))
     try { localStorage.setItem(`mustard-limit-${activeTab}`, String(limit)) } catch { /* noop */ }
+  }
+
+  function handleFilterChange(filter: StatusFilter) {
+    setFilterPrefs((prev) => ({ ...prev, [activeTab]: filter }))
+    try { localStorage.setItem(`mustard-filter-${activeTab}`, filter) } catch { /* noop */ }
   }
 
   function handleRecordClick(record: MustardRecord) {
@@ -220,8 +240,10 @@ export function CrudPanel({ collapsed, onToggle }: CrudPanelProps) {
                   onSortChange={handleSortChange}
                   limit={currentLimit}
                   onLimitChange={handleLimitChange}
-                  totalRecords={records.length}
-                  showStatusSort={activeTab === 'todo'}
+                  totalRecords={filteredRecords.length}
+                  statusFilter={currentFilter}
+                  onStatusFilterChange={handleFilterChange}
+                  showStatusFilter={activeTab === 'todo'}
                 />
                 <div className="crud-panel-list" data-testid="panel-list">
                   {visibleRecords.map((record) => (

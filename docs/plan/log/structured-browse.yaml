@@ -29,3 +29,10 @@ entries:
     result: "pass"
     notes: "US-U2 has 10 criteria: two-column layout, toggle, collapse/expand, 40% width, lense always visible, title change, responsive, panel dir, E2E test, user guide."
     tokens: ~
+  - task: 5
+    time: "2026-03-22T09:04:00Z"
+    story: "US-U2"
+    description: "Investigate: App.tsx is single <main> with max-width 700px. Plan: wrap in flex container, CrudPanel on left (40%), lense on right. Toggle collapses panel. Responsive at 768px. Title change. Need docs/manual/layout.md and E2E test."
+    result: "pass"
+    notes: "Current App.tsx: form + stage + results + empty state. E2E tests target input[type=text] and .lense-results. Need CrudPanel.tsx in components/panel/."
+    tokens: ~

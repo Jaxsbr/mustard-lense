@@ -7,7 +7,7 @@ config:
   quality_check_suppressions: []
 
 state:
-  task_number: 2
+  task_number: 3
   phase: capture-edit
   phase_complete: false
   review_stage: null
@@ -16,6 +16,6 @@ state:
   pr_number: null
   status: running
   last_result: pass
-  next_task: "[US-U5] Investigate: write API approach — data writer module, endpoints, validation, ID mapping"
+  next_task: "[US-U5] Implement: data writer module + POST/PUT /api/records endpoints + unit tests"
   consecutive_fails: 0
   completed_stories: []

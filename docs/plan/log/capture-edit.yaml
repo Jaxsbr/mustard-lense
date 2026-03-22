@@ -8,3 +8,10 @@ entries:
     result: "pass"
     notes: "reader.ts has reusable getDataDir/resolveHome. app.ts uses DI. MustardRecord in shared/record.ts. Need log_type→dir mapping."
     tokens: ~
+  - task: 2
+    time: "2026-03-22T09:58:00Z"
+    story: "US-U5"
+    description: "Investigate: write API approach — writer module, endpoints, validation, ID-to-filepath mapping via readRecords scan."
+    result: "pass"
+    notes: "Plan: writer.ts (create/update), app.ts endpoints with allowlist validation, temp dir tests. Queue implement."
+    tokens: ~

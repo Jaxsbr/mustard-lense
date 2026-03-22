@@ -7,7 +7,7 @@ config:
   quality_check_suppressions: []
 
 state:
-  task_number: 8
+  task_number: 9
   phase: capture-edit
   phase_complete: false
   review_stage: null
@@ -16,6 +16,6 @@ state:
   pr_number: null
   status: running
   last_result: pass
-  next_task: null
+  next_task: "[US-U8] Investigate: sort dropdown, limit control, localStorage persistence, unit tests for sort logic"
   consecutive_fails: 0
   completed_stories: [US-U5, US-U6, US-U7]

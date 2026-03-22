@@ -1,3 +1,10 @@
 phase: "structured-browse"
 started: "2026-03-22T08:46:54Z"
-entries: []
+entries:
+  - task: 1
+    time: "2026-03-22T08:50:00Z"
+    story: "phase"
+    description: "Investigation — classify phase as server/schema/cross-cutting (new API endpoint, data reader module, frontend layout). 4 stories (US-U1→U4), 39 criteria. Pre-existing lint fix (Date.now purity). Verify passes (37 tests). US-U1 is foundation — queue investigate for data reader approach."
+    result: "pass"
+    notes: "Phase type: server/schema/cross-cutting (investigate-first mandate). Indexer has MustardRecord interface and YAML parsing — reusable. DEFAULT_DATA_PATH hardcoded, needs MUSTARD_DATA_DIR env var. No data/ dir or panel/ dir yet."
+    tokens: ~

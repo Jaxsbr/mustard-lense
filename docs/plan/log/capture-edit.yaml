@@ -29,3 +29,17 @@ entries:
     result: "pass"
     notes: "CrudPanel wraps records in div with key. Need DetailDrawer.tsx + CSS. Forms: todo(text,status,due), people(text,person), idea(text,status), daily(text,theme). Queue implement."
     tokens: ~
+  - task: 5
+    time: "2026-03-22T10:08:00Z"
+    story: "US-U6"
+    description: "Investigate: detail drawer component — read CrudPanel, ListItems, types, CSS for wiring plan."
+    result: "pass"
+    notes: "Queue implement."
+    tokens: ~
+  - task: 6
+    time: "2026-03-22T10:12:00Z"
+    story: "US-U6"
+    description: "Implement: DetailDrawer component + CSS + CrudPanel wiring + Add button. 63 tests pass."
+    result: "pass"
+    notes: "DrawerForm inner component with key-based remount. Slide animation. Type-specific forms. Add button in header."
+    tokens: ~

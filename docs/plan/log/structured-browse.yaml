@@ -15,3 +15,10 @@ entries:
     result: "pass"
     notes: "Plan: extract reader module, add MUSTARD_DATA_DIR env var, update indexer imports, add GET /api/records to app.ts, add .env.example, add tests."
     tokens: ~
+  - task: 3
+    time: "2026-03-22T08:57:00Z"
+    story: "US-U1"
+    description: "Create data reader module, browse API endpoint, MUSTARD_DATA_DIR support, .env.example, 5 browse tests. Refactor indexer to import from shared reader."
+    result: "pass"
+    notes: "42 tests pass (up from 37). All 13 US-U1 criteria met. ✓ US-U1 complete"
+    tokens: ~

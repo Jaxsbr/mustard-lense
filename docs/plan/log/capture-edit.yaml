@@ -27,19 +27,26 @@ entries:
     story: "US-U6"
     description: "Investigate: detail drawer — CrudPanel click handler, slide-over, type-specific forms, E2E."
     result: "pass"
-    notes: "CrudPanel wraps records in div with key. Need DetailDrawer.tsx + CSS. Forms: todo(text,status,due), people(text,person), idea(text,status), daily(text,theme). Queue implement."
+    notes: "CrudPanel wraps records in div with key. Need DetailDrawer.tsx + CSS."
     tokens: ~
   - task: 5
     time: "2026-03-22T10:08:00Z"
     story: "US-U6"
-    description: "Investigate: detail drawer component — read CrudPanel, ListItems, types, CSS for wiring plan."
+    description: "Investigate: read CrudPanel, ListItems, types, CSS for wiring plan."
     result: "pass"
     notes: "Queue implement."
     tokens: ~
   - task: 6
     time: "2026-03-22T10:12:00Z"
     story: "US-U6"
-    description: "Implement: DetailDrawer component + CSS + CrudPanel wiring + Add button. 63 tests pass."
+    description: "Implement: DetailDrawer + CSS + CrudPanel wiring + Add button. 63 tests."
     result: "pass"
     notes: "DrawerForm inner component with key-based remount. Slide animation. Type-specific forms. Add button in header."
+    tokens: ~
+  - task: 7
+    time: "2026-03-22T10:15:00Z"
+    story: "US-U6"
+    description: "E2E tests for drawer + Add button + user guide docs/manual/editing.md."
+    result: "pass"
+    notes: "3 E2E tests (drawer open/close, Add create mode, save disabled). ✓ US-U6 complete ✓ US-U7 complete"
     tokens: ~

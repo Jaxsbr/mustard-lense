@@ -7,7 +7,7 @@ config:
   quality_check_suppressions: []
 
 state:
-  task_number: 7
+  task_number: 8
   phase: capture-edit
   phase_complete: false
   review_stage: null
@@ -16,6 +16,6 @@ state:
   pr_number: null
   status: running
   last_result: pass
-  next_task: "[US-U6] Implement: Playwright E2E tests for detail drawer + Add button, user guide docs/manual/editing.md"
+  next_task: null
   consecutive_fails: 0
-  completed_stories: [US-U5]
+  completed_stories: [US-U5, US-U6, US-U7]

@@ -1,0 +1,45 @@
+phase: "rag-lense"
+started: "2026-03-21T19:13:45Z"
+entries:
+  - task: 1
+    time: "2026-03-21T19:17:00Z"
+    story: "US-L10"
+    description: "Investigation — classify phase as server/schema/cross-cutting, 4 stories (US-L10→L13), 41 criteria. US-L10 is foundation. Queued investigate for RAG pipeline approach."
+    result: "pass"
+    notes: "Phase type: server/schema/cross-cutting (investigate-first mandate). 23 existing tests pass. US-L10 has 9 criteria. Need transformers.js + LanceDB deps, embedder/indexer/retriever modules, fixture tests."
+    tokens: ~
+  - task: 2
+    time: "2026-03-21T19:20:00Z"
+    story: "US-L10"
+    description: "Investigate: RAG pipeline approach — @huggingface/transformers v3 (feature-extraction pipeline, Xenova/all-MiniLM-L6-v2, 384d), @lancedb/lancedb (embedded vector store), ESM compatible, Vitest compatible."
+    result: "pass"
+    notes: "Packages confirmed. Queued implement: install deps + embedder module."
+    tokens: ~
+  - task: 3
+    time: "2026-03-21T19:22:00Z"
+    story: "US-L10"
+    description: "Install @huggingface/transformers + @lancedb/lancedb, create src/server/rag/embedder.ts with singleton pipeline for Xenova/all-MiniLM-L6-v2 (384d)"
+    result: "pass"
+    notes: "Dependencies installed. Embedder module created. All verify checks pass."
+    tokens: ~
+  - task: 4
+    time: "2026-03-21T19:24:00Z"
+    story: "US-L10"
+    description: "Investigation — embedder done. Next: indexer module. Confirmed YAML record structure from real data store. Fields: id, log_type, capture_date_local, text, meta.tags. Type-specific: status/due_date_local (todos), theme (daily_logs), person (people_notes), status (ideas). No category or period fields in current data."
+    result: "pass"
+    notes: "Need yaml npm package. LanceDB table schema: vector(384) + text + all metadata columns. Configurable data path. Create/overwrite on each run. Queued implement for indexer."
+    tokens: ~
+  - task: 16
+    time: "2026-03-21T20:57:14Z"
+    story: "phase"
+    description: "[review] review-pr pr=3 — posted COMMENT review with 0 critical, 2 concerns, 1 nit. Good DI pattern, clean SSE implementation, proper error handling."
+    result: "pass"
+    notes: "Concerns: 1) finally block resets stage to idle after done state, 2) sequential embedding in indexer loop. Nit: LanceDB cache in node_modules. Review posted to GitHub."
+    tokens: ~
+  - task: 17
+    time: "2026-03-21T21:02:00Z"
+    story: "phase"
+    description: "[review] handle-pr-review pr=3 — triaged 3 threads: 1 fixed (stage reset), 1 TODO added (batch embedding), 1 acknowledged (cache path). All quality checks pass."
+    result: "pass"
+    notes: "Fixed stage reset bug (finally→catch), added batch embedding TODO, resolved all 3 threads, posted summary. 37 tests pass."
+    tokens: ~

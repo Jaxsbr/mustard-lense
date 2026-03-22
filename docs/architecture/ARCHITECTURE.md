@@ -10,20 +10,47 @@
 │  ┌──────────┐  ┌─────────────────┐  │
 │  │  Lense   │  │    Template     │  │
 │  │  Input   │──│   Renderers     │  │
-│  └──────────┘  └─────────────────┘  │
+│  │          │  │                 │  │
+│  │  Stage   │  │  (planned for   │  │
+│  │  Loading │  │   rag-lense:    │  │
+│  │  (SSE)   │  │   reads SSE     │  │
+│  └──────────┘  │   stream)       │  │
+│                └─────────────────┘  │
 └──────────────┬──────────────────────┘
-               │ POST /api/lense
+               │ POST /api/lense (SSE stream)
+               │ POST /api/reindex (planned for rag-lense)
                ▼
 ┌─────────────────────────────────────┐
 │         API Server (Express)        │
-│  (planned for intelligent-lense)    │
+│         src/server/app.ts           │
 │                                     │
 │  ┌──────────┐  ┌─────────────────┐  │
 │  │  System   │  │   Response      │  │
 │  │  Prompt   │  │   Schema        │  │
 │  └──────────┘  └─────────────────┘  │
+│                                     │
+│  (planned for rag-lense phase:)     │
+│  ┌──────────────────────────────┐   │
+│  │  RAG Pipeline                │   │
+│  │  src/server/rag/             │   │
+│  │  ┌────────┐ ┌──────────────┐ │   │
+│  │  │Embedder│ │   LanceDB    │ │   │
+│  │  │(local) │→│ Vector Store │ │   │
+│  │  └────────┘ └──────────────┘ │   │
+│  │  ┌────────┐ ┌──────────────┐ │   │
+│  │  │Indexer │ │  Retriever   │ │   │
+│  │  │        │ │  (top-k=5)   │ │   │
+│  │  └────────┘ └──────────────┘ │   │
+│  └──────────────────────────────┘   │
+│  ┌──────────────────────────────┐   │
+│  │  Synthesiser Interface       │   │
+│  │  src/server/synthesiser.ts   │   │
+│  │  └─ CliSynthesiser (current) │   │
+│  │  └─ SdkSynthesiser (future)  │   │
+│  └──────────────────────────────┘   │
 └──────────────┬──────────────────────┘
                │ invokeClaude(basic)
+               │ (no file access — records injected inline)
                ▼
 ┌─────────────────────────────────────┐
 │       Claude Code CLI Module        │
@@ -39,46 +66,55 @@
 ┌─────────────────────────────────────┐
 │         Claude Code CLI             │
 │         (system binary)             │
-└──────────────┬──────────────────────┘
-               │ reads YAML files
-               ▼
+└─────────────────────────────────────┘
+
 ┌─────────────────────────────────────┐
 │       Mustard Data Store            │
 │    ~/dev/mustard/data/ (YAML)       │
 │  todos/ daily_logs/ people_notes/   │
 │  ideas/                             │
 └─────────────────────────────────────┘
+  ↑ read by RAG Indexer at server start + POST /api/reindex
 ```
 
 ## Module structure
 
 ```
 src/
-├── App.tsx                    # Lense page — input, loading, result rendering
+├── App.tsx                    # Lense page — input, SSE stage loading, result rendering
 ├── App.css                    # App styles
 ├── index.css                  # Global reset styles
 ├── main.tsx                   # React entry point
-├── components/                # (planned for intelligent-lense phase)
-│   ├── LenseInput.tsx         # Intent input field with submit/loading states
+├── components/
 │   ├── ResultRenderer.tsx     # Component registry — maps type string to renderer
 │   ├── TodoList.tsx           # todo-list component renderer
 │   ├── LogTimeline.tsx        # log-timeline component renderer
 │   ├── PersonNotes.tsx        # person-notes component renderer
 │   ├── IdeaList.tsx           # idea-list component renderer
-│   └── Summary.tsx            # summary component renderer
-├── shared/                    # (planned for intelligent-lense phase)
+│   ├── Summary.tsx            # summary component renderer
+│   ├── FallbackComponent.tsx  # Fallback for unknown component types
+│   ├── components.css         # Shared component styles
+│   └── tokens.css             # Design tokens (CSS variables)
+├── shared/
 │   └── schema.ts             # Response schema — TypeScript interfaces for component types
-├── server/                    # (planned for intelligent-lense phase)
-│   ├── index.ts               # Express API server entry point
-│   ├── prompt.ts              # System prompt construction
-│   └── server.test.ts         # API endpoint unit tests (mocked invokeClaude)
+├── server/
+│   ├── index.ts               # Express API server entry point (triggers index on startup)
+│   ├── app.ts                 # Express app with POST /api/lense (SSE) and POST /api/reindex
+│   ├── prompt.ts              # Synthesis prompt construction (injects records inline)
+│   ├── synthesiser.ts         # Synthesiser interface + CliSynthesiser (planned for rag-lense)
+│   ├── server.test.ts         # API endpoint unit tests (mocked retriever + synthesiser)
+│   └── rag/                   # (planned for rag-lense phase)
+│       ├── embedder.ts        # Embedding wrapper — transformers.js, all-MiniLM-L6-v2
+│       ├── indexer.ts         # Reads YAML, generates embeddings, writes to LanceDB
+│       ├── retriever.ts       # Embeds query, similarity search, returns top-k records
+│       └── rag.test.ts        # Unit tests for indexer + retriever (fixture data)
 ├── lib/
 │   ├── claude-cli.ts          # CLI invocation module with mode support
 │   └── claude-cli.test.ts     # Unit tests (mocked child_process)
 └── smoke/
     ├── basic.ts               # On-demand smoke test — basic mode
     ├── admin.ts               # On-demand smoke test — admin mode
-    └── lense.ts               # On-demand smoke test — lense E2E (planned)
+    └── lense.ts               # On-demand smoke test — lense E2E (SSE stream)
 ```
 
 ## CLI modes
@@ -103,16 +139,24 @@ Claude Code CLI with `--dangerously-skip-permissions`. Used for tasks that requi
 
 ## Data flow
 
-### Lense query flow (planned for intelligent-lense phase)
+### Lense query flow (planned for rag-lense phase — replaces direct CLI file reading)
 
 1. User types natural language intent into the lense input and presses Enter
 2. Frontend sends `POST /api/lense` with `{ "intent": "..." }` to the API server
-3. API server constructs a full prompt: system prompt (data store path, response schema, component types) + user intent
-4. API server calls `invokeClaude({ mode: 'basic', prompt })` — basic mode, no admin permissions needed
-5. Claude Code CLI reads YAML files from `~/dev/mustard/data/` (todos, daily_logs, people_notes, ideas)
-6. Claude returns structured JSON matching the response schema: `{ "components": [{ "type": "todo-list", "data": {...} }, ...] }`
-7. API server parses JSON from stdout and returns it to the frontend
-8. Frontend maps each component to a template renderer (component registry) and animates them into view
+3. API server validates intent (type, length, empty) — returns 400 on failure before opening stream
+4. API server opens SSE stream and emits `retrieving` stage event
+5. RAG retriever embeds the intent string and performs similarity search against LanceDB, returning top-k records (default k=5) with metadata
+6. API server emits `thinking` stage event
+7. Synthesiser builds a prompt with retrieved records injected inline (wrapped in `<record>` delimiters) and user intent (wrapped in `<user-intent>` delimiters), then calls `invokeClaude({ mode: 'basic', prompt })` — no file access, no `allowedTools`, no `addDirs`
+8. Claude returns structured JSON matching the response schema: `{ "components": [{ "type": "todo-list", "data": {...} }, ...] }`
+9. API server parses JSON from stdout and emits `result` SSE event with the components
+10. Frontend receives stage events, displays "Finding records..." → "Thinking..." → renders result components with animated transitions
+
+### Index lifecycle (planned for rag-lense phase)
+
+1. **Server start**: indexer reads all YAML files from `~/dev/mustard/data/`, embeds `text` field of each record, writes vectors + metadata to LanceDB table (create or overwrite)
+2. **Manual refresh**: `POST /api/reindex` triggers a full re-index — same process as server start
+3. **No file-system watcher**: data store changes infrequently; boot-time + on-demand covers the use case
 
 ### Response schema contract
 
@@ -120,7 +164,7 @@ Claude returns a JSON object with a `components` array. Each component has:
 - `type` — discriminator string matching a known component type (`todo-list`, `log-timeline`, `person-notes`, `idea-list`, `summary`)
 - `data` — typed object with fields specific to the component type
 
-The shared schema module (`src/shared/schema.ts`, planned) defines TypeScript interfaces for each component type, used by both server validation and frontend rendering.
+The shared schema module (`src/shared/schema.ts`) defines TypeScript interfaces for each component type, used by both server validation and frontend rendering.
 
 ### Future (data write phase)
 
@@ -137,7 +181,9 @@ The lense currently supports read-only queries. Future phases will add write ope
 
 | System | Purpose | Required |
 |--------|---------|----------|
-| Claude Code CLI (`claude`) | AI conversation engine | Yes (smoke tests require it; unit tests mock it) |
-| Mustard data store (`~/dev/mustard/data/`) | Record storage (YAML files) | Yes for lense queries (Claude Code reads directly); unit tests mock `invokeClaude` |
-| Express (or equivalent) | API server for lense endpoint | Yes (planned for intelligent-lense phase) |
-| Playwright | E2E browser testing for lense UI | Yes (planned for intelligent-lense phase) |
+| Claude Code CLI (`claude`) | AI synthesis engine (receives pre-retrieved records, returns structured JSON) | Yes (smoke tests require it; unit tests mock synthesiser) |
+| Mustard data store (`~/dev/mustard/data/`) | Record storage (YAML files) | Yes for indexing (read by RAG indexer at startup + reindex); unit tests use fixture data |
+| Express | API server for lense endpoint (SSE) and reindex endpoint | Yes |
+| Playwright | E2E browser testing for lense UI | Yes |
+| transformers.js (`all-MiniLM-L6-v2`) | Local embedding model for RAG pipeline (planned for rag-lense) | Yes — runs in-process, no external API |
+| LanceDB | Embedded vector store for RAG pipeline (planned for rag-lense) | Yes — runs in-process, no server, no external service |

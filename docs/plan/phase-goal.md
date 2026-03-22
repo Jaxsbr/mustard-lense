@@ -1,60 +1,61 @@
 ## Phase goal
 
-Connect the React frontend to the Claude Code CLI backend through a lightweight API server, creating an intelligent lense interface. The user types natural language intent into a single input field, the backend routes it to Claude Code (which reads the mustard data store directly), and the frontend renders the response as pre-built template components with animated transitions. No chat UI — input replaces previous results, loading spinner during processing, components animate into view.
+Replace the Claude CLI's file-reading tool calls with a local RAG pipeline that pre-retrieves relevant mustard records and injects them inline into the synthesis prompt. Change POST /api/lense from synchronous JSON to an SSE stream with real processing stage events (retrieving → thinking → result). Abstract the synthesis layer behind an interface so it can be swapped from the CLI to the Anthropic SDK in a future phase. Add a manual reindex endpoint.
 
 ### Dependencies
-- foundation
+- intelligent-lense
 
 ### Stories in scope
-- US-L6 — API server with intent endpoint and response schema
-- US-L7 — Lense input with loading and animated transitions
-- US-L8 — Template renderer components for mustard data types
-- US-L9 — End-to-end smoke test with real data
+- US-L10 — Local RAG pipeline with embedding and vector store
+- US-L11 — Synthesis layer abstraction
+- US-L12 — SSE streaming API with RAG retrieval
+- US-L13 — Frontend SSE consumption with stage-based loading
 
 ### Done-when (observable)
-- [x] A server module exists (e.g. `src/server/`) that exports an Express or equivalent HTTP server with a `POST /api/lense` route [US-L6]
-- [x] `POST /api/lense` with valid `{ "intent": "open todos" }` body returns HTTP 200 with `Content-Type: application/json` [US-L6]
-- [x] A system prompt module exists that references the mustard data store path (`~/dev/mustard/data/`) and enumerates the response schema component types [US-L6]
-- [x] The API endpoint calls `invokeClaude` with `mode: 'basic'` (verified by unit test mocking `invokeClaude`) [US-L6]
-- [x] A shared response schema module exports TypeScript interfaces for all five component types: `todo-list`, `log-timeline`, `person-notes`, `idea-list`, `summary` [US-L6]
-- [x] Each component type interface defines a `type` discriminator field and a `data` object with typed fields (e.g., `todo-list` data includes `items` array with `id`, `text`, `status` fields) [US-L6]
-- [x] `npm run dev` starts both the Vite dev server on port 5234 and the API server, with API requests from the frontend proxied or routed correctly [US-L6]
-- [x] Unit tests exist for the API endpoint that mock `invokeClaude` and verify: valid request returns parsed JSON, missing intent returns 400, invocation failure returns 500 [US-L6]
-- [x] `POST /api/lense` returns 400 when the `intent` field is missing from the request body [US-L6]
-- [x] `POST /api/lense` returns 400 when the `intent` field is an empty string [US-L6]
-- [x] `POST /api/lense` returns 500 with a structured JSON error body (not a raw stack trace) when `invokeClaude` fails [US-L6]
-- [x] The `intent` field is validated for type (`string`) and maximum length before being passed to `invokeClaude` [US-L6]
-- [x] Root URL (`/`) renders a visible text input element that serves as the lense input [US-L7]
-- [x] Submitting the input (Enter key or submit affordance) triggers a `POST` request to `/api/lense` with the input value as `intent` [US-L7]
-- [x] A loading indicator element (spinner or equivalent) is present in the DOM while the API request is in flight [US-L7]
-- [x] The input element has a visually distinct loading state (e.g., `disabled` attribute or CSS class change) while the request is in flight [US-L7]
-- [x] Result components are rendered inside an animation wrapper that applies CSS `transition` or `animation` on mount (verifiable by presence of animation/transition CSS properties or class) [US-L7]
-- [x] When a new query is submitted, existing result components are removed from the DOM before new results render (always-replace) [US-L7]
-- [x] The input value resets to empty string after a query is submitted [US-L7]
-- [x] When the API returns an error, an error message is rendered in the DOM (not a browser alert or console-only error) [US-L7]
-- [x] Before any query is submitted, the page displays the Matthew 13:31-32 mustard seed verse as the default empty state [US-L7]
-- [x] Playwright test exists that: types a query, asserts loading indicator appears, and asserts at least one result component renders after loading completes [US-L7]
-- [x] `README.md` or `docs/` contains a "Using the Lense" section documenting the lense input, example queries, and component types rendered [US-L7]
-- [x] A component registry module exists that accepts a component type string and returns the corresponding React component (or a fallback) [US-L8]
-- [x] `todo-list` renderer displays each item's `status` (as a visual indicator), `text`, and `due_date_local` when present [US-L8]
-- [x] `log-timeline` renderer displays entries with `capture_date_local`, `theme`, and `text` [US-L8]
-- [x] `person-notes` renderer displays notes with `person` name, `capture_date_local`, and `text` [US-L8]
-- [x] `idea-list` renderer displays items with `status` badge and `text` [US-L8]
-- [x] `summary` renderer displays a `title` and `text` block [US-L8]
-- [x] All renderer components accept props typed with the shared schema interfaces from US-L6 (`npm run typecheck` passes) [US-L8]
-- [x] Passing an unrecognized component type to the registry returns a fallback component that renders a visible element (not empty/blank) and does not throw a runtime error [US-L8]
-- [x] Renderer components use a shared CSS module, CSS variables, or design tokens file for consistent spacing, typography, and color [US-L8]
-- [x] All renderer components render mustard data text using React JSX expressions (textContent), not `dangerouslySetInnerHTML` [US-L8]
-- [x] `package.json` defines a `smoke:lense` script that is separate from the `test` script [US-L9]
-- [x] `npm test` does NOT execute the lense smoke test [US-L9]
-- [x] `npm run smoke:lense` sends an HTTP request with a cross-cutting intent (e.g., "what's going on this week") to the API endpoint [US-L9]
-- [x] The smoke test asserts the response parses as valid JSON containing a `components` array with at least one entry [US-L9]
-- [x] The smoke test prints the component types present in the response to stdout [US-L9]
-- [x] `AGENTS.md` reflects new API server modules, response schema, frontend components, and lense interaction introduced in this phase [phase]
+- [x] `src/server/rag/` directory exists with embedding, indexer, and retriever modules [US-L10]
+- [x] Embedding module imports from a transformers.js package and loads the `Xenova/all-MiniLM-L6-v2` model (verifiable by model name string in source) [US-L10]
+- [x] Indexer reads all YAML files from a configurable data store path, embeds the `text` field of each record, and writes vectors to a LanceDB table [US-L10]
+- [x] Each LanceDB record stores metadata columns: `id`, `log_type`, `capture_date_local`, and type-specific fields where present (`person`, `status`, `due_date_local`, `category`, `theme`, `period`, `tags`) [US-L10]
+- [x] Retriever exports a function that accepts a query string and optional `k` parameter (default 5), returns an array of records with `text` and metadata fields [US-L10]
+- [x] Indexer creates or overwrites the LanceDB table on each run — not incremental [US-L10]
+- [x] Unit tests exist for indexer and retriever using fixture YAML data — `npm test` does not depend on the real mustard data store [US-L10]
+- [x] Embedding runs locally in-process — no HTTP calls to external embedding APIs (verifiable by absence of fetch/axios calls in embedding module) [US-L10]
+- [x] `package.json` includes a transformers.js package and a LanceDB package as dependencies [US-L10]
+- [x] `src/server/synthesiser.ts` exports a `Synthesiser` interface with a method accepting `intent` (string) and `records` (array of retrieved records), returning `Promise<LenseResponse>` [US-L11]
+- [x] `src/server/synthesiser.ts` exports a `CliSynthesiser` class or function that implements the `Synthesiser` interface by wrapping `invokeClaude` [US-L11]
+- [x] The synthesis prompt injects retrieved records inline with their text and metadata — no file-reading instructions, no data store path reference, no `allowedTools` or `addDirs` in the `invokeClaude` call [US-L11]
+- [x] User intent is wrapped in `<user-intent>` delimiters in the synthesis prompt (existing prompt injection resistance preserved) [US-L11]
+- [x] Retrieved records injected into the prompt are wrapped in explicit delimiters (e.g., `<record>...</record>`) to distinguish data from instructions [US-L11]
+- [x] Error paths return generic messages and log details server-side only — raw LLM output is never included in client-facing error responses [US-L11]
+- [x] Unit tests verify `CliSynthesiser` with mocked `invokeClaude`: success path returns `LenseResponse`, error path returns generic error without leaking raw output [US-L11]
+- [x] `POST /api/lense` returns `Content-Type: text/event-stream` [US-L12]
+- [x] The SSE stream emits named events in order: `retrieving`, `thinking`, `result` [US-L12]
+- [x] The `result` event `data` field parses as JSON with a `components` array matching the existing `LenseResponse` shape [US-L12]
+- [x] An `error` event is emitted on stream failure with a generic error message (no stack traces, no raw LLM output) [US-L12]
+- [x] Intent validation (type check, empty check, max length) returns HTTP 400 JSON response before opening the SSE stream [US-L12]
+- [x] `POST /api/reindex` triggers a full vector index rebuild and returns HTTP 200 with `{ "status": "ok", "records": <count> }` on success [US-L12]
+- [x] `POST /api/reindex` returns HTTP 500 with a structured JSON error body (not a raw stack trace) when indexing fails [US-L12]
+- [x] Server entry point (`src/server/index.ts`) triggers vector index build on startup before accepting requests [US-L12]
+- [x] Unit tests mock retriever and synthesiser and verify the SSE event sequence (`retrieving` → `thinking` → `result`) [US-L12]
+- [x] Unit test verifies `POST /api/reindex` returns 200 with record count [US-L12]
+- [x] `smoke:lense` script updated to read the SSE stream and extract the `result` event instead of calling `res.json()` [US-L12]
+- [x] Diagnostic timing is logged server-side for retrieval and synthesis stages (console output includes retrieval and synthesis durations) [US-L12]
+- [x] Frontend sends `POST` to `/api/lense` and reads the response as an SSE stream [US-L13]
+- [x] "Finding records..." text is visible in the DOM during the `retrieving` stage [US-L13]
+- [x] "Thinking..." text is visible in the DOM during the `thinking` stage [US-L13]
+- [x] Stage transitions have CSS `animation` or `transition` properties (verifiable by computed style or class presence) [US-L13]
+- [x] Result components render when the `result` SSE event arrives (same component rendering pipeline as before) [US-L13]
+- [x] An `error` SSE event renders an error message in the DOM (not a browser alert or console-only error) [US-L13]
+- [x] New query clears previous results before showing stage indicators (always-replace behavior preserved) [US-L13]
+- [x] Input value resets to empty string after submit (existing behavior preserved) [US-L13]
+- [x] Playwright E2E test mocks the SSE endpoint and verifies: stage indicator appears during processing, at least one result component renders after the `result` event [US-L13]
+- [x] Playwright E2E test verifies an `error` SSE event renders an error message in the DOM [US-L13]
+- [x] "Using the Lense" documentation updated to describe the stage-based loading experience (stage names and what they mean) [US-L13]
+- [x] `AGENTS.md` reflects new RAG modules (`src/server/rag/`), synthesiser (`src/server/synthesiser.ts`), SSE streaming on `POST /api/lense`, and `POST /api/reindex` endpoint introduced in this phase [phase]
 
 ### Golden principles (phase-relevant)
-- **Faithful stewardship** — quality over speed; the system prompt and response schema are the highest-leverage code in this phase — get them right
-- **Safety and ethics** — basic CLI mode only; user intent is passed via argument array, not shell interpolation; no dangerouslySetInnerHTML
-- **Clarity over complexity** — template components over dynamic code generation; a known set of component types rather than unbounded flexibility
-- **People first** — polished transitions and loading states treat user time and attention with respect; the interface should feel intentional, not bolted-on
-- **Continuous improvement** — the response schema and component registry are designed to grow; new component types can be added without restructuring
+- **Great Commission ambition + nonprofit stewardship** — zero recurring cost architecture: local embedding (transformers.js), local vector store (LanceDB), no external APIs for retrieval. Every dollar is donor-trust money.
+- **Faithful stewardship** — RAG retrieval quality is the highest-leverage code in this phase; k=5 validated by POC benchmarking. Get the embedding and retrieval right.
+- **People first** — SSE stage events give honest, purposeful feedback; "Finding records..." and "Thinking..." respect user attention more than a static spinner.
+- **Clarity over complexity** — server-start indexing + manual reindex over file-system watchers; synthesis interface is minimal (one method). No premature abstraction.
+- **Continuous improvement** — synthesis interface enables future SDK swap without rework; RAG pipeline enables future dynamic-k, metadata filtering, and full-scan optimizations.

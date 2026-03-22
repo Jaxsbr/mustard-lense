@@ -14,6 +14,7 @@ credentials.json
 # Node
 node_modules/
 dist/
+test-results/
 
 # Python
 __pycache__/

@@ -32,6 +32,7 @@ export function CrudPanel({ collapsed, onToggle }: CrudPanelProps) {
   const [activeTab, setActiveTab] = useState<string>(TABS[0].type)
   const [records, setRecords] = useState<MustardRecord[]>([])
   const [counts, setCounts] = useState<Record<string, number>>({})
+  const [countsLoaded, setCountsLoaded] = useState(false)
   const [loading, setLoading] = useState(false)
 
   const fetchRecords = useCallback(async (type: string) => {
@@ -60,6 +61,7 @@ export function CrudPanel({ collapsed, onToggle }: CrudPanelProps) {
           countMap[tab.type] = data.filter((r) => r.log_type === tab.type).length
         }
         setCounts(countMap)
+        setCountsLoaded(true)
       }
     } catch {
       // counts remain as-is
@@ -69,9 +71,14 @@ export function CrudPanel({ collapsed, onToggle }: CrudPanelProps) {
   useEffect(() => {
     if (!collapsed) {
       fetchRecords(activeTab)
+    }
+  }, [collapsed, activeTab, fetchRecords])
+
+  useEffect(() => {
+    if (!collapsed && !countsLoaded) {
       fetchAllCounts()
     }
-  }, [collapsed, activeTab, fetchRecords, fetchAllCounts])
+  }, [collapsed, countsLoaded, fetchAllCounts])
 
   function handleTabClick(type: string) {
     setActiveTab(type)

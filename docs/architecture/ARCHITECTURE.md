@@ -93,7 +93,7 @@ src/
 │   ├── IdeaList.tsx           # idea-list component renderer
 │   ├── Summary.tsx            # summary component renderer
 │   ├── FallbackComponent.tsx  # Fallback for unknown component types
-│   ├── panel/                 # (planned for structured-browse phase)
+│   ├── panel/                 # CRUD panel and data reader
 │   │   ├── CrudPanel.tsx      # Collapsible panel container with type tabs and list views
 │   │   └── ...                # Type-specific list view components
 │   ├── components.css         # Shared component styles
@@ -106,7 +106,7 @@ src/
 │   ├── prompt.ts              # Synthesis prompt construction (injects records inline)
 │   ├── synthesiser.ts         # Synthesiser interface + CliSynthesiser (planned for rag-lense)
 │   ├── server.test.ts         # API endpoint unit tests (mocked retriever + synthesiser)
-│   ├── data/                  # (planned for structured-browse phase)
+│   ├── data/                  # CRUD panel and data reader
 │   │   └── reader.ts          # Reads YAML records from configurable data directory
 │   └── rag/                   # (planned for rag-lense phase)
 │       ├── embedder.ts        # Embedding wrapper — transformers.js, all-MiniLM-L6-v2
@@ -171,7 +171,7 @@ Claude returns a JSON object with a `components` array. Each component has:
 
 The shared schema module (`src/shared/schema.ts`) defines TypeScript interfaces for each component type, used by both server validation and frontend rendering.
 
-### Browse API data flow (planned for structured-browse phase)
+### Browse API data flow CRUD panel and data reader
 
 1. Frontend CRUD panel sends `GET /api/records?type=<log_type>` to the API server
 2. Data reader module reads all YAML files from `MUSTARD_DATA_DIR` (defaults to `~/dev/mustard/data/`)

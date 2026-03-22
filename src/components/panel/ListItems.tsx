@@ -1,4 +1,4 @@
-import type { PanelRecord } from './CrudPanel.js'
+import type { PanelRecord } from './types.js'
 import './ListItems.css'
 
 function truncate(text: string, max = 80): string {

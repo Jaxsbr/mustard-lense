@@ -1,22 +1,9 @@
 import * as fs from 'node:fs'
 import * as path from 'node:path'
 import { parse as parseYaml } from 'yaml'
+import type { MustardRecord } from '../../shared/record.js'
 
 const DEFAULT_DATA_PATH = '~/dev/mustard/data'
-
-export interface MustardRecord {
-  id: string
-  log_type: string
-  capture_date_local: string
-  text: string
-  person: string | null
-  status: string | null
-  due_date_local: string | null
-  category: string | null
-  theme: string | null
-  period: string | null
-  tags: string[]
-}
 
 export function getDataDir(): string {
   return resolveHome(process.env.MUSTARD_DATA_DIR ?? DEFAULT_DATA_PATH)
@@ -69,4 +56,5 @@ export function readRecords(dataDir?: string): MustardRecord[] {
   return records
 }
 
+export type { MustardRecord }
 export { findYamlFiles, resolveHome }

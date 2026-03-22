@@ -1,27 +1,8 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
+import type { MustardRecord } from '../../shared/record.js'
+import { TABS } from './types.js'
 import { ListItem } from './ListItems.js'
 import './CrudPanel.css'
-
-interface MustardRecord {
-  id: string
-  log_type: string
-  capture_date_local: string
-  text: string
-  person: string | null
-  status: string | null
-  due_date_local: string | null
-  category: string | null
-  theme: string | null
-  period: string | null
-  tags: string[]
-}
-
-const TABS = [
-  { label: 'Todos', type: 'todo' },
-  { label: 'People', type: 'people_note' },
-  { label: 'Ideas', type: 'idea' },
-  { label: 'Daily Logs', type: 'daily_log' },
-] as const
 
 interface CrudPanelProps {
   collapsed: boolean
@@ -35,19 +16,25 @@ export function CrudPanel({ collapsed, onToggle }: CrudPanelProps) {
   const [countsLoaded, setCountsLoaded] = useState(false)
   const [loading, setLoading] = useState(false)
 
+  const abortRef = useRef<AbortController | null>(null)
+
   const fetchRecords = useCallback(async (type: string) => {
+    abortRef.current?.abort()
+    const controller = new AbortController()
+    abortRef.current = controller
     setLoading(true)
     try {
-      const res = await fetch(`/api/records?type=${type}`)
+      const res = await fetch(`/api/records?type=${type}`, { signal: controller.signal })
       if (res.ok) {
         const data: MustardRecord[] = await res.json()
         setRecords(data)
         setCounts((prev) => ({ ...prev, [type]: data.length }))
       }
-    } catch {
+    } catch (err) {
+      if (err instanceof DOMException && err.name === 'AbortError') return
       setRecords([])
     } finally {
-      setLoading(false)
+      if (!controller.signal.aborted) setLoading(false)
     }
   }, [])
 
@@ -136,6 +123,3 @@ export function CrudPanel({ collapsed, onToggle }: CrudPanelProps) {
     </aside>
   )
 }
-
-export { TABS }
-export type { MustardRecord as PanelRecord }

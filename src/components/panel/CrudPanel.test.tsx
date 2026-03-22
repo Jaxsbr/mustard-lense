@@ -64,7 +64,7 @@ describe('CrudPanel tabs', () => {
     render(<CrudPanel collapsed={false} onToggle={() => {}} />)
 
     await waitFor(() => {
-      expect(fetchMock).toHaveBeenCalledWith('/api/records?type=todo')
+      expect(fetchMock).toHaveBeenCalledWith('/api/records?type=todo', expect.objectContaining({ signal: expect.any(AbortSignal) }))
     })
   })
 

@@ -11,42 +11,49 @@ entries:
   - task: 2
     time: "2026-03-22T08:53:00Z"
     story: "US-U1"
-    description: "Investigate: data reader approach — indexer has reusable MustardRecord, findYamlFiles, parseRecord, resolveHome. Extract to shared data/reader.ts. DI pattern in app.ts supports new endpoint. 37 tests, fixture approach reusable."
+    description: "Investigate: data reader approach"
     result: "pass"
-    notes: "Plan: extract reader module, add MUSTARD_DATA_DIR env var, update indexer imports, add GET /api/records to app.ts, add .env.example, add tests."
+    notes: "Plan confirmed. Queue implement."
     tokens: ~
   - task: 3
     time: "2026-03-22T08:57:00Z"
     story: "US-U1"
-    description: "Create data reader module, browse API endpoint, MUSTARD_DATA_DIR support, .env.example, 5 browse tests. Refactor indexer to import from shared reader."
+    description: "Create data reader module, browse API endpoint, MUSTARD_DATA_DIR support, .env.example, 5 browse tests."
     result: "pass"
-    notes: "42 tests pass (up from 37). All 13 US-U1 criteria met. ✓ US-U1 complete"
+    notes: "42 tests. ✓ US-U1 complete"
     tokens: ~
   - task: 4
     time: "2026-03-22T09:00:00Z"
     story: "US-U2"
-    description: "Investigation — US-U1 complete. US-U2 next: split-screen layout. Queue investigate for current App.tsx structure and layout approach."
+    description: "Investigation — US-U2 split-screen layout."
     result: "pass"
-    notes: "US-U2 has 10 criteria: two-column layout, toggle, collapse/expand, 40% width, lense always visible, title change, responsive, panel dir, E2E test, user guide."
+    notes: "10 criteria. Queued investigate."
     tokens: ~
   - task: 5
     time: "2026-03-22T09:04:00Z"
     story: "US-U2"
-    description: "Investigate: App.tsx is single <main> with max-width 700px. Plan: wrap in flex container, CrudPanel on left (40%), lense on right. Toggle collapses panel. Responsive at 768px. Title change. Need docs/manual/layout.md and E2E test."
+    description: "Investigate: App.tsx structure and layout plan."
     result: "pass"
-    notes: "Current App.tsx: form + stage + results + empty state. E2E tests target input[type=text] and .lense-results. Need CrudPanel.tsx in components/panel/."
+    notes: "Plan confirmed. Queue implement."
     tokens: ~
   - task: 6
     time: "2026-03-22T09:10:00Z"
     story: "US-U2"
-    description: "Implement split-screen layout: CrudPanel.tsx with toggle, flex layout in App.tsx, responsive collapse at 768px, title to Mustard, E2E test, docs/manual/layout.md."
+    description: "Implement split-screen layout: CrudPanel.tsx, flex layout, toggle, responsive, E2E, docs."
     result: "pass"
-    notes: "42 tests still pass. All 10 US-U2 criteria met. ✓ US-U2 complete"
+    notes: "42 tests. ✓ US-U2 complete"
     tokens: ~
   - task: 7
     time: "2026-03-22T09:13:00Z"
     story: "US-U3"
-    description: "Investigation — US-U2 complete. US-U3 next: type tabs. Queue investigate for CrudPanel tab extension with fetch, count badges, loading state."
+    description: "Investigation — US-U3 type tabs. CrudPanel needs tabs, fetch, count badges, loading, unit tests."
     result: "pass"
-    notes: "US-U3 has 7 criteria: 4 tabs, fetch on click, active tab styling, default Todos, count badge, loading indicator, unit tests."
+    notes: "7 criteria. Queue investigate + implement."
+    tokens: ~
+  - task: 8
+    time: "2026-03-22T09:15:00Z"
+    story: "US-U3"
+    description: "Investigate: CrudPanel has placeholder body. Need to add tab bar with 4 tabs, useState for active tab, useEffect for fetch, loading state, count badges. Unit tests via vitest + testing-library or inline component tests."
+    result: "pass"
+    notes: "Approach: extend CrudPanel.tsx with tab state + fetch. Need Vite proxy already handles /api. Use aria-selected for active tab. Queue implement."
     tokens: ~

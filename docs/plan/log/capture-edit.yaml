@@ -37,7 +37,7 @@ entries:
     notes: "Queue implement."
     tokens: ~
   - task: 6
-    time: "2026-03-22$10:12:00Z"
+    time: "2026-03-22T10:12:00Z"
     story: "US-U6"
     description: "Implement: DetailDrawer + Add button + CrudPanel wiring."
     result: "pass"
@@ -74,7 +74,21 @@ entries:
   - task: 11
     time: "2026-03-22T10:25:00Z"
     story: "phase"
-    description: "AGENTS.md update + phase completion gate. All 72 done-when criteria met. 68 tests."
+    description: "AGENTS.md update + phase completion gate."
     result: "pass"
-    notes: "Phase complete. 4 stories shipped: US-U5, US-U6, US-U7, US-U8."
+    notes: "Phase complete. 4 stories shipped."
+    tokens: ~
+  - task: 13
+    time: "2026-03-22T10:30:00Z"
+    story: "phase"
+    description: "[review] review-pr pr=5 — posted COMMENT review with 0 critical, 2 concerns, 1 observation."
+    result: "pass"
+    notes: "Concerns: explicit field destructuring on POST/PUT. Observation: O(n) findRecordFile scan."
+    tokens: ~
+  - task: 14
+    time: "2026-03-22T10:35:00Z"
+    story: "phase"
+    description: "[review] handle-pr-review pr=5 — triaged 3 findings: 2 fixed (field destructuring), 1 addressed (comment). All quality checks pass."
+    result: "pass"
+    notes: "68 tests pass. Review complete."
     tokens: ~

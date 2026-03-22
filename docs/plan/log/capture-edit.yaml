@@ -1,3 +1,10 @@
 phase: "capture-edit"
 started: "2026-03-22T09:51:34Z"
-entries: []
+entries:
+  - task: 1
+    time: "2026-03-22T09:55:00Z"
+    story: "phase"
+    description: "Investigation — classify phase as server/schema/cross-cutting. 49 tests. Investigate-first mandate applies. US-U5 first (write API foundation)."
+    result: "pass"
+    notes: "reader.ts has reusable getDataDir/resolveHome. app.ts uses DI. MustardRecord in shared/record.ts. Need log_type→dir mapping."
+    tokens: ~

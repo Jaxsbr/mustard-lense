@@ -8,3 +8,10 @@ entries:
     result: "pass"
     notes: "Server/schema phase — investigate-first mandate applies."
     tokens: ~
+  - task: 2
+    time: "2026-03-23T01:15:00Z"
+    story: "US-D4"
+    description: "Investigate: 73 tests, writer.ts uses findRecordFile for ID-to-filepath, PUT pattern is the template. Need deleteRecord + DELETE route + 3+ tests."
+    result: "pass"
+    notes: "Server/schema phase — queued implement task."
+    tokens: ~

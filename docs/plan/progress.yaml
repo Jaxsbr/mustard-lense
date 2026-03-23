@@ -7,7 +7,7 @@ config:
   quality_check_suppressions: []
 
 state:
-  task_number: 1
+  task_number: 2
   phase: living-polish
   phase_complete: false
   review_stage: null
@@ -16,6 +16,6 @@ state:
   pr_number: null
   status: running
   last_result: null
-  next_task: "[US-D4] Investigate: confirm current test count, review writer.ts findRecordFile pattern, identify all files needing changes for DELETE endpoint + deleteRecord"
+  next_task: "[US-D4] Implement deleteRecord in writer.ts + DELETE /api/records/:id endpoint in app.ts + unit tests in server.test.ts"
   consecutive_fails: 0
   completed_stories: []

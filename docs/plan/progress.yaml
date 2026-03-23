@@ -7,15 +7,15 @@ config:
   quality_check_suppressions: []
 
 state:
-  task_number: 10
+  task_number: 11
   phase: daily-ready
   phase_complete: true
-  review_stage: pr_created
+  review_stage: review_posted
   review_complete: false
   retro_complete: false
   pr_number: 6
   status: running
   last_result: pass
-  next_task: "[review] review-pr pr=6 auto=true"
+  next_task: "[review] handle-pr-review pr=6 auto=true"
   consecutive_fails: 0
   completed_stories: [US-D1, US-D2, US-D3]

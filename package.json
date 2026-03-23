@@ -15,7 +15,8 @@
     "smoke:admin": "npx tsx src/smoke/admin.ts",
     "smoke:lense": "npx tsx src/smoke/lense.ts",
     "test:e2e": "npx playwright test",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "start": "npm run build && PORT=7777 node --import tsx src/server/index.ts"
   },
   "dependencies": {
     "@huggingface/transformers": "^3.8.1",

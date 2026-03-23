@@ -1,3 +1,6 @@
+import path from 'node:path'
+import { fileURLToPath } from 'node:url'
+import express from 'express'
 import { createApp } from './app.js'
 import { retrieve } from './rag/retriever.js'
 import { buildIndex } from './rag/indexer.js'
@@ -6,6 +9,8 @@ import { readRecords } from './data/reader.js'
 import { createRecord, updateRecord } from './data/writer.js'
 
 const PORT = parseInt(process.env.PORT ?? '3001', 10)
+const __dirname = path.dirname(fileURLToPath(import.meta.url))
+const distDir = path.resolve(__dirname, '../../dist')
 
 let indexReady = false
 
@@ -23,6 +28,14 @@ async function start() {
     createRecord,
     updateRecord,
   })
+
+  // In production, serve Vite build static files so the full app runs on a single port
+  if (process.env.NODE_ENV !== 'development') {
+    app.use(express.static(distDir))
+    app.get('*', (_req, res) => {
+      res.sendFile(path.join(distDir, 'index.html'))
+    })
+  }
 
   app.listen(PORT, () => {
     console.log(`Lense API server listening on port ${PORT}`)

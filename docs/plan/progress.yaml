@@ -16,6 +16,6 @@ state:
   pr_number: null
   status: running
   last_result: pass
-  next_task: null
+  next_task: "[US-D3] Implement: type-specific CRUD panel colors — active tab border, count badge, list item left indicator using --lense-color-type-* tokens, E2E test"
   consecutive_fails: 0
   completed_stories: [US-D1, US-D2]

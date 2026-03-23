@@ -147,4 +147,14 @@ function findRecordFile(id: string, dataDir: string): string | null {
   return null
 }
 
+export function deleteRecord(id: string, dataDir?: string): string | null {
+  const dir = dataDir ?? getDataDir()
+
+  const filePath = findRecordFile(id, dir)
+  if (!filePath) return null
+
+  fs.unlinkSync(filePath)
+  return id
+}
+
 export { VALID_LOG_TYPES, MAX_TEXT_LENGTH }

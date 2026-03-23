@@ -14,6 +14,7 @@ export interface AppDependencies {
   readRecords: (dataDir?: string) => MustardRecord[]
   createRecord: (input: CreateRecordInput, dataDir?: string) => MustardRecord
   updateRecord: (id: string, input: UpdateRecordInput, dataDir?: string) => MustardRecord | null
+  deleteRecord: (id: string, dataDir?: string) => string | null
 }
 
 export function createApp(deps: AppDependencies) {
@@ -154,6 +155,39 @@ export function createApp(deps: AppDependencies) {
       console.error('[records] update error:', message)
       res.status(500).json({ error: 'Failed to update record.' })
     }
+  })
+
+  app.delete('/api/records/:id', (req, res) => {
+    try {
+      const { id } = req.params
+
+      // Validate ID format — must be a UUID pattern (no path traversal)
+      if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id)) {
+        res.status(400).json({ error: 'Invalid record ID format.' })
+        return
+      }
+
+      const deletedId = deps.deleteRecord(id)
+      if (!deletedId) {
+        res.status(404).json({ error: 'Record not found.' })
+        return
+      }
+      res.json({ id: deletedId })
+
+      // Background reindex — fire and forget
+      deps.buildIndex().catch((err) => {
+        console.error('[reindex] background reindex after delete failed:', err instanceof Error ? err.message : err)
+      })
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Unknown error'
+      console.error('[records] delete error:', message)
+      res.status(500).json({ error: 'Failed to delete record.' })
+    }
+  })
+
+  // Catch-all for DELETE /api/records/ with no ID — return JSON, not SPA HTML
+  app.delete('/api/records', (_req, res) => {
+    res.status(400).json({ error: 'Record ID is required. Use DELETE /api/records/:id.' })
   })
 
   return app

@@ -42,6 +42,8 @@ let mockReadRecords: any
 let mockCreateRecord: any
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 let mockUpdateRecord: any
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+let mockDeleteRecord: any
 let deps: AppDependencies
 
 beforeEach(() => {
@@ -77,7 +79,8 @@ beforeEach(() => {
     period: null,
     tags: ['personal'],
   })
-  deps = { retrieve: mockRetrieve, synthesiser: { synthesise: mockSynthesise }, buildIndex: mockBuildIndex, readRecords: mockReadRecords, createRecord: mockCreateRecord, updateRecord: mockUpdateRecord }
+  mockDeleteRecord = vi.fn().mockReturnValue('aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee')
+  deps = { retrieve: mockRetrieve, synthesiser: { synthesise: mockSynthesise }, buildIndex: mockBuildIndex, readRecords: mockReadRecords, createRecord: mockCreateRecord, updateRecord: mockUpdateRecord, deleteRecord: mockDeleteRecord }
 })
 
 describe('POST /api/lense', () => {
@@ -452,5 +455,67 @@ describe('PUT /api/records/:id', () => {
 
     await new Promise((r) => setTimeout(r, 10))
     expect(mockBuildIndex).toHaveBeenCalled()
+  })
+})
+
+describe('DELETE /api/records/:id', () => {
+  it('returns 200 with deleted record ID', async () => {
+    const app = createApp(deps)
+    const res = await request(app)
+      .delete('/api/records/aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee')
+      .expect(200)
+      .expect('Content-Type', /json/)
+
+    expect(res.body).toEqual({ id: 'aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee' })
+    expect(mockDeleteRecord).toHaveBeenCalledWith('aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee')
+  })
+
+  it('returns 404 when record not found', async () => {
+    mockDeleteRecord.mockReturnValueOnce(null)
+    const app = createApp(deps)
+    const res = await request(app)
+      .delete('/api/records/aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee')
+      .expect(404)
+
+    expect(res.body.error).toMatch(/not found/i)
+  })
+
+  it('returns 400 for invalid ID format', async () => {
+    const app = createApp(deps)
+    await request(app)
+      .delete('/api/records/not-a-valid-uuid')
+      .expect(400)
+  })
+
+  it('returns 500 with structured error when delete throws', async () => {
+    mockDeleteRecord.mockImplementation(() => { throw new Error('EPERM: operation not permitted') })
+    const app = createApp(deps)
+    const res = await request(app)
+      .delete('/api/records/aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee')
+      .expect(500)
+      .expect('Content-Type', /json/)
+
+    expect(res.body).toHaveProperty('error')
+    expect(res.body.error).not.toContain('EPERM')
+  })
+
+  it('triggers background reindex after successful delete', async () => {
+    const app = createApp(deps)
+    await request(app)
+      .delete('/api/records/aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee')
+      .expect(200)
+
+    await new Promise((r) => setTimeout(r, 10))
+    expect(mockBuildIndex).toHaveBeenCalled()
+  })
+
+  it('returns 400 JSON when no ID is provided', async () => {
+    const app = createApp(deps)
+    const res = await request(app)
+      .delete('/api/records')
+      .expect(400)
+      .expect('Content-Type', /json/)
+
+    expect(res.body.error).toMatch(/id.*required/i)
   })
 })

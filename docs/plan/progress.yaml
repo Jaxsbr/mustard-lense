@@ -16,6 +16,6 @@ state:
   pr_number: null
   status: running
   last_result: pass
-  next_task: null
+  next_task: "[phase] Implement: production static serving from dist/ + start script in package.json"
   consecutive_fails: 0
   completed_stories: [US-D1, US-D2, US-D3]

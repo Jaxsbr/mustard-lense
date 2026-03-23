@@ -1,3 +1,10 @@
 phase: "living-polish"
 started: "2026-03-23T01:12:56Z"
-entries: []
+entries:
+  - task: 1
+    time: "2026-03-23T01:13:00Z"
+    story: "US-D4"
+    description: "Phase started. Investigated codebase: 73 unit tests, verify passes. Queued investigate task for DELETE endpoint."
+    result: "pass"
+    notes: "Server/schema phase — investigate-first mandate applies."
+    tokens: ~

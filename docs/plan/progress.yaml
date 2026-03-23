@@ -16,6 +16,6 @@ state:
   pr_number: null
   status: running
   last_result: null
-  next_task: null
+  next_task: "[US-D4] Investigate: confirm current test count, review writer.ts findRecordFile pattern, identify all files needing changes for DELETE endpoint + deleteRecord"
   consecutive_fails: 0
   completed_stories: []

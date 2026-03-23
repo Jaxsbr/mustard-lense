@@ -7,7 +7,7 @@ config:
   quality_check_suppressions: []
 
 state:
-  task_number: 4
+  task_number: 5
   phase: living-polish
   phase_complete: false
   review_stage: null

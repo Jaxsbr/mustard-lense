@@ -29,3 +29,10 @@ entries:
     result: "pass"
     notes: "Delete UI criteria met. Celebration animations + E2E tests remain for US-D4."
     tokens: ~
+  - task: 5
+    time: "2026-03-23T01:22:00Z"
+    story: "US-D4"
+    description: "Implement celebration animations: tab burst (create), item shimmer (edit), item farewell (delete). CSS-only."
+    result: "pass"
+    notes: "Celebration animations criteria met. E2E tests remain for US-D4."
+    tokens: ~

@@ -18,6 +18,11 @@
   --lense-color-type-daily: #e07850;
   --lense-color-type-idea: #2d9574;
 
+  --lense-color-type-todo-hover: rgba(74, 127, 196, 0.08);
+  --lense-color-type-people-hover: rgba(123, 94, 167, 0.08);
+  --lense-color-type-daily-hover: rgba(224, 120, 80, 0.08);
+  --lense-color-type-idea-hover: rgba(45, 149, 116, 0.08);
+
   --lense-color-status-open: #d97706;
   --lense-color-status-done: #059669;
   --lense-color-status-parked: #6b7280;
@@ -58,6 +63,11 @@
   --lense-color-type-daily: #e89878;
   --lense-color-type-idea: #4db594;
 
+  --lense-color-type-todo-hover: rgba(106, 159, 212, 0.12);
+  --lense-color-type-people-hover: rgba(155, 126, 199, 0.12);
+  --lense-color-type-daily-hover: rgba(232, 152, 120, 0.12);
+  --lense-color-type-idea-hover: rgba(77, 181, 148, 0.12);
+
   --lense-color-status-open: #f59e0b;
   --lense-color-status-done: #34d399;
   --lense-color-status-parked: #9ca3af;
@@ -90,6 +100,11 @@
     --lense-color-type-people: #9b7ec7;
     --lense-color-type-daily: #e89878;
     --lense-color-type-idea: #4db594;
+
+    --lense-color-type-todo-hover: rgba(106, 159, 212, 0.12);
+    --lense-color-type-people-hover: rgba(155, 126, 199, 0.12);
+    --lense-color-type-daily-hover: rgba(232, 152, 120, 0.12);
+    --lense-color-type-idea-hover: rgba(77, 181, 148, 0.12);
 
     --lense-color-status-open: #f59e0b;
     --lense-color-status-done: #34d399;

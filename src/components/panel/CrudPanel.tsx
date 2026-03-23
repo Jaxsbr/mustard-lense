@@ -66,7 +66,16 @@ export function CrudPanel({ collapsed, onToggle }: CrudPanelProps) {
     return prefs
   })
 
+  const [celebratingTab, setCelebratingTab] = useState<string | null>(null)
+  const [shimmeringId, setShimmeringId] = useState<string | null>(null)
+  const [farewellId, setFarewellId] = useState<string | null>(null)
+
   const abortRef = useRef<AbortController | null>(null)
+  const deleteAbortRef = useRef<AbortController | null>(null)
+
+  useEffect(() => {
+    return () => { deleteAbortRef.current?.abort() }
+  }, [])
 
   const currentSort = sortPrefs[activeTab] ?? 'newest'
   const currentLimit = limitPrefs[activeTab] ?? DEFAULT_LIMIT
@@ -161,6 +170,29 @@ export function CrudPanel({ collapsed, onToggle }: CrudPanelProps) {
     setSelectedRecord(null)
   }
 
+  async function handleDelete(id: string) {
+    deleteAbortRef.current?.abort()
+    const controller = new AbortController()
+    deleteAbortRef.current = controller
+    try {
+      const res = await fetch(`/api/records/${id}`, {
+        method: 'DELETE',
+        signal: controller.signal,
+      })
+      if (!res.ok) return
+      handleDrawerClose()
+      // Play farewell animation before removing from list
+      setFarewellId(id)
+      setTimeout(() => {
+        setFarewellId(null)
+        setCountsLoaded(false)
+        fetchRecords(activeTab)
+      }, 500)
+    } catch {
+      // delete failed — drawer stays open
+    }
+  }
+
   async function handleDrawerSave(data: Partial<MustardRecord> & { log_type: string }) {
     try {
       if (drawerMode === 'edit' && data.id) {
@@ -170,6 +202,9 @@ export function CrudPanel({ collapsed, onToggle }: CrudPanelProps) {
           body: JSON.stringify(data),
         })
         if (!res.ok) return
+        // Trigger edit shimmer on the updated item
+        setShimmeringId(data.id)
+        setTimeout(() => setShimmeringId(null), 800)
       } else {
         const res = await fetch('/api/records', {
           method: 'POST',
@@ -177,6 +212,9 @@ export function CrudPanel({ collapsed, onToggle }: CrudPanelProps) {
           body: JSON.stringify(data),
         })
         if (!res.ok) return
+        // Trigger create celebration on the active tab
+        setCelebratingTab(activeTab)
+        setTimeout(() => setCelebratingTab(null), 600)
       }
       handleDrawerClose()
       setCountsLoaded(false)
@@ -217,7 +255,7 @@ export function CrudPanel({ collapsed, onToggle }: CrudPanelProps) {
                 key={tab.type}
                 role="tab"
                 aria-selected={activeTab === tab.type}
-                className={`crud-panel-tab crud-panel-tab--${tab.type}${activeTab === tab.type ? ' crud-panel-tab--active' : ''}`}
+                className={`crud-panel-tab crud-panel-tab--${tab.type}${activeTab === tab.type ? ' crud-panel-tab--active' : ''}${celebratingTab === tab.type ? ' crud-panel-tab--celebrate' : ''}`}
                 onClick={() => handleTabClick(tab.type)}
                 data-testid={`tab-${tab.type}`}
               >
@@ -228,7 +266,7 @@ export function CrudPanel({ collapsed, onToggle }: CrudPanelProps) {
               </button>
             ))}
           </div>
-          <div className="crud-panel-body">
+          <div key={activeTab} className="crud-panel-body">
             {loading && <div className="crud-panel-loading" data-testid="panel-loading">Loading...</div>}
             {!loading && records.length === 0 && (
               <p className="crud-panel-empty" data-testid="panel-empty">No records found.</p>
@@ -247,7 +285,13 @@ export function CrudPanel({ collapsed, onToggle }: CrudPanelProps) {
                 />
                 <div className="crud-panel-list" data-testid="panel-list">
                   {visibleRecords.map((record) => (
-                    <div key={record.id} data-testid="panel-list-item" onClick={() => handleRecordClick(record)} style={{ cursor: 'pointer' }}>
+                    <div
+                      key={record.id}
+                      data-testid="panel-list-item"
+                      onClick={() => handleRecordClick(record)}
+                      style={{ cursor: 'pointer' }}
+                      className={`${shimmeringId === record.id ? 'list-item-shimmer' : ''}${farewellId === record.id ? ' list-item-farewell' : ''}`}
+                    >
                       <ListItem record={record} type={activeTab} />
                     </div>
                   ))}
@@ -264,6 +308,7 @@ export function CrudPanel({ collapsed, onToggle }: CrudPanelProps) {
         open={drawerOpen}
         onClose={handleDrawerClose}
         onSave={handleDrawerSave}
+        onDelete={handleDelete}
       />
     </aside>
   )

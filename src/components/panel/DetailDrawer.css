@@ -6,6 +6,12 @@
   bottom: 0;
   background: rgba(0, 0, 0, 0.2);
   z-index: 100;
+  animation: backdrop-fade-in 0.2s ease-out;
+}
+
+@keyframes backdrop-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
 
 .detail-drawer {
@@ -114,6 +120,59 @@
   border-top: 1px solid var(--lense-color-border);
   display: flex;
   justify-content: flex-end;
+  align-items: center;
+  gap: var(--lense-spacing-sm);
+}
+
+.drawer-delete {
+  background: none;
+  border: 1px solid var(--lense-color-error-text);
+  border-radius: var(--lense-radius);
+  padding: var(--lense-spacing-sm) var(--lense-spacing-lg);
+  font-size: var(--lense-font-size-sm);
+  font-weight: 600;
+  color: var(--lense-color-error-text);
+  cursor: pointer;
+  margin-right: auto;
+  transition: background-color 0.2s, color 0.2s;
+}
+
+.drawer-delete:hover {
+  background: var(--lense-color-error-bg);
+}
+
+.drawer-delete-confirm {
+  display: flex;
+  align-items: center;
+  gap: var(--lense-spacing-sm);
+  margin-right: auto;
+}
+
+.drawer-delete-confirm-text {
+  font-size: var(--lense-font-size-sm);
+  color: var(--lense-color-error-text);
+  font-weight: 600;
+}
+
+.drawer-delete-yes {
+  background: var(--lense-color-error-text);
+  color: white;
+  border: none;
+  border-radius: var(--lense-radius);
+  padding: var(--lense-spacing-xs) var(--lense-spacing-sm);
+  font-size: var(--lense-font-size-sm);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.drawer-delete-no {
+  background: none;
+  border: 1px solid var(--lense-color-border);
+  border-radius: var(--lense-radius);
+  padding: var(--lense-spacing-xs) var(--lense-spacing-sm);
+  font-size: var(--lense-font-size-sm);
+  color: var(--lense-color-text-muted);
+  cursor: pointer;
 }
 
 .drawer-save {

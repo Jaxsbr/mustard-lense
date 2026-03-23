@@ -560,6 +560,61 @@ As Jaco, I want each record type to have its own color identity in the CRUD pane
 
 ---
 
+### Living Polish
+
+Interaction feedback and micro-animations that make the CRUD panel feel alive. Celebration animations for create/edit/delete, a delete endpoint and in-app delete UI, list item hover states, click feedback, tab crossfade, and drawer backdrop fade.
+
+### US-D4 — Action celebration animations with delete
+
+As Jaco, I want unique CSS animations that celebrate each CRUD action — a burst on create, a shimmer on edit, a farewell on delete — plus a delete endpoint and in-app delete UI, so that data management feels alive and fun instead of mechanical.
+
+**Acceptance criteria**:
+- `DELETE /api/records/:id` removes the YAML file and returns 200 with the deleted record's `id`
+- `DELETE /api/records/:id` returns 404 when the record ID is not found
+- `DELETE /api/records/:id` validates `id` parameter as UUID format before file lookup (same pattern as PUT)
+- `DELETE /api/records/:id` triggers background reindex after successful delete (same as create/update)
+- `DELETE /api/records/:id` returns 500 with structured JSON error body (not raw stack trace) on file removal failure
+- Delete button is visible in the detail drawer only in edit mode (not in create mode)
+- Clicking delete shows an in-app confirmation step (not browser `confirm()` dialog) — builder picks the UX pattern (inline confirm, two-step button, etc.)
+- On confirmed delete: drawer closes, list refreshes without the deleted record, tab count decrements
+- Create celebration: a CSS animation plays localized to the active tab header area when a new record saves successfully (burst, flash, pop, or color pulse)
+- Edit celebration: a CSS animation plays on the refreshed list item when an edit saves successfully (shimmer, pulse, or equivalent)
+- Delete farewell: a CSS animation plays on the departing list item before it is removed from the DOM (tilt, shrink, fade, or equivalent)
+- All three celebration effects are cohesive — they feel like a family of animations sharing timing, easing, or visual language
+- All animations use CSS `@keyframes`, `transition`, and/or `transform` only — no JavaScript animation libraries (Framer Motion, GSAP, etc.)
+- Unit tests exist for `DELETE /api/records/:id` (success, not found, invalid ID format)
+
+**User guidance:**
+- Discovery: Delete button appears in the detail drawer when editing an existing record. Celebration animations play automatically on save/delete.
+- Manual section: existing page: "Editing Records"
+- Key steps: 1. Create a new record via the Add button — watch for a celebration effect on the tab header when it saves. 2. Edit a record and save — notice the shimmer on the updated list item. 3. Open a record, click Delete, confirm — the record plays a farewell animation and disappears.
+
+**Design rationale:** Bundling delete with celebration animations lets the farewell animation motivate the delete feature — delete is small and only exists to complete the trio. CSS-only keeps the bundle size unchanged. In-app confirmation (not browser `confirm()`) maintains visual cohesion with the rest of the app.
+
+---
+
+### US-D5 — List item interaction polish
+
+As Jaco, I want hover states with type-appropriate colors, click feedback before the drawer opens, smooth tab crossfades, and drawer backdrop fading, so that every micro-interaction in the CRUD panel feels intentional and responsive.
+
+**Acceptance criteria**:
+- List items have a hover state that applies a type-appropriate background color derived from the existing `--lense-color-type-*` tokens
+- `tokens.css` defines type-specific hover color variants (e.g., `--lense-color-type-todo-hover`) for both light and dark mode
+- List items have a click feedback animation (brief scale or flash) that plays before the drawer opens
+- Tab content transitions with a crossfade animation (~150–200ms) when switching between tabs (not instant swap)
+- Drawer backdrop fades in on open and fades out on close (not instant appear/disappear)
+- Hover colors render correctly in both light and dark modes
+- All effects use CSS `transition`, `@keyframes`, and/or `transform` only — no JavaScript animation libraries
+
+**User guidance:**
+- Discovery: Hover over any list item in the CRUD panel to see the type-colored highlight; click to see feedback before the drawer opens
+- Manual section: existing page: "App Layout"
+- Key steps: 1. Hover over a list item — it highlights with the type-specific color (blue for todos, purple for people, etc.). 2. Click a list item — a brief click animation plays before the drawer slides in with a fading backdrop. 3. Switch tabs — the content crossfades smoothly instead of snapping.
+
+**Design rationale:** Type-appropriate hover colors reinforce the color identity established in US-D3, making type context visible even before a click. Click feedback bridges the perceptual gap between tap and drawer open. Tab crossfade and backdrop fade smooth out the two most jarring instant transitions in the panel — small touches that compound into "this feels polished."
+
+---
+
 ## Implementation phases
 
 | Phase | Name | Stories | Status |
@@ -569,7 +624,8 @@ As Jaco, I want each record type to have its own color identity in the CRUD pane
 | 3 | RAG Lense | US-L10, US-L11, US-L12, US-L13 | Shipped |
 | 4 | Structured Browse | US-U1, US-U2, US-U3, US-U4 | Shipped |
 | 5 | Capture & Edit | US-U5, US-U6, US-U7, US-U8 | Shipped |
-| 6 | Daily-Ready Visual Identity | US-D1, US-D2, US-D3 | Planned |
+| 6 | Daily-Ready Visual Identity | US-D1, US-D2, US-D3 | Shipped |
+| 7 | Living Polish | US-D4, US-D5 | Planned |
 
 ### Phase 1 — Foundation
 
@@ -933,3 +989,73 @@ Port the original mustard app's warm visual identity into the React app and add 
 - **Faithful stewardship** — token-level change minimizes per-file edits and maximizes consistency; the original mustard's proven dark mode pattern is adapted, not reinvented
 - **Clarity over complexity** — CSS custom properties absorb the palette shift; no JavaScript color manipulation; `[data-theme]` + `prefers-color-scheme` is a well-understood pattern
 - **Continuous improvement** — the token system compounds: future components automatically inherit the warm palette and dark mode; production port 7777 positions mustard-lense as the daily driver
+
+### Phase 7 — Living Polish
+
+Add interaction feedback and micro-animations to the CRUD panel, plus delete functionality. Three cohesive celebration animations (create burst, edit shimmer, delete farewell) transform data management from mechanical into fun — the MLP "whoa" moment. List item hover states, click feedback, tab crossfade, and drawer backdrop fade make every micro-interaction feel intentional. A DELETE endpoint and in-app delete UI complete the CRUD quartet.
+
+**Done-when (observable):**
+
+**US-D4 — Action celebration animations with delete**
+
+*Delete API:*
+- [ ] `DELETE /api/records/:id` with a valid existing record ID returns HTTP 200 with JSON containing `{ "id": "<uuid>" }` [US-D4]
+- [ ] `DELETE /api/records/:id` returns HTTP 404 with structured JSON error when the record ID is not found [US-D4]
+- [ ] `DELETE /api/records/:id` returns HTTP 400 with structured JSON error when `:id` is not a valid UUID format [US-D4]
+- [ ] `DELETE /api/records/:id` removes the YAML file from disk — file no longer exists after successful response [US-D4]
+- [ ] `DELETE /api/records/:id` triggers background reindex after successful delete (verifiable by server log output indicating reindex started) [US-D4]
+- [ ] `DELETE /api/records/:id` returns HTTP 500 with structured JSON error body (not raw stack trace) when file removal fails [US-D4]
+- [ ] `DELETE /api/records/:id` uses ID-to-filepath mapping from the data reader — no user-provided values interpolated into file paths via string concatenation [US-D4]
+- [ ] `src/server/data/writer.ts` exports a `deleteRecord` function (or equivalent) that removes a YAML file by ID [US-D4]
+- [ ] Unit tests exist for `DELETE /api/records/:id`: success (200), not found (404), invalid UUID format (400) — in `src/server/server.test.ts` [US-D4]
+
+*Delete UI:*
+- [ ] A delete button element is present in the detail drawer DOM when the drawer is in edit mode [US-D4]
+- [ ] The delete button is NOT present in the detail drawer DOM when the drawer is in create mode [US-D4]
+- [ ] Clicking the delete button shows an in-app confirmation element in the DOM — `window.confirm` is not called (verifiable by absence of `window.confirm` or `confirm(` calls in drawer component source) [US-D4]
+- [ ] After confirmed delete: the drawer closes, the deleted record is removed from the list, and the tab count decrements by 1 [US-D4]
+- [ ] The delete fetch uses AbortController or equivalent cleanup — if the drawer component unmounts during a pending delete request, the fetch is cancelled [US-D4]
+
+*Celebration animations:*
+- [ ] A CSS `@keyframes` animation plays on or near the active tab header area when `POST /api/records` succeeds (create celebration) — verifiable by presence of animation class or `animationName` computed style on the tab element after create [US-D4]
+- [ ] A CSS `@keyframes` animation plays on the updated list item when `PUT /api/records/:id` succeeds (edit celebration) — verifiable by presence of animation class or `animationName` computed style on the list item after edit [US-D4]
+- [ ] A CSS `@keyframes` animation plays on the departing list item before it is removed from the DOM on delete (farewell animation) — verifiable by presence of animation class on the item during removal [US-D4]
+- [ ] All three animations use only CSS `@keyframes`, `transition`, and/or `transform` — no JavaScript animation library packages in `package.json` dependencies (no `framer-motion`, `gsap`, `react-spring`, `animejs`, or equivalent) [US-D4]
+- [ ] Playwright E2E test verifies: delete button visible in edit-mode drawer, delete button absent in create-mode drawer, confirmation element appears on delete button click (mocked DELETE API) [US-D4]
+
+**US-D5 — List item interaction polish**
+
+- [ ] List items (`.list-item` or equivalent selector) change background color on CSS `:hover` — the hover color is type-appropriate (derived from `--lense-color-type-*` tokens, not a single generic hover color) [US-D5]
+- [ ] `tokens.css` `:root` block defines hover color variants for each type: `--lense-color-type-todo-hover`, `--lense-color-type-people-hover`, `--lense-color-type-daily-hover`, `--lense-color-type-idea-hover` (or equivalent naming pattern) [US-D5]
+- [ ] `tokens.css` `[data-theme="dark"]` block defines dark-mode values for all four type hover color tokens [US-D5]
+- [ ] List items have a click feedback effect — a CSS `transition` or `@keyframes` animation (scale, flash, or equivalent) plays on click before the drawer opens (verifiable by presence of transition/animation CSS on the element during click interaction) [US-D5]
+- [ ] Tab content transitions with a CSS crossfade effect when switching tabs — a `transition` or `@keyframes` animation with duration between 100ms and 300ms is applied to the tab content container (verifiable by computed `transition` or `animation` CSS property on the content element) [US-D5]
+- [ ] Drawer backdrop (`.detail-drawer-backdrop` or equivalent) has a CSS `transition` on `opacity` — it fades in when the drawer opens and fades out when the drawer closes (not instant appear/disappear) [US-D5]
+- [ ] Hover colors render correctly in dark mode — with `data-theme="dark"` set, list item hover backgrounds use the dark-mode hover token values [US-D5]
+- [ ] All effects use CSS `transition`, `@keyframes`, and/or `transform` only — no JS animation library imports in component source files [US-D5]
+- [ ] Playwright E2E test verifies: list item has hover-related CSS properties (e.g., `transition` on `background-color`), tab content container has `transition` or `animation` CSS property [US-D5]
+
+*Auto-added safety criteria:*
+- [ ] Drawer component source does not call `window.confirm` or bare `confirm(` — confirmation is handled by a React element in the DOM (verifiable by `rg 'window\.confirm\|[^a-zA-Z]confirm(' src/components/panel/DetailDrawer.tsx` returning zero matches) [US-D4]
+- [ ] `DELETE /api/records/` (no ID) returns a JSON response with appropriate HTTP status (not HTML from the SPA catch-all) [US-D4]
+
+*Structural criteria:*
+- [ ] `AGENTS.md` reflects: new `DELETE /api/records/:id` endpoint, `deleteRecord` export in writer module, celebration animations behavior, type-specific hover tokens in `tokens.css` [phase]
+- [ ] User guide "Editing Records" page (`docs/manual/editing.md`) documents the delete button, confirmation step, and celebration animation behavior [US-D4]
+- [ ] User guide "App Layout" page (`docs/manual/layout.md`) documents list item hover states, click feedback, and tab crossfade transitions [US-D5]
+
+**AGENTS.md sections affected:**
+- File ownership map (updated writer.ts exports, updated DetailDrawer/CrudPanel/ListItems scope)
+- Behavior rules (new `DELETE /api/records/:id` endpoint, celebration animations, in-app delete confirmation)
+- App layout (no structural change — behavior additions to existing components)
+- Design tokens (new `--lense-color-type-*-hover` tokens in tokens.css)
+
+**User documentation:**
+- Updated "Editing Records" page (`docs/manual/editing.md`) with delete button, confirmation, and celebration animations
+- Updated "App Layout" page (`docs/manual/layout.md`) with hover states, click feedback, and tab crossfade
+
+**Golden principles (phase-relevant):**
+- **People first** — micro-interactions treat user attention with respect; celebrations make data management feel alive, not mechanical
+- **Faithful stewardship** — CSS-only animations add zero dependency weight; delete reuses existing ID-to-filepath safety patterns from PUT
+- **Clarity over complexity** — pure CSS effects are declarative and maintainable; no animation runtime to debug or upgrade
+- **Continuous improvement** — the token system compounds: hover color variants build on type tokens from US-D3; celebration patterns can extend to future actions

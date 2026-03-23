@@ -6,7 +6,7 @@ import { retrieve } from './rag/retriever.js'
 import { buildIndex } from './rag/indexer.js'
 import { CliSynthesiser } from './synthesiser.js'
 import { readRecords } from './data/reader.js'
-import { createRecord, updateRecord } from './data/writer.js'
+import { createRecord, updateRecord, deleteRecord } from './data/writer.js'
 
 const PORT = parseInt(process.env.PORT ?? '3001', 10)
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
@@ -27,6 +27,7 @@ async function start() {
     readRecords,
     createRecord,
     updateRecord,
+    deleteRecord,
   })
 
   // In production, serve Vite build static files so the full app runs on a single port

@@ -9,6 +9,18 @@
   font-size: var(--lense-font-size-sm);
   color: var(--lense-color-text);
   line-height: 1.4;
+  transition: background-color 0.15s ease, transform 0.1s ease;
+}
+
+/* Type-specific hover colors */
+.list-item--todo:hover { background-color: var(--lense-color-type-todo-hover); }
+.list-item--people:hover { background-color: var(--lense-color-type-people-hover); }
+.list-item--idea:hover { background-color: var(--lense-color-type-idea-hover); }
+.list-item--daily-log:hover { background-color: var(--lense-color-type-daily-hover); }
+
+/* Click feedback — brief scale */
+.list-item:active {
+  transform: scale(0.98);
 }
 
 /* Type-specific left indicator */

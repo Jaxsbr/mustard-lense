@@ -169,7 +169,7 @@ const fixtureRecords = [
 ]
 
 function setupRecordsRoute(page: import('@playwright/test').Page) {
-  return page.route('**/api/records*', async (route) => {
+  return page.route('**/api/records**', async (route) => {
     const method = route.request().method()
     if (method === 'GET') {
       const url = new URL(route.request().url())
@@ -193,6 +193,14 @@ function setupRecordsRoute(page: import('@playwright/test').Page) {
         status: 200,
         contentType: 'application/json',
         body: JSON.stringify({ ...fixtureRecords[0], ...body }),
+      })
+    } else if (method === 'DELETE') {
+      const url = new URL(route.request().url())
+      const id = url.pathname.split('/').pop()
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({ id }),
       })
     }
   })
@@ -352,6 +360,80 @@ test('active tab border color varies by type', async ({ page }) => {
   // People tab should have a non-transparent border when active
   // and it should differ from the todo color
   expect(peopleBorder).not.toEqual(todoTabAfter)
+})
+
+test('delete button visible in edit mode, absent in create mode, confirmation appears on click', async ({ page }) => {
+  await setupRecordsRoute(page)
+  await page.goto('/')
+
+  // Wait for list items
+  await expect(page.locator('[data-testid="panel-list-item"]').first()).toBeVisible({ timeout: 5000 })
+
+  // Click a list item to open drawer in edit mode
+  await page.locator('[data-testid="panel-list-item"]').first().click()
+  const drawer = page.locator('[data-testid="detail-drawer"]')
+  await expect(drawer).toBeVisible({ timeout: 3000 })
+
+  // Delete button should be visible in edit mode
+  const deleteBtn = page.locator('[data-testid="drawer-delete"]')
+  await expect(deleteBtn).toBeVisible()
+
+  // Click delete — confirmation element should appear
+  await deleteBtn.click()
+  const confirmEl = page.locator('[data-testid="drawer-delete-confirm"]')
+  await expect(confirmEl).toBeVisible()
+
+  // Cancel confirmation
+  await page.locator('[data-testid="drawer-delete-no"]').click()
+  await expect(confirmEl).not.toBeVisible()
+
+  // Close drawer
+  await page.locator('[data-testid="drawer-close"]').click()
+  await expect(drawer).not.toBeVisible()
+
+  // Open drawer in create mode — delete button should NOT be present
+  await page.locator('[data-testid="panel-add"]').click()
+  await expect(drawer).toBeVisible({ timeout: 3000 })
+  await expect(page.locator('[data-testid="drawer-delete"]')).not.toBeVisible()
+})
+
+test('confirming delete closes drawer and removes record from list', async ({ page }) => {
+  await setupRecordsRoute(page)
+  await page.goto('/')
+
+  // Wait for list items
+  await expect(page.locator('[data-testid="panel-list-item"]').first()).toBeVisible({ timeout: 5000 })
+
+  // Click a list item to open drawer in edit mode
+  await page.locator('[data-testid="panel-list-item"]').first().click()
+  const drawer = page.locator('[data-testid="detail-drawer"]')
+  await expect(drawer).toBeVisible({ timeout: 3000 })
+
+  // Click delete, then confirm
+  await page.locator('[data-testid="drawer-delete"]').click()
+  await expect(page.locator('[data-testid="drawer-delete-confirm"]')).toBeVisible()
+  await page.locator('[data-testid="drawer-delete-yes"]').click()
+
+  // Drawer should close after confirmed delete
+  await expect(drawer).not.toBeVisible({ timeout: 3000 })
+})
+
+test('list items have hover transition and tab content has crossfade animation', async ({ page }) => {
+  await setupRecordsRoute(page)
+  await page.goto('/')
+
+  // Wait for list items
+  await expect(page.locator('[data-testid="panel-list-item"]').first()).toBeVisible({ timeout: 5000 })
+
+  // List item should have transition on background-color (hover effect)
+  const listItem = page.locator('.list-item').first()
+  const transition = await listItem.evaluate((el) => getComputedStyle(el).transition)
+  expect(transition).toContain('background-color')
+
+  // Tab content container should have the crossfade animation
+  const body = page.locator('.crud-panel-body')
+  const animation = await body.evaluate((el) => getComputedStyle(el).animationName)
+  expect(animation).toBe('tab-crossfade')
 })
 
 test('clicking Add opens drawer in create mode with active tab type pre-selected', async ({ page }) => {

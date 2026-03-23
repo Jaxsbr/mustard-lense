@@ -1,54 +1,61 @@
 ## Phase goal
 
-Port the original mustard app's warm visual identity into the React app and add dark mode. Replace the cool blue-grey palette with warm gold, type-specific colors, and success/error tokens at the design-token level. Add dark mode with system preference detection, toggle, and localStorage persistence. Give each record type its own color identity in the CRUD panel. Update production port to 7777 so mustard-lense replaces the legacy mustard app on the same port.
+Add interaction feedback and micro-animations to the CRUD panel, plus delete functionality. Three cohesive celebration animations (create burst, edit shimmer, delete farewell) transform data management from mechanical into fun. List item hover states, click feedback, tab crossfade, and drawer backdrop fade make every micro-interaction feel intentional. A DELETE endpoint and in-app delete UI complete the CRUD quartet.
 
 ### Dependencies
-- structured-browse (archived)
+- daily-ready (archived)
 
 ### Stories in scope
-- US-D1 — Warm gold design token port
-- US-D2 — Dark mode
-- US-D3 — Type-specific CRUD panel colors
+- US-D4 — Action celebration animations with delete
+- US-D5 — List item interaction polish
 
 ### Done-when (observable)
-- [x] `tokens.css` `:root` declares `--lense-color-accent` with value `#c8982c` (warm gold, replacing `#4f6d7a`) [US-D1]
-- [x] `tokens.css` `:root` declares `--lense-color-accent-light` with a warm-tinted value derived from `#c8982c` (not the previous cool `#e8f0f3`) [US-D1]
-- [x] `tokens.css` `:root` declares `--lense-color-bg` with value `#faf9f6` (warm off-white, replacing `#ffffff`) [US-D1]
-- [x] `tokens.css` `:root` declares `--lense-color-bg-subtle` with a warm-tinted value (replacing `#f9fafb`) [US-D1]
-- [x] `tokens.css` `:root` declares `--lense-color-type-todo: #4a7fc4` [US-D1]
-- [x] `tokens.css` `:root` declares `--lense-color-type-people: #7b5ea7` [US-D1]
-- [x] `tokens.css` `:root` declares `--lense-color-type-daily: #e07850` [US-D1]
-- [x] `tokens.css` `:root` declares `--lense-color-type-idea: #2d9574` [US-D1]
-- [x] `tokens.css` `:root` declares `--lense-color-success-bg` and `--lense-color-success-text` tokens [US-D1]
-- [x] `tokens.css` `:root` declares `--lense-color-error-bg` and `--lense-color-error-text` tokens [US-D1]
-- [x] Zero matches for literal `#4f6d7a` in any file under `src/` (`rg '#4f6d7a' src/` returns no results) [US-D1]
-- [x] All color values in `App.css` reference `var(--lense-*)` tokens — no hardcoded hex color values remain outside `@keyframes` blocks (verifiable by `rg '#[0-9a-fA-F]{3,8}' src/App.css` returning only `@keyframes` context or zero matches) [US-D1]
-- [x] `npm run build` exits 0 [US-D1]
-- [x] `npm run typecheck` exits 0 [US-D1]
-- [x] `tokens.css` contains a `[data-theme="dark"]` selector block that overrides all `--lense-color-*` variables with dark-adapted values [US-D2]
-- [x] `tokens.css` contains a `@media (prefers-color-scheme: dark)` block using `html:not([data-theme="light"])` selector as system-preference fallback [US-D2]
-- [x] The `[data-theme="dark"]` block defines adjusted values for at minimum: `--lense-color-bg`, `--lense-color-bg-subtle`, `--lense-color-text`, `--lense-color-text-muted`, `--lense-color-border`, `--lense-color-accent`, `--lense-color-accent-light`, `--lense-color-shadow`, all four `--lense-color-type-*` tokens, `--lense-color-success-bg`, `--lense-color-success-text`, `--lense-color-error-bg`, `--lense-color-error-text`, `--lense-color-status-open`, `--lense-color-status-done`, `--lense-color-status-parked` [US-D2]
-- [x] A theme toggle `<button>` element exists in the app DOM with an accessible label (e.g., `aria-label` containing "theme") [US-D2]
-- [x] Clicking the theme toggle sets the `data-theme` attribute on the `<html>` element to `"dark"` or `"light"` [US-D2]
-- [x] Theme preference is stored in `localStorage` under key `mustard-theme` — `localStorage.getItem('mustard-theme')` returns the selected value after toggle interaction [US-D2]
-- [x] `index.html` contains an inline `<script>` block (before the React bundle `<script>`) that reads `mustard-theme` from `localStorage` and sets `data-theme` on `document.documentElement` — prevents flash of wrong theme on page load [US-D2]
-- [x] Dark mode covers all surfaces: lense cards (`.lense-card`), CRUD panel (`.crud-panel`), detail drawer (`.detail-drawer`), list items (`.list-item`), tabs (`.crud-panel-tab`), list controls (`.list-controls-select`), blockquote/verse, error display (`.lense-error`), and stage indicators (`.lense-spinner`, `.lense-stage-text`) all derive colors from `var(--lense-*)` tokens — no hardcoded hex colors that bypass dark mode in `components.css`, `CrudPanel.css`, `DetailDrawer.css`, `ListItems.css`, `ListControls.css`, or `App.css` [US-D2]
-- [x] Playwright E2E test verifies: theme toggle button exists in DOM, clicking toggle changes `data-theme` attribute value on `document.documentElement` [US-D2]
-- [x] User guide "App Layout" page (`docs/manual/layout.md`) documents the theme toggle and dark mode behavior (system preference, manual override, persistence) [US-D2]
-- [x] Active tab's bottom border (`border-bottom-color`) uses the type-specific color token — e.g., Todos tab active uses `--lense-color-type-todo` (`#4a7fc4`), People tab active uses `--lense-color-type-people` (`#7b5ea7`), etc. — not a single `--lense-color-accent` for all tabs (verifiable by Playwright computed style or CSS class-per-type pattern in `CrudPanel.css`) [US-D3]
-- [x] Active tab count badge (`.crud-panel-tab--active .crud-panel-tab-count`) background uses a tinted variant of the type-specific color (not the generic `--lense-color-accent-light`) [US-D3]
-- [x] List items in the CRUD panel have a visible type-colored left indicator — a left border, accent stripe, or equivalent element using the type-specific color token (verifiable by inspecting `.list-item` computed styles or a CSS class per type in `ListItems.css`) [US-D3]
-- [x] Type-specific colors render correctly in dark mode — `[data-theme="dark"]` values for `--lense-color-type-*` tokens are applied (verifiable by setting `data-theme="dark"` and checking computed styles) [US-D3]
-- [x] Playwright E2E test verifies: active Todos tab has a border color matching `--lense-color-type-todo`, switching to People tab changes border color to match `--lense-color-type-people` [US-D3]
-- [x] Express server (`src/server/index.ts` or `src/server/app.ts`) serves Vite production build static files from `dist/` when not in dev mode, so the full app (API + frontend) runs on a single port [phase] (enables port 7777 replacement of legacy mustard)
-- [x] `ARCHITECTURE.md` production port entry updated from 5678 to 7777 [phase]
-- [x] `package.json` defines a `start` script (or equivalent) that builds and starts the production server [phase]
-- [x] `AGENTS.md` reflects: new design tokens (`--lense-color-type-*`, `--lense-color-success-*`, `--lense-color-error-*`), dark mode CSS architecture (`[data-theme]` + `prefers-color-scheme`), theme toggle UI element, production port 7777, and dark mode behavior [phase]
-- [x] `npm test` exits 0 with all existing unit tests passing [phase]
-- [x] `npm run test:e2e` exits 0 with all E2E tests passing (existing + new dark mode and type color tests) [phase]
+
+**US-D4 — Delete API:**
+- [x] `DELETE /api/records/:id` with a valid existing record ID returns HTTP 200 with JSON containing `{ "id": "<uuid>" }` [US-D4]
+- [x] `DELETE /api/records/:id` returns HTTP 404 with structured JSON error when the record ID is not found [US-D4]
+- [x] `DELETE /api/records/:id` returns HTTP 400 with structured JSON error when `:id` is not a valid UUID format [US-D4]
+- [x] `DELETE /api/records/:id` removes the YAML file from disk — file no longer exists after successful response [US-D4]
+- [x] `DELETE /api/records/:id` triggers background reindex after successful delete (verifiable by server log output indicating reindex started) [US-D4]
+- [x] `DELETE /api/records/:id` returns HTTP 500 with structured JSON error body (not raw stack trace) when file removal fails [US-D4]
+- [x] `DELETE /api/records/:id` uses ID-to-filepath mapping from the data reader — no user-provided values interpolated into file paths via string concatenation [US-D4]
+- [x] `src/server/data/writer.ts` exports a `deleteRecord` function (or equivalent) that removes a YAML file by ID [US-D4]
+- [x] Unit tests exist for `DELETE /api/records/:id`: success (200), not found (404), invalid UUID format (400) — in `src/server/server.test.ts` [US-D4]
+
+**US-D4 — Delete UI:**
+- [x] A delete button element is present in the detail drawer DOM when the drawer is in edit mode [US-D4]
+- [x] The delete button is NOT present in the detail drawer DOM when the drawer is in create mode [US-D4]
+- [x] Clicking the delete button shows an in-app confirmation element in the DOM — `window.confirm` is not called (verifiable by absence of `window.confirm` or `confirm(` calls in drawer component source) [US-D4]
+- [x] After confirmed delete: the drawer closes, the deleted record is removed from the list, and the tab count decrements by 1 [US-D4]
+- [x] The delete fetch uses AbortController or equivalent cleanup — if the drawer component unmounts during a pending delete request, the fetch is cancelled [US-D4]
+- [x] Drawer component source does not call `window.confirm` or bare `confirm(` — confirmation is handled by a React element in the DOM (verifiable by `rg 'window\.confirm\|[^a-zA-Z]confirm(' src/components/panel/DetailDrawer.tsx` returning zero matches) [US-D4]
+- [x] `DELETE /api/records/` (no ID) returns a JSON response with appropriate HTTP status (not HTML from the SPA catch-all) [US-D4]
+
+**US-D4 — Celebration animations:**
+- [x] A CSS `@keyframes` animation plays on or near the active tab header area when `POST /api/records` succeeds (create celebration) — verifiable by presence of animation class or `animationName` computed style on the tab element after create [US-D4]
+- [x] A CSS `@keyframes` animation plays on the updated list item when `PUT /api/records/:id` succeeds (edit celebration) — verifiable by presence of animation class or `animationName` computed style on the list item after edit [US-D4]
+- [x] A CSS `@keyframes` animation plays on the departing list item before it is removed from the DOM on delete (farewell animation) — verifiable by presence of animation class on the item during removal [US-D4]
+- [x] All three animations use only CSS `@keyframes`, `transition`, and/or `transform` — no JavaScript animation library packages in `package.json` dependencies (no `framer-motion`, `gsap`, `react-spring`, `animejs`, or equivalent) [US-D4]
+- [x] Playwright E2E test verifies: delete button visible in edit-mode drawer, delete button absent in create-mode drawer, confirmation element appears on delete button click (mocked DELETE API) [US-D4]
+
+**US-D5 — List item interaction polish:**
+- [x] List items (`.list-item` or equivalent selector) change background color on CSS `:hover` — the hover color is type-appropriate (derived from `--lense-color-type-*` tokens, not a single generic hover color) [US-D5]
+- [x] `tokens.css` `:root` block defines hover color variants for each type: `--lense-color-type-todo-hover`, `--lense-color-type-people-hover`, `--lense-color-type-daily-hover`, `--lense-color-type-idea-hover` (or equivalent naming pattern) [US-D5]
+- [x] `tokens.css` `[data-theme="dark"]` block defines dark-mode values for all four type hover color tokens [US-D5]
+- [x] List items have a click feedback effect — a CSS `transition` or `@keyframes` animation (scale, flash, or equivalent) plays on click before the drawer opens (verifiable by presence of transition/animation CSS on the element during click interaction) [US-D5]
+- [x] Tab content transitions with a CSS crossfade effect when switching tabs — a `transition` or `@keyframes` animation with duration between 100ms and 300ms is applied to the tab content container (verifiable by computed `transition` or `animation` CSS property on the content element) [US-D5]
+- [x] Drawer backdrop (`.detail-drawer-backdrop` or equivalent) has a CSS `transition` on `opacity` — it fades in when the drawer opens and fades out when the drawer closes (not instant appear/disappear) [US-D5]
+- [x] Hover colors render correctly in dark mode — with `data-theme="dark"` set, list item hover backgrounds use the dark-mode hover token values [US-D5]
+- [x] All effects use CSS `transition`, `@keyframes`, and/or `transform` only — no JS animation library imports in component source files [US-D5]
+- [x] Playwright E2E test verifies: list item has hover-related CSS properties (e.g., `transition` on `background-color`), tab content container has `transition` or `animation` CSS property [US-D5]
+
+**Phase-level:**
+- [x] `AGENTS.md` reflects: new `DELETE /api/records/:id` endpoint, `deleteRecord` export in writer module, celebration animations behavior, type-specific hover tokens in `tokens.css` [phase]
+- [x] User guide "Editing Records" page (`docs/manual/editing.md`) documents the delete button, confirmation step, and celebration animation behavior [US-D4]
+- [x] User guide "App Layout" page (`docs/manual/layout.md`) documents list item hover states, click feedback, and tab crossfade transitions [US-D5]
 
 ### Golden principles (phase-relevant)
-- **People first** — warm gold creates emotional familiarity ("this is MY tool"); dark mode respects comfort at any time of day; type-specific colors provide instant recognition
-- **Faithful stewardship** — token-level change minimizes per-file edits and maximizes consistency; the original mustard's proven dark mode pattern is adapted, not reinvented
-- **Clarity over complexity** — CSS custom properties absorb the palette shift; no JavaScript color manipulation; `[data-theme]` + `prefers-color-scheme` is a well-understood pattern
-- **Continuous improvement** — the token system compounds: future components automatically inherit the warm palette and dark mode; production port 7777 positions mustard-lense as the daily driver
+- **People first** — celebration animations transform mechanical data management into something fun; hover states provide instant visual feedback that respects the user's attention
+- **Faithful stewardship** — CSS-only animations keep the bundle unchanged; delete completes the CRUD quartet using existing patterns (UUID validation, ID-to-filepath mapping, background reindex)
+- **Clarity over complexity** — all effects use standard CSS (`@keyframes`, `transition`, `transform`); no animation libraries; in-app confirmation instead of browser `confirm()`
+- **Continuous improvement** — type-specific hover tokens compound on the token system from daily-ready; interaction polish raises the quality floor for all future components

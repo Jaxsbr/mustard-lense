@@ -85,22 +85,22 @@ mustard-lense/
 | `src/lib/claude-cli.ts` | CLI module | Exports `invokeClaude`, `ClaudeResult`, `ClaudeMode` |
 | `src/lib/claude-cli.test.ts` | Tests | Mocked unit tests — no real CLI invoked |
 | `src/shared/schema.ts` | Schema | Response schema — 5 component types, shared by server and frontend |
-| `src/server/app.ts` | API server | Express app: POST /api/lense (SSE), POST /api/reindex, GET /api/records, POST /api/records, PUT /api/records/:id. Uses dependency injection (createApp). |
+| `src/server/app.ts` | API server | Express app: POST /api/lense (SSE), POST /api/reindex, GET /api/records, POST /api/records, PUT /api/records/:id, DELETE /api/records/:id. Uses dependency injection (createApp). |
 | `src/server/index.ts` | Entry point | Builds vector index on startup, wires real dependencies, serves `dist/` static files in production, starts server |
 | `src/server/data/reader.ts` | Data reader | Reads YAML records from `MUSTARD_DATA_DIR` (default `~/dev/mustard/data/`). Exports `readRecords`, `getDataDir`, `findYamlFiles`. Shared by browse API, RAG indexer, and writer. |
-| `src/server/data/writer.ts` | Data writer | Creates and updates YAML record files. Exports `createRecord`, `updateRecord`, `validateLogType`, `validateText`. UUID generation, auto-filled metadata, log_type-to-subdirectory mapping. |
+| `src/server/data/writer.ts` | Data writer | Creates, updates, and deletes YAML record files. Exports `createRecord`, `updateRecord`, `deleteRecord`, `validateLogType`, `validateText`. UUID generation, auto-filled metadata, log_type-to-subdirectory mapping. |
 | `src/server/synthesiser.ts` | Synthesis | Synthesiser interface + CliSynthesiser — wraps invokeClaude with inline records |
 | `src/server/synthesiser.test.ts` | Tests | CliSynthesiser tests — mocked invokeClaude, success + error paths |
 | `src/server/rag/embedder.ts` | RAG | Singleton embedding pipeline — transformers.js, Xenova/all-MiniLM-L6-v2, 384d vectors |
 | `src/server/rag/indexer.ts` | RAG | Imports readRecords from data/reader, embeds text, writes to LanceDB with metadata |
 | `src/server/rag/retriever.ts` | RAG | Embeds query, performs LanceDB vector search, returns top-k records (default k=5) |
 | `src/server/rag/rag.test.ts` | Tests | Indexer + retriever tests with fixture YAML data, mocked embedder + LanceDB |
-| `src/server/server.test.ts` | Tests | API endpoint tests with mocked deps — verifies SSE events, browse endpoint, reindex, create, update |
+| `src/server/server.test.ts` | Tests | API endpoint tests with mocked deps — verifies SSE events, browse endpoint, reindex, create, update, delete |
 | `src/components/ResultRenderer.tsx` | Registry | Maps component type string to React renderer |
 | `src/components/*.tsx` | Renderers | Template components for each mustard data type |
-| `src/components/panel/CrudPanel.tsx` | CRUD panel | Collapsible panel with type tabs, list views, detail drawer, sort/limit controls, Add button, localStorage prefs |
+| `src/components/panel/CrudPanel.tsx` | CRUD panel | Collapsible panel with type tabs, list views, detail drawer, sort/limit controls, Add button, localStorage prefs, celebration animations (create/edit/delete) |
 | `src/components/panel/CrudPanel.test.tsx` | Tests | Unit tests for tab rendering, active state, fetch, loading, empty state |
-| `src/components/panel/DetailDrawer.tsx` | Detail drawer | Slide-over drawer for viewing/editing/creating records, type-specific form fields |
+| `src/components/panel/DetailDrawer.tsx` | Detail drawer | Slide-over drawer for viewing/editing/creating/deleting records, type-specific form fields, inline delete confirmation |
 | `src/components/panel/ListControls.tsx` | List controls | Sort dropdown (newest, oldest, status) + limit control (default 25) + Show all |
 | `src/components/panel/ListItems.tsx` | List views | Type-specific list item components: TodoListItem, PeopleListItem, IdeaListItem, DailyLogListItem |
 | `src/components/panel/sort.ts` | Sort logic | Sort functions: newest first, oldest first, status grouping (open → parked → done) |
@@ -122,7 +122,7 @@ mustard-lense/
 - **Warm gold palette** — accent `#c8982c`, background `#faf9f6`, type-specific colors (todo `#4a7fc4`, people `#7b5ea7`, daily `#e07850`, idea `#2d9574`), success/error tokens.
 - **Dark mode** — `[data-theme="dark"]` selector overrides all color tokens. `@media (prefers-color-scheme: dark) { html:not([data-theme="light"]) }` provides system-preference fallback.
 - **No-flash** — inline `<script>` in `index.html` applies saved theme before React hydrates.
-- **Type-specific colors** — tabs and list items use `--lense-color-type-*` tokens for active borders, count badges, and left indicators.
+- **Type-specific colors** — tabs and list items use `--lense-color-type-*` tokens for active borders, count badges, left indicators, and hover states (`--lense-color-type-*-hover` tokens for light and dark mode).
 
 ## CRUD panel
 
@@ -135,6 +135,8 @@ mustard-lense/
 - **Sort controls** — dropdown above list: "Newest first" (default), "Oldest first", "Status (open first)" (todo only). Client-side sort, no API call.
 - **Limit control** — "Show" dropdown (default 25) with "Show all" link when more records exist.
 - **localStorage persistence** — sort and limit prefs saved per tab: `mustard-sort-{type}`, `mustard-limit-{type}`.
+- **List interaction polish** — type-specific hover background colors (`--lense-color-type-*-hover`), click feedback (scale), tab content crossfade animation (180ms), drawer backdrop fade-in.
+- **Celebration animations** — CSS-only `@keyframes`: create burst on active tab, edit shimmer on updated list item, delete farewell (tilt/shrink/fade) on departing item. No JS animation libraries.
 
 ## Detail drawer
 
@@ -142,15 +144,17 @@ mustard-lense/
 - **Edit mode** — click a list item. Shows all fields in editable form inputs. `log_type` and `id` are read-only.
 - **Create mode** — click Add button. Empty form, `log_type` changeable via dropdown, `text` auto-focused.
 - **Type-specific fields** — todo: text (textarea), status (dropdown), due_date (date input). people_note: text, person. idea: text, status. daily_log: text, theme.
-- **Save** — PUT `/api/records/:id` (edit) or POST `/api/records` (create). Drawer closes, list refreshes, counts update.
-- **Close** — button or backdrop click. No save.
+- **Save** — PUT `/api/records/:id` (edit) or POST `/api/records` (create). Drawer closes, list refreshes, counts update. Create triggers tab celebration animation; edit triggers shimmer on updated list item.
+- **Delete** — visible in edit mode only. Two-step inline confirmation (no browser `confirm()`). Calls DELETE `/api/records/:id`. Departing item plays farewell animation.
+- **Close** — button or backdrop click (backdrop fades in). No save.
 - **Validation** — Save disabled when text is empty.
 
 ## Write API
 
 - **POST /api/records** — creates a record. Requires `log_type` (allowlist: todo, people_note, idea, daily_log) and `text` (non-empty, max 10000 chars). Auto-generates UUID `id`, `capture_date_local` (today), `source: mustard-app`, `meta: { tags: [] }`. Returns 201. Triggers background reindex.
 - **PUT /api/records/:id** — updates a record by ID. UUID format validated. Uses ID-to-filepath scan (no path interpolation). Returns 200. Returns 404 if not found. Triggers background reindex.
-- **Validation** — log_type allowlist, text non-empty + max length, UUID format on PUT. 400 for invalid input, 500 with structured error on write failure.
+- **DELETE /api/records/:id** — deletes a record by ID. UUID format validated. Uses ID-to-filepath scan via `deleteRecord` (no path interpolation). Removes YAML file from disk. Returns 200 with `{ id }`. Returns 404 if not found. Triggers background reindex. `DELETE /api/records` (no ID) returns 400 JSON.
+- **Validation** — log_type allowlist, text non-empty + max length, UUID format on PUT/DELETE. 400 for invalid input, 500 with structured error on write failure.
 
 ## Lense interaction model
 
@@ -188,7 +192,7 @@ Defined in `src/shared/schema.ts`, used by both server and frontend.
 
 ## Testing
 
-- `npm test` — Vitest unit tests (73 tests: 8 CLI + 30 server + 9 synthesiser + 7 RAG + 7 panel + 5 sort + 7 reserved) with mocked dependencies
+- `npm test` — Vitest unit tests (79 tests: 8 CLI + 36 server + 9 synthesiser + 7 RAG + 7 panel + 5 sort + 7 reserved) with mocked dependencies
 - `npm start` — builds and runs production server on port 7777 (serves `dist/` + API on single port)
 - `npm run test:e2e` — Playwright E2E tests with mocked SSE endpoint and mocked records API
 - `npm run smoke:basic` / `npm run smoke:admin` — real CLI invocation
@@ -203,3 +207,4 @@ Defined in `src/shared/schema.ts`, used by both server and frontend.
 - error-path-coverage
 - agents-consistency
 - token-consumer-check
+- e2e-route-coverage

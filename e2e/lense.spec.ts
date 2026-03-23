@@ -397,6 +397,24 @@ test('delete button visible in edit mode, absent in create mode, confirmation ap
   await expect(page.locator('[data-testid="drawer-delete"]')).not.toBeVisible()
 })
 
+test('list items have hover transition and tab content has crossfade animation', async ({ page }) => {
+  await setupRecordsRoute(page)
+  await page.goto('/')
+
+  // Wait for list items
+  await expect(page.locator('[data-testid="panel-list-item"]').first()).toBeVisible({ timeout: 5000 })
+
+  // List item should have transition on background-color (hover effect)
+  const listItem = page.locator('.list-item').first()
+  const transition = await listItem.evaluate((el) => getComputedStyle(el).transition)
+  expect(transition).toContain('background-color')
+
+  // Tab content container should have the crossfade animation
+  const body = page.locator('.crud-panel-body')
+  const animation = await body.evaluate((el) => getComputedStyle(el).animationName)
+  expect(animation).toBe('tab-crossfade')
+})
+
 test('clicking Add opens drawer in create mode with active tab type pre-selected', async ({ page }) => {
   await setupRecordsRoute(page)
   await page.goto('/')

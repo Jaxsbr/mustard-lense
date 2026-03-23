@@ -14,7 +14,7 @@ state:
   review_complete: true
   retro_complete: true
   pr_number: 8
-  status: running
+  status: idle
   last_result: pass
   next_task: null
   consecutive_fails: 0

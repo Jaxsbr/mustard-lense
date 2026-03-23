@@ -71,6 +71,11 @@ export function CrudPanel({ collapsed, onToggle }: CrudPanelProps) {
   const [farewellId, setFarewellId] = useState<string | null>(null)
 
   const abortRef = useRef<AbortController | null>(null)
+  const deleteAbortRef = useRef<AbortController | null>(null)
+
+  useEffect(() => {
+    return () => { deleteAbortRef.current?.abort() }
+  }, [])
 
   const currentSort = sortPrefs[activeTab] ?? 'newest'
   const currentLimit = limitPrefs[activeTab] ?? DEFAULT_LIMIT
@@ -166,7 +171,9 @@ export function CrudPanel({ collapsed, onToggle }: CrudPanelProps) {
   }
 
   async function handleDelete(id: string) {
+    deleteAbortRef.current?.abort()
     const controller = new AbortController()
+    deleteAbortRef.current = controller
     try {
       const res = await fetch(`/api/records/${id}`, {
         method: 'DELETE',

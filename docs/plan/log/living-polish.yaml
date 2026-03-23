@@ -22,3 +22,10 @@ entries:
     result: "pass"
     notes: "DELETE API criteria all met. Delete UI + celebration animations remain."
     tokens: ~
+  - task: 4
+    time: "2026-03-23T01:20:00Z"
+    story: "US-D4"
+    description: "Implement delete button + inline confirmation in DetailDrawer + handleDelete in CrudPanel."
+    result: "pass"
+    notes: "Delete UI criteria met. Celebration animations + E2E tests remain for US-D4."
+    tokens: ~

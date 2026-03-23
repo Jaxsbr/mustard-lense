@@ -30,8 +30,8 @@ Increase baseline legibility across the CRUD panel and detail drawer by raising 
 - [x] `npm run typecheck && npm run lint && npm test` passes with zero errors [US-R2]
 
 **Phase-level:**
-- [ ] `AGENTS.md` reflects: updated font-size token values, drawer width change, drawer flex layout [phase]
-- [ ] No new JavaScript animation libraries added to `package.json` [phase]
+- [x] `AGENTS.md` reflects: updated font-size token values, drawer width change, drawer flex layout [phase]
+- [x] No new JavaScript animation libraries added to `package.json` [phase]
 
 ### Golden principles (phase-relevant)
 - **Token-first** — meaningful size changes flow through `tokens.css`, not scattered magic numbers

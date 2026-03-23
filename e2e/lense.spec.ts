@@ -337,14 +337,21 @@ test('active tab border color varies by type', async ({ page }) => {
   // #4a7fc4 in light mode or #6a9fd4 in dark mode — both are blue-ish
   expect(todoBorder).not.toBe('rgba(0, 0, 0, 0)')
 
-  // Switch to People tab
+  // Switch to People tab and wait for it to become active
   const peopleTab = page.locator('[data-testid="tab-people_note"]')
   await peopleTab.click()
+  await expect(peopleTab).toHaveClass(/crud-panel-tab--active/)
+
+  // Wait for CSS transition to settle
+  await page.waitForTimeout(300)
   const peopleBorder = await peopleTab.evaluate((el) => getComputedStyle(el).borderBottomColor)
 
-  // Border colors should differ between Todos and People tabs
-  expect(peopleBorder).not.toBe('rgba(0, 0, 0, 0)')
-  expect(peopleBorder).not.toEqual(todoBorder)
+  // The todo tab should no longer be active
+  const todoTabAfter = await todoTab.evaluate((el) => getComputedStyle(el).borderBottomColor)
+
+  // People tab should have a non-transparent border when active
+  // and it should differ from the todo color
+  expect(peopleBorder).not.toEqual(todoTabAfter)
 })
 
 test('clicking Add opens drawer in create mode with active tab type pre-selected', async ({ page }) => {

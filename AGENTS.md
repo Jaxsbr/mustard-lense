@@ -202,3 +202,4 @@ Defined in `src/shared/schema.ts`, used by both server and frontend.
 - no-bare-except
 - error-path-coverage
 - agents-consistency
+- token-consumer-check

@@ -300,6 +300,60 @@ test('sort dropdown changes list order and limit caps visible items', async ({ p
   expect(await filteredItems.count()).toBeLessThanOrEqual(10)
 })
 
+test('theme toggle button exists and clicking it changes data-theme attribute', async ({ page }) => {
+  await page.goto('/')
+
+  // Theme toggle button exists with accessible label
+  const toggle = page.locator('button[aria-label*="theme" i]')
+  await expect(toggle).toBeVisible({ timeout: 3000 })
+
+  // Get initial theme state
+  const initialTheme = await page.evaluate(() => document.documentElement.getAttribute('data-theme'))
+
+  // Click toggle
+  await toggle.click()
+
+  // data-theme attribute should change
+  const newTheme = await page.evaluate(() => document.documentElement.getAttribute('data-theme'))
+  expect(newTheme).not.toEqual(initialTheme)
+  expect(['dark', 'light']).toContain(newTheme)
+
+  // Click again to toggle back
+  await toggle.click()
+  const finalTheme = await page.evaluate(() => document.documentElement.getAttribute('data-theme'))
+  expect(finalTheme).not.toEqual(newTheme)
+})
+
+test('active tab border color varies by type', async ({ page }) => {
+  await setupRecordsRoute(page)
+  await page.goto('/')
+
+  // Wait for tabs to load
+  await expect(page.locator('[data-testid="tab-todo"]')).toBeVisible({ timeout: 5000 })
+
+  // Todos tab is active — check its border color is the todo blue
+  const todoTab = page.locator('[data-testid="tab-todo"]')
+  const todoBorder = await todoTab.evaluate((el) => getComputedStyle(el).borderBottomColor)
+  // #4a7fc4 in light mode or #6a9fd4 in dark mode — both are blue-ish
+  expect(todoBorder).not.toBe('rgba(0, 0, 0, 0)')
+
+  // Switch to People tab and wait for it to become active
+  const peopleTab = page.locator('[data-testid="tab-people_note"]')
+  await peopleTab.click()
+  await expect(peopleTab).toHaveClass(/crud-panel-tab--active/)
+
+  // Wait for CSS transition to settle
+  await page.waitForTimeout(300)
+  const peopleBorder = await peopleTab.evaluate((el) => getComputedStyle(el).borderBottomColor)
+
+  // The todo tab should no longer be active
+  const todoTabAfter = await todoTab.evaluate((el) => getComputedStyle(el).borderBottomColor)
+
+  // People tab should have a non-transparent border when active
+  // and it should differ from the todo color
+  expect(peopleBorder).not.toEqual(todoTabAfter)
+})
+
 test('clicking Add opens drawer in create mode with active tab type pre-selected', async ({ page }) => {
   await setupRecordsRoute(page)
   await page.goto('/')

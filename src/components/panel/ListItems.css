@@ -3,11 +3,19 @@
   align-items: baseline;
   gap: var(--lense-spacing-sm);
   padding: var(--lense-spacing-sm) 0;
+  padding-left: var(--lense-spacing-sm);
   border-bottom: 1px solid var(--lense-color-border);
+  border-left: 3px solid transparent;
   font-size: var(--lense-font-size-sm);
   color: var(--lense-color-text);
   line-height: 1.4;
 }
+
+/* Type-specific left indicator */
+.list-item--todo { border-left-color: var(--lense-color-type-todo); }
+.list-item--people { border-left-color: var(--lense-color-type-people); }
+.list-item--idea { border-left-color: var(--lense-color-type-idea); }
+.list-item--daily-log { border-left-color: var(--lense-color-type-daily); }
 
 .list-item:last-child {
   border-bottom: none;

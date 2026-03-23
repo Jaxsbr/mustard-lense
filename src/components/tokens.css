@@ -4,17 +4,34 @@
   --lense-font-size-base: 1rem;
   --lense-font-size-lg: 1.25rem;
 
-  --lense-color-text: #1a1a2e;
-  --lense-color-text-muted: #6b7280;
-  --lense-color-bg: #ffffff;
-  --lense-color-bg-subtle: #f9fafb;
-  --lense-color-border: #e5e7eb;
-  --lense-color-accent: #4f6d7a;
-  --lense-color-accent-light: #e8f0f3;
+  --lense-color-text: #2d2d2d;
+  --lense-color-text-muted: #6b6b6b;
+  --lense-color-bg: #faf9f6;
+  --lense-color-bg-subtle: #f5f4f0;
+  --lense-color-border: #e5e3de;
+  --lense-color-accent: #c8982c;
+  --lense-color-accent-light: #f8f0db;
+  --lense-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+
+  --lense-color-type-todo: #4a7fc4;
+  --lense-color-type-people: #7b5ea7;
+  --lense-color-type-daily: #e07850;
+  --lense-color-type-idea: #2d9574;
 
   --lense-color-status-open: #d97706;
   --lense-color-status-done: #059669;
   --lense-color-status-parked: #6b7280;
+
+  --lense-color-success-bg: #e8f5e6;
+  --lense-color-success-text: #2e6b28;
+  --lense-color-error-bg: #fde8e8;
+  --lense-color-error-text: #9b2c2c;
+
+  --lense-color-input-border: #d5d3ce;
+  --lense-color-elapsed: #9ca3af;
+  --lense-color-verse-border: #c8982c;
+  --lense-color-verse-bg: #fdf8e8;
+  --lense-color-verse-footer: #6b6b6b;
 
   --lense-spacing-xs: 0.25rem;
   --lense-spacing-sm: 0.5rem;
@@ -23,5 +40,70 @@
   --lense-spacing-xl: 2rem;
 
   --lense-radius: 8px;
-  --lense-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+}
+
+/* Explicit dark mode — user toggled via theme button */
+[data-theme="dark"] {
+  --lense-color-text: #e5e5e5;
+  --lense-color-text-muted: #9ca3af;
+  --lense-color-bg: #1a1a1e;
+  --lense-color-bg-subtle: #242428;
+  --lense-color-border: #3a3a3e;
+  --lense-color-accent: #dab04d;
+  --lense-color-accent-light: #332d1a;
+  --lense-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+
+  --lense-color-type-todo: #6a9fd4;
+  --lense-color-type-people: #9b7ec7;
+  --lense-color-type-daily: #e89878;
+  --lense-color-type-idea: #4db594;
+
+  --lense-color-status-open: #f59e0b;
+  --lense-color-status-done: #34d399;
+  --lense-color-status-parked: #9ca3af;
+
+  --lense-color-success-bg: #1a2e1a;
+  --lense-color-success-text: #4ade80;
+  --lense-color-error-bg: #2e1a1a;
+  --lense-color-error-text: #f87171;
+
+  --lense-color-input-border: #4a4a4e;
+  --lense-color-elapsed: #6b7280;
+  --lense-color-verse-border: #dab04d;
+  --lense-color-verse-bg: #2a2518;
+  --lense-color-verse-footer: #9ca3af;
+}
+
+/* System preference fallback — applies dark when OS is dark and user hasn't explicitly chosen light */
+@media (prefers-color-scheme: dark) {
+  html:not([data-theme="light"]) {
+    --lense-color-text: #e5e5e5;
+    --lense-color-text-muted: #9ca3af;
+    --lense-color-bg: #1a1a1e;
+    --lense-color-bg-subtle: #242428;
+    --lense-color-border: #3a3a3e;
+    --lense-color-accent: #dab04d;
+    --lense-color-accent-light: #332d1a;
+    --lense-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+
+    --lense-color-type-todo: #6a9fd4;
+    --lense-color-type-people: #9b7ec7;
+    --lense-color-type-daily: #e89878;
+    --lense-color-type-idea: #4db594;
+
+    --lense-color-status-open: #f59e0b;
+    --lense-color-status-done: #34d399;
+    --lense-color-status-parked: #9ca3af;
+
+    --lense-color-success-bg: #1a2e1a;
+    --lense-color-success-text: #4ade80;
+    --lense-color-error-bg: #2e1a1a;
+    --lense-color-error-text: #f87171;
+
+    --lense-color-input-border: #4a4a4e;
+    --lense-color-elapsed: #6b7280;
+    --lense-color-verse-border: #dab04d;
+    --lense-color-verse-bg: #2a2518;
+    --lense-color-verse-footer: #9ca3af;
+  }
 }

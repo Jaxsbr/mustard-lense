@@ -1,0 +1,59 @@
+phase: "daily-ready"
+started: "2026-03-22T23:54:33Z"
+entries:
+  - task: 1
+    time: "2026-03-22T23:58:00Z"
+    story: "phase"
+    description: "Investigation — classify phase as CSS/JS-only, 73 tests pass. Identified hardcoded colors in App.css and old palette in tokens.css."
+    result: "pass"
+    notes: "CSS/JS-only phase. US-D1 first (token foundation). Queue investigate for US-D1."
+    tokens: ~
+  - task: 2
+    time: "2026-03-23T00:00:00Z"
+    story: "US-D1"
+    description: "Investigate: reviewed original mustard palette, mapped all hardcoded colors in App.css (16 instances), confirmed panel CSS already uses tokens."
+    result: "pass"
+    notes: "Only tokens.css and App.css need changes. Queue implement."
+    tokens: ~
+  - task: 3
+    time: "2026-03-23T00:02:00Z"
+    story: "US-D1"
+    description: "Implement: warm gold palette in tokens.css (accent #c8982c, bg #faf9f6, 4 type colors, success/error) + tokenize all 16 hardcoded hex colors in App.css. 73 tests pass, build exits 0."
+    result: "pass"
+    notes: "✓ US-D1 complete"
+    tokens: ~
+  - task: 4
+    time: "2026-03-23T00:05:00Z"
+    story: "US-D2"
+    description: "Implement: dark mode — [data-theme=dark] + prefers-color-scheme blocks in tokens.css, ThemeToggle component, inline script in index.html, E2E test, user guide update. 73 tests pass, build exits 0."
+    result: "pass"
+    notes: "✓ US-D2 complete"
+    tokens: ~
+  - task: 5
+    time: "2026-03-23T00:08:00Z"
+    story: "US-D3"
+    description: "Implement: type-specific tab colors (border + badge via CSS class per type), list item left border indicators, E2E test. 73 tests pass, build exits 0."
+    result: "pass"
+    notes: "✓ US-D3 complete"
+    tokens: ~
+  - task: 7
+    time: "2026-03-23T00:10:00Z"
+    story: "phase"
+    description: "Production static serving from dist/ + start script + AGENTS.md update. Phase completion gate passed — 73 unit tests, 11 E2E tests, all done-when criteria verified."
+    result: "pass"
+    notes: "Phase complete. 3 stories shipped."
+    tokens: ~
+  - task: 10
+    time: "2026-03-23T00:13:00Z"
+    story: "phase"
+    description: "[review] review-pr pr=6 — posted COMMENT review with 1 critical, 2 concerns, 0 nits."
+    result: "pass"
+    notes: "Critical: --lense-shadow token name mismatch. Concerns: dark token duplication, catch-all route scope."
+    tokens: ~
+  - task: 11
+    time: "2026-03-23T00:15:00Z"
+    story: "phase"
+    description: "[review] handle-pr-review pr=6 — triaged 3 findings: 2 fixed (shadow token name, catch-all route), 1 challenged (duplication is intentional). All quality checks pass."
+    result: "pass"
+    notes: "73 tests pass, 11 E2E pass. Review complete."
+    tokens: ~

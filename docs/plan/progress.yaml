@@ -7,7 +7,7 @@ config:
   quality_check_suppressions: []
 
 state:
-  task_number: 3
+  task_number: 4
   phase: typography-layout
   phase_complete: false
   review_stage: null
@@ -16,6 +16,6 @@ state:
   pr_number: null
   status: running
   last_result: pass
-  next_task: null
+  next_task: "[US-R2] Widen detail drawer to 520px with responsive max-width, restructure drawer body so textarea fills remaining vertical space via flex layout"
   consecutive_fails: 0
   completed_stories: [US-R1]

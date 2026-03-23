@@ -15,3 +15,10 @@ entries:
     result: "pass"
     notes: "Server/schema phase — queued implement task."
     tokens: ~
+  - task: 3
+    time: "2026-03-23T01:18:00Z"
+    story: "US-D4"
+    description: "Implement deleteRecord + DELETE endpoint + 6 unit tests. 79 tests pass."
+    result: "pass"
+    notes: "DELETE API criteria all met. Delete UI + celebration animations remain."
+    tokens: ~

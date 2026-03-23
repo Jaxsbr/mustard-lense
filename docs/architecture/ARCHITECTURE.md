@@ -18,7 +18,8 @@
 │                └─────────────────┘  │
 └──────────────┬──────────────────────┘
                │ POST /api/lense (SSE stream)
-               │ POST /api/reindex (planned for rag-lense)
+               │ POST /api/reindex
+               │ DELETE /api/records/:id (planned for living-polish)
                ▼
 ┌─────────────────────────────────────┐
 │         API Server (Express)        │
@@ -193,12 +194,40 @@ The shared schema module (`src/shared/schema.ts`) defines TypeScript interfaces 
 7. Server triggers background reindex so the lense picks up the change
 8. Frontend closes the drawer, refreshes the panel list and tab counts
 
-### Design token architecture (planned for daily-ready phase)
+### Delete API data flow (planned for `living-polish` phase)
+
+1. User opens a record in the detail drawer (edit mode) and clicks the delete button
+2. An in-app confirmation element appears (not browser `confirm()`)
+3. On confirm, frontend sends `DELETE /api/records/:id`
+4. Server validates UUID format on `:id`, locates the YAML file via ID-to-filepath mapping from the data reader
+5. Data writer module removes the YAML file from disk
+6. Server returns 200 with `{ "id": "<uuid>" }`
+7. Server triggers background reindex (same as create/update)
+8. Frontend plays a farewell animation on the departing list item, then removes it from the DOM; drawer closes, tab count decrements
+
+### Celebration animations and interaction polish (planned for `living-polish` phase)
+
+CSS-only micro-animations that provide feedback for CRUD actions and list interactions. Zero JavaScript animation libraries.
+
+**Celebration animations** — three cohesive effects sharing timing/easing:
+- **Create:** burst/flash/pop localized to the active tab header area on successful `POST /api/records`
+- **Edit:** shimmer/pulse on the refreshed list item on successful `PUT /api/records/:id`
+- **Delete:** farewell (tilt/shrink/fade) on the departing list item before DOM removal
+
+**List interaction polish:**
+- **Hover states:** type-appropriate background color on list items, using `--lense-color-type-*-hover` tokens (light + dark mode)
+- **Click feedback:** brief scale/flash on list item click before drawer opens
+- **Tab crossfade:** ~150–200ms CSS crossfade transition on tab content swap
+- **Drawer backdrop fade:** CSS opacity transition on backdrop open/close
+
+All effects use CSS `@keyframes`, `transition`, and `transform` only.
+
+### Design token architecture
 
 The design token system in `tokens.css` uses CSS custom properties (`--lense-*`) consumed by all component stylesheets. Three layers:
 
-1. **`:root` block** — light-mode defaults: warm gold accent (`#c8982c`), type-specific colors (todo blue, people purple, daily orange, idea green), success/error tokens, warm background (`#faf9f6`).
-2. **`[data-theme="dark"]` block** — explicit dark mode overrides for all `--lense-color-*` variables. Applied when the user selects dark mode via the theme toggle.
+1. **`:root` block** — light-mode defaults: warm gold accent (`#c8982c`), type-specific colors (todo blue, people purple, daily orange, idea green), success/error tokens, warm background (`#faf9f6`). (Planned for `living-polish` phase: type-specific hover variants `--lense-color-type-*-hover`.)
+2. **`[data-theme="dark"]` block** — explicit dark mode overrides for all `--lense-color-*` variables. Applied when the user selects dark mode via the theme toggle. (Planned for `living-polish` phase: dark-mode hover token values.)
 3. **`@media (prefers-color-scheme: dark) { html:not([data-theme="light"]) }` block** — system-preference fallback. Applies dark palette when the OS is in dark mode and the user hasn't explicitly chosen light.
 
 Theme persistence: `localStorage` key `mustard-theme`. An inline `<script>` in `index.html` applies the stored theme before React hydrates, preventing flash-of-wrong-theme.
@@ -207,7 +236,7 @@ Theme persistence: `localStorage` key `mustard-theme`. An inline `<script>` in `
 
 In production, the Express server serves Vite's `dist/` static files alongside the API endpoints, so the full app runs on a single port (7777). This replaces the legacy mustard Flask app on the same port.
 
-### Future (beyond daily-ready)
+### Future (beyond living-polish)
 
 Metadata-filtered retrieval, data repo separation (`mustard-data`), old mustard archival, and mustard-capture skill deletion are planned for subsequent phases.
 

@@ -22,3 +22,10 @@ entries:
     result: "pass"
     notes: "✓ US-D1 complete"
     tokens: ~
+  - task: 4
+    time: "2026-03-23T00:05:00Z"
+    story: "US-D2"
+    description: "Implement: dark mode — [data-theme=dark] + prefers-color-scheme blocks in tokens.css, ThemeToggle component, inline script in index.html, E2E test, user guide update. 73 tests pass, build exits 0."
+    result: "pass"
+    notes: "✓ US-D2 complete"
+    tokens: ~

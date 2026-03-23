@@ -7,7 +7,7 @@ config:
   quality_check_suppressions: []
 
 state:
-  task_number: 4
+  task_number: 5
   phase: daily-ready
   phase_complete: false
   review_stage: null
@@ -16,6 +16,6 @@ state:
   pr_number: null
   status: running
   last_result: pass
-  next_task: "[US-D2] Implement: add dark mode — [data-theme=dark] + prefers-color-scheme blocks in tokens.css, theme toggle component, inline script in index.html, tokenize remaining hardcoded colors in component CSS files"
+  next_task: null
   consecutive_fails: 0
-  completed_stories: [US-D1]
+  completed_stories: [US-D1, US-D2]

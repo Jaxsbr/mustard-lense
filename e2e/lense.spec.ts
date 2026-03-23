@@ -194,6 +194,14 @@ function setupRecordsRoute(page: import('@playwright/test').Page) {
         contentType: 'application/json',
         body: JSON.stringify({ ...fixtureRecords[0], ...body }),
       })
+    } else if (method === 'DELETE') {
+      const url = new URL(route.request().url())
+      const id = url.pathname.split('/').pop()
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({ id }),
+      })
     }
   })
 }
@@ -352,6 +360,41 @@ test('active tab border color varies by type', async ({ page }) => {
   // People tab should have a non-transparent border when active
   // and it should differ from the todo color
   expect(peopleBorder).not.toEqual(todoTabAfter)
+})
+
+test('delete button visible in edit mode, absent in create mode, confirmation appears on click', async ({ page }) => {
+  await setupRecordsRoute(page)
+  await page.goto('/')
+
+  // Wait for list items
+  await expect(page.locator('[data-testid="panel-list-item"]').first()).toBeVisible({ timeout: 5000 })
+
+  // Click a list item to open drawer in edit mode
+  await page.locator('[data-testid="panel-list-item"]').first().click()
+  const drawer = page.locator('[data-testid="detail-drawer"]')
+  await expect(drawer).toBeVisible({ timeout: 3000 })
+
+  // Delete button should be visible in edit mode
+  const deleteBtn = page.locator('[data-testid="drawer-delete"]')
+  await expect(deleteBtn).toBeVisible()
+
+  // Click delete — confirmation element should appear
+  await deleteBtn.click()
+  const confirmEl = page.locator('[data-testid="drawer-delete-confirm"]')
+  await expect(confirmEl).toBeVisible()
+
+  // Cancel confirmation
+  await page.locator('[data-testid="drawer-delete-no"]').click()
+  await expect(confirmEl).not.toBeVisible()
+
+  // Close drawer
+  await page.locator('[data-testid="drawer-close"]').click()
+  await expect(drawer).not.toBeVisible()
+
+  // Open drawer in create mode — delete button should NOT be present
+  await page.locator('[data-testid="panel-add"]').click()
+  await expect(drawer).toBeVisible({ timeout: 3000 })
+  await expect(page.locator('[data-testid="drawer-delete"]')).not.toBeVisible()
 })
 
 test('clicking Add opens drawer in create mode with active tab type pre-selected', async ({ page }) => {

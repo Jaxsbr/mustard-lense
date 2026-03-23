@@ -118,7 +118,8 @@ mustard-lense/
 
 ## Design tokens and dark mode
 
-- **Token file** — `src/components/tokens.css`. All color values defined as `--lense-color-*` CSS custom properties.
+- **Token file** — `src/components/tokens.css`. All design values defined as `--lense-*` CSS custom properties.
+- **Font sizes** — `--lense-font-size-xs` (0.75rem), `--lense-font-size-sm` (0.9rem), `--lense-font-size-base` (1rem), `--lense-font-size-lg` (1.25rem). All panel/drawer CSS uses these tokens — no hardcoded font-size values.
 - **Warm gold palette** — accent `#c8982c`, background `#faf9f6`, type-specific colors (todo `#4a7fc4`, people `#7b5ea7`, daily `#e07850`, idea `#2d9574`), success/error tokens.
 - **Dark mode** — `[data-theme="dark"]` selector overrides all color tokens. `@media (prefers-color-scheme: dark) { html:not([data-theme="light"]) }` provides system-preference fallback.
 - **No-flash** — inline `<script>` in `index.html` applies saved theme before React hydrates.
@@ -140,7 +141,7 @@ mustard-lense/
 
 ## Detail drawer
 
-- **Slide-over** — overlays from the right, 400px wide (max 80vw). CSS slide transition.
+- **Slide-over** — overlays from the right, `min(520px, 90vw)` wide. CSS slide transition. Text textarea uses flex layout to fill remaining vertical space (no fixed `rows` constraint).
 - **Edit mode** — click a list item. Shows all fields in editable form inputs. `log_type` and `id` are read-only.
 - **Create mode** — click Add button. Empty form, `log_type` changeable via dropdown, `text` auto-focused.
 - **Type-specific fields** — todo: text (textarea), status (dropdown), due_date (date input). people_note: text, person. idea: text, status. daily_log: text, theme.

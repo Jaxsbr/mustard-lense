@@ -7,15 +7,15 @@ config:
   quality_check_suppressions: []
 
 state:
-  task_number: 11
-  phase: living-polish
+  task_number: 9
+  phase: typography-layout
   phase_complete: true
   review_stage: review_posted
   review_complete: true
   retro_complete: true
-  pr_number: 7
+  pr_number: 8
   status: running
   last_result: pass
   next_task: null
   consecutive_fails: 0
-  completed_stories: [US-D4, US-D5]
+  completed_stories: [US-R1, US-R2]

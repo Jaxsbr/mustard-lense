@@ -17,7 +17,7 @@
 
 .list-controls-select {
   font-family: inherit;
-  font-size: 0.75rem;
+  font-size: var(--lense-font-size-xs);
   padding: 2px 6px;
   border: 1px solid var(--lense-color-border);
   border-radius: var(--lense-radius);
@@ -27,7 +27,7 @@
 }
 
 .list-controls-label {
-  font-size: 0.75rem;
+  font-size: var(--lense-font-size-xs);
   color: var(--lense-color-text-muted);
 }
 
@@ -35,7 +35,7 @@
   background: none;
   border: none;
   color: var(--lense-color-accent);
-  font-size: 0.75rem;
+  font-size: var(--lense-font-size-xs);
   cursor: pointer;
   padding: 0;
   text-decoration: underline;

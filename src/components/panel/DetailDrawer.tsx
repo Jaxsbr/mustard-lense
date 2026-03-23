@@ -123,14 +123,13 @@ function DrawerForm({ record, mode, defaultLogType, onClose, onSave, onDelete }:
           </div>
         )}
 
-        <div className="drawer-field">
+        <div className="drawer-field drawer-field--text">
           <label className="drawer-label">Text</label>
           <textarea
             ref={textRef}
             className="drawer-textarea"
             value={text}
             onChange={(e) => setText(e.target.value)}
-            rows={5}
             data-testid="drawer-field-text"
           />
         </div>

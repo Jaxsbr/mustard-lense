@@ -1,0 +1,59 @@
+phase: "typography-layout"
+started: "2026-03-23T22:49:21Z"
+entries:
+  - task: 1
+    time: "2026-03-23T22:51:00Z"
+    story: "US-R1"
+    description: "Investigation: verify passes (79 tests). Found 7 hardcoded font-size values (0.75rem in ListControls, CrudPanel, ListItems; 1.1rem in CrudPanel). Most panel/drawer CSS already uses tokens. Queued US-R1 implementation."
+    result: "pass"
+    notes: "CSS/JS-only phase. Need new --lense-font-size-xs token for 0.75rem replacements."
+    tokens: ~
+  - task: 2
+    time: "2026-03-23T22:53:00Z"
+    story: "US-R1"
+    description: "Implement: added --lense-font-size-xs (0.75rem), raised --lense-font-size-sm to 0.9rem, replaced 7 hardcoded font-size values with tokens. 79 tests pass. ✓ US-R1 complete."
+    result: "pass"
+    notes: "All US-R1 criteria met. Story milestone committed."
+    tokens: ~
+  - task: 3
+    time: "2026-03-23T22:54:00Z"
+    story: "US-R2"
+    description: "Investigation: drawer is 400px/80vw, textarea uses rows={5}. Drawer body already has flex-column. Need to widen, add responsive max-width, make textarea flex-grow. Queued US-R2 implementation."
+    result: "pass"
+    notes: "Single task needed — CSS changes + remove rows prop."
+    tokens: ~
+  - task: 4
+    time: "2026-03-23T22:55:00Z"
+    story: "US-R2"
+    description: "Implement: widened drawer to min(520px, 90vw), added .drawer-field--text flex wrapper, textarea flex:1 + min-height:120px, removed rows={5}. 79 tests pass. ✓ US-R2 complete."
+    result: "pass"
+    notes: "All US-R2 criteria met. Both stories complete. Phase-level criteria remain."
+    tokens: ~
+  - task: 5
+    time: "2026-03-23T22:57:00Z"
+    story: "phase"
+    description: "Phase completion gate passed. Updated AGENTS.md. 79 tests pass. All done-when criteria verified. No new dependencies."
+    result: "pass"
+    notes: "Phase complete. 2 stories shipped (US-R1, US-R2)."
+    tokens: ~
+  - task: 6
+    time: "2026-03-23T22:58:00Z"
+    story: "phase"
+    description: "Created PR #8. Queued review-pr."
+    result: "pass"
+    notes: "Review stage: pr_created."
+    tokens: ~
+  - task: 7
+    time: "2026-03-23T22:58:00Z"
+    story: "phase"
+    description: "[review] review-pr pr=8 — posted COMMENT review with 0 critical, 1 concern, 0 nits."
+    result: "pass"
+    notes: "Concern: flex+resize interaction on textarea."
+    tokens: ~
+  - task: 8
+    time: "2026-03-23T22:59:00Z"
+    story: "phase"
+    description: "[review] handle-pr-review pr=8 — triaged 1 finding: 1 challenged (flex+resize intentional). All quality checks pass."
+    result: "pass"
+    notes: "79 tests pass. Review complete."
+    tokens: ~

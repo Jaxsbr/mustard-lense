@@ -324,6 +324,29 @@ test('theme toggle button exists and clicking it changes data-theme attribute', 
   expect(finalTheme).not.toEqual(newTheme)
 })
 
+test('active tab border color varies by type', async ({ page }) => {
+  await setupRecordsRoute(page)
+  await page.goto('/')
+
+  // Wait for tabs to load
+  await expect(page.locator('[data-testid="tab-todo"]')).toBeVisible({ timeout: 5000 })
+
+  // Todos tab is active — check its border color is the todo blue
+  const todoTab = page.locator('[data-testid="tab-todo"]')
+  const todoBorder = await todoTab.evaluate((el) => getComputedStyle(el).borderBottomColor)
+  // #4a7fc4 in light mode or #6a9fd4 in dark mode — both are blue-ish
+  expect(todoBorder).not.toBe('rgba(0, 0, 0, 0)')
+
+  // Switch to People tab
+  const peopleTab = page.locator('[data-testid="tab-people_note"]')
+  await peopleTab.click()
+  const peopleBorder = await peopleTab.evaluate((el) => getComputedStyle(el).borderBottomColor)
+
+  // Border colors should differ between Todos and People tabs
+  expect(peopleBorder).not.toBe('rgba(0, 0, 0, 0)')
+  expect(peopleBorder).not.toEqual(todoBorder)
+})
+
 test('clicking Add opens drawer in create mode with active tab type pre-selected', async ({ page }) => {
   await setupRecordsRoute(page)
   await page.goto('/')

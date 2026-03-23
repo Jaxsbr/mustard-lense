@@ -217,7 +217,7 @@ export function CrudPanel({ collapsed, onToggle }: CrudPanelProps) {
                 key={tab.type}
                 role="tab"
                 aria-selected={activeTab === tab.type}
-                className={`crud-panel-tab${activeTab === tab.type ? ' crud-panel-tab--active' : ''}`}
+                className={`crud-panel-tab crud-panel-tab--${tab.type}${activeTab === tab.type ? ' crud-panel-tab--active' : ''}`}
                 onClick={() => handleTabClick(tab.type)}
                 data-testid={`tab-${tab.type}`}
               >

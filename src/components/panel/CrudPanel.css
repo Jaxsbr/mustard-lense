@@ -93,9 +93,25 @@
 }
 
 .crud-panel-tab--active {
-  color: var(--lense-color-accent);
-  border-bottom-color: var(--lense-color-accent);
   font-weight: 600;
+}
+
+/* Type-specific active tab colors */
+.crud-panel-tab--todo.crud-panel-tab--active {
+  color: var(--lense-color-type-todo);
+  border-bottom-color: var(--lense-color-type-todo);
+}
+.crud-panel-tab--people_note.crud-panel-tab--active {
+  color: var(--lense-color-type-people);
+  border-bottom-color: var(--lense-color-type-people);
+}
+.crud-panel-tab--daily_log.crud-panel-tab--active {
+  color: var(--lense-color-type-daily);
+  border-bottom-color: var(--lense-color-type-daily);
+}
+.crud-panel-tab--idea.crud-panel-tab--active {
+  color: var(--lense-color-type-idea);
+  border-bottom-color: var(--lense-color-type-idea);
 }
 
 .crud-panel-tab-count {
@@ -109,9 +125,22 @@
   text-align: center;
 }
 
-.crud-panel-tab--active .crud-panel-tab-count {
-  background: var(--lense-color-accent-light);
-  color: var(--lense-color-accent);
+/* Type-specific active tab count badge */
+.crud-panel-tab--todo.crud-panel-tab--active .crud-panel-tab-count {
+  background: color-mix(in srgb, var(--lense-color-type-todo) 15%, transparent);
+  color: var(--lense-color-type-todo);
+}
+.crud-panel-tab--people_note.crud-panel-tab--active .crud-panel-tab-count {
+  background: color-mix(in srgb, var(--lense-color-type-people) 15%, transparent);
+  color: var(--lense-color-type-people);
+}
+.crud-panel-tab--daily_log.crud-panel-tab--active .crud-panel-tab-count {
+  background: color-mix(in srgb, var(--lense-color-type-daily) 15%, transparent);
+  color: var(--lense-color-type-daily);
+}
+.crud-panel-tab--idea.crud-panel-tab--active .crud-panel-tab-count {
+  background: color-mix(in srgb, var(--lense-color-type-idea) 15%, transparent);
+  color: var(--lense-color-type-idea);
 }
 
 /* Body */

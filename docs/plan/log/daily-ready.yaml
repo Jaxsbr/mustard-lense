@@ -15,3 +15,10 @@ entries:
     result: "pass"
     notes: "Only tokens.css and App.css need changes. Queue implement."
     tokens: ~
+  - task: 3
+    time: "2026-03-23T00:02:00Z"
+    story: "US-D1"
+    description: "Implement: warm gold palette in tokens.css (accent #c8982c, bg #faf9f6, 4 type colors, success/error) + tokenize all 16 hardcoded hex colors in App.css. 73 tests pass, build exits 0."
+    result: "pass"
+    notes: "✓ US-D1 complete"
+    tokens: ~

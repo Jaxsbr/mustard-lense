@@ -207,3 +207,4 @@ Defined in `src/shared/schema.ts`, used by both server and frontend.
 - error-path-coverage
 - agents-consistency
 - token-consumer-check
+- e2e-route-coverage

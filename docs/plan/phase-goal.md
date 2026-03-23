@@ -22,12 +22,12 @@ Increase baseline legibility across the CRUD panel and detail drawer by raising 
 - [x] `npm run typecheck && npm run lint && npm test` passes with zero errors [US-R1]
 
 **US-R2 — Detail drawer layout improvement:**
-- [ ] Detail drawer width is >= 500px (currently 400px) in `DetailDrawer.css` — verifiable by reading the `.detail-drawer` width value [US-R2]
-- [ ] Detail drawer `max-width` uses a responsive approach (e.g., `min()`, `clamp()`, or media query) so it doesn't overflow on viewports < 600px [US-R2]
-- [ ] The drawer body uses a flex-column layout where the text textarea region grows to fill remaining vertical space (`flex: 1` or `flex-grow: 1` on the textarea wrapper or textarea itself) [US-R2]
-- [ ] The textarea element does NOT rely solely on `rows={5}` as its height constraint — either `rows` is removed/increased or the textarea has CSS that overrides the rows-based height (e.g., `height: 100%`, `flex: 1`, `min-height` significantly larger than 5 rows) [US-R2]
-- [ ] On a viewport width of 500px, the drawer does not overflow horizontally — `max-width` constraint keeps it within bounds [US-R2]
-- [ ] `npm run typecheck && npm run lint && npm test` passes with zero errors [US-R2]
+- [x] Detail drawer width is >= 500px (currently 400px) in `DetailDrawer.css` — verifiable by reading the `.detail-drawer` width value [US-R2]
+- [x] Detail drawer `max-width` uses a responsive approach (e.g., `min()`, `clamp()`, or media query) so it doesn't overflow on viewports < 600px [US-R2]
+- [x] The drawer body uses a flex-column layout where the text textarea region grows to fill remaining vertical space (`flex: 1` or `flex-grow: 1` on the textarea wrapper or textarea itself) [US-R2]
+- [x] The textarea element does NOT rely solely on `rows={5}` as its height constraint — either `rows` is removed/increased or the textarea has CSS that overrides the rows-based height (e.g., `height: 100%`, `flex: 1`, `min-height` significantly larger than 5 rows) [US-R2]
+- [x] On a viewport width of 500px, the drawer does not overflow horizontally — `max-width` constraint keeps it within bounds [US-R2]
+- [x] `npm run typecheck && npm run lint && npm test` passes with zero errors [US-R2]
 
 **Phase-level:**
 - [ ] `AGENTS.md` reflects: updated font-size token values, drawer width change, drawer flex layout [phase]

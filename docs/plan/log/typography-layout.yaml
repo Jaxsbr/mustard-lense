@@ -22,3 +22,10 @@ entries:
     result: "pass"
     notes: "Single task needed — CSS changes + remove rows prop."
     tokens: ~
+  - task: 4
+    time: "2026-03-23T22:55:00Z"
+    story: "US-R2"
+    description: "Implement: widened drawer to min(520px, 90vw), added .drawer-field--text flex wrapper, textarea flex:1 + min-height:120px, removed rows={5}. 79 tests pass. ✓ US-R2 complete."
+    result: "pass"
+    notes: "All US-R2 criteria met. Both stories complete. Phase-level criteria remain."
+    tokens: ~

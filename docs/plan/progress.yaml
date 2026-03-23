@@ -7,7 +7,7 @@ config:
   quality_check_suppressions: []
 
 state:
-  task_number: 6
+  task_number: 8
   phase: daily-ready
   phase_complete: false
   review_stage: null
@@ -16,6 +16,6 @@ state:
   pr_number: null
   status: running
   last_result: pass
-  next_task: "[phase] Implement: production static serving from dist/ + start script in package.json"
+  next_task: "[phase] Update AGENTS.md with new design tokens, dark mode architecture, theme toggle, production port 7777"
   consecutive_fails: 0
   completed_stories: [US-D1, US-D2, US-D3]

@@ -43,3 +43,10 @@ entries:
     result: "pass"
     notes: "US-D4 nearly complete — user guide update remains. Moving to US-D5."
     tokens: ~
+  - task: 7
+    time: "2026-03-23T01:25:00Z"
+    story: "US-D5"
+    description: "Implement interaction polish: hover tokens, hover states, click feedback, tab crossfade, backdrop fade, E2E test. 13 E2E pass."
+    result: "pass"
+    notes: "US-D5 nearly complete — user guide update remains."
+    tokens: ~

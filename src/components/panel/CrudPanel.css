@@ -182,3 +182,47 @@
 .crud-panel-list-item:last-child {
   border-bottom: none;
 }
+
+/* Celebration animations */
+
+/* Create: burst flash on tab */
+@keyframes tab-celebrate {
+  0% { transform: scale(1); }
+  25% { transform: scale(1.15); }
+  50% { transform: scale(0.95); box-shadow: 0 0 12px var(--lense-color-accent); }
+  75% { transform: scale(1.05); }
+  100% { transform: scale(1); box-shadow: none; }
+}
+
+.crud-panel-tab--celebrate {
+  animation: tab-celebrate 0.5s ease-out;
+}
+
+/* Edit: shimmer on list item */
+@keyframes item-shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+.list-item-shimmer {
+  background: linear-gradient(
+    90deg,
+    transparent 30%,
+    var(--lense-color-accent-light) 50%,
+    transparent 70%
+  );
+  background-size: 200% 100%;
+  animation: item-shimmer 0.8s ease-out;
+}
+
+/* Delete: farewell — tilt, shrink, fade */
+@keyframes item-farewell {
+  0% { opacity: 1; transform: scale(1) rotate(0deg); }
+  50% { opacity: 0.6; transform: scale(0.9) rotate(-2deg); }
+  100% { opacity: 0; transform: scale(0.7) rotate(-5deg); height: 0; padding: 0; margin: 0; overflow: hidden; }
+}
+
+.list-item-farewell {
+  animation: item-farewell 0.5s ease-in forwards;
+  pointer-events: none;
+}

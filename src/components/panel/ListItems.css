@@ -69,13 +69,13 @@
 
 .list-date {
   flex-shrink: 0;
-  font-size: 0.75rem;
+  font-size: var(--lense-font-size-xs);
   color: var(--lense-color-text-muted);
 }
 
 .list-theme {
   flex-shrink: 0;
-  font-size: 0.75rem;
+  font-size: var(--lense-font-size-xs);
   color: var(--lense-color-accent);
   background: var(--lense-color-accent-light);
   padding: 0 var(--lense-spacing-xs);

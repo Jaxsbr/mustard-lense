@@ -21,7 +21,7 @@ mustard-lense/
 │   │   ├── Summary.tsx           # summary component renderer
 │   │   ├── FallbackComponent.tsx # Fallback for unknown component types
 │   │   ├── components.css        # Shared component styles
-│   │   ├── tokens.css            # Design tokens (CSS variables)
+│   │   ├── tokens.css            # Design tokens (CSS variables): warm gold palette, type colors, dark mode overrides
 │   │   └── panel/
 │   │       ├── CrudPanel.tsx     # Collapsible panel with type tabs, list views, drawer, sort/limit
 │   │       ├── CrudPanel.css     # Panel, tab, list, and add button styles
@@ -31,7 +31,7 @@ mustard-lense/
 │   │       ├── ListControls.tsx  # Sort dropdown + limit control above record list
 │   │       ├── ListControls.css  # Controls bar styles
 │   │       ├── ListItems.tsx     # Type-specific list item components
-│   │       ├── ListItems.css     # List item styles using design tokens
+│   │       ├── ListItems.css     # List item styles with type-colored left indicators
 │   │       ├── sort.ts           # Sort logic — newest, oldest, status (open first)
 │   │       ├── sort.test.ts      # Unit tests for sort logic
 │   │       └── types.ts          # Tab definitions and PanelRecord type alias
@@ -63,18 +63,19 @@ mustard-lense/
 ├── docs/
 │   ├── architecture/ARCHITECTURE.md
 │   ├── briefs/              # Phase briefs from spec-author
-│   ├── manual/layout.md     # User guide — split-screen layout, tabs, list views
+│   ├── manual/layout.md     # User guide — split-screen layout, tabs, list views, dark mode
+│   ├── manual/editing.md    # User guide — detail drawer, editing records, Add button
 │   ├── plan/                # Build loop state
 │   └── product/             # PRD and specs
 ├── .env.example             # Documents MUSTARD_DATA_DIR env var
-├── index.html               # SPA shell with viewport meta
+├── index.html               # SPA shell with viewport meta + inline theme script (prevents FOUC)
 ├── vite.config.ts           # Dev server port 5234, Vite proxy /api -> 3001
 ├── playwright.config.ts     # Playwright E2E config
 ├── tsconfig.json            # Project references root
 ├── tsconfig.app.json        # App TS config (strict, node types)
 ├── tsconfig.node.json       # Node TS config (vite + playwright configs)
 ├── eslint.config.js         # ESLint config
-└── package.json             # Scripts: dev, build, lint, typecheck, test, smoke:*, test:e2e
+└── package.json             # Scripts: dev, build, lint, typecheck, test, smoke:*, test:e2e, start
 ```
 
 ## File ownership
@@ -85,7 +86,7 @@ mustard-lense/
 | `src/lib/claude-cli.test.ts` | Tests | Mocked unit tests — no real CLI invoked |
 | `src/shared/schema.ts` | Schema | Response schema — 5 component types, shared by server and frontend |
 | `src/server/app.ts` | API server | Express app: POST /api/lense (SSE), POST /api/reindex, GET /api/records, POST /api/records, PUT /api/records/:id. Uses dependency injection (createApp). |
-| `src/server/index.ts` | Entry point | Builds vector index on startup, wires real dependencies (readRecords, createRecord, updateRecord), starts server |
+| `src/server/index.ts` | Entry point | Builds vector index on startup, wires real dependencies, serves `dist/` static files in production, starts server |
 | `src/server/data/reader.ts` | Data reader | Reads YAML records from `MUSTARD_DATA_DIR` (default `~/dev/mustard/data/`). Exports `readRecords`, `getDataDir`, `findYamlFiles`. Shared by browse API, RAG indexer, and writer. |
 | `src/server/data/writer.ts` | Data writer | Creates and updates YAML record files. Exports `createRecord`, `updateRecord`, `validateLogType`, `validateText`. UUID generation, auto-filled metadata, log_type-to-subdirectory mapping. |
 | `src/server/synthesiser.ts` | Synthesis | Synthesiser interface + CliSynthesiser — wraps invokeClaude with inline records |
@@ -104,7 +105,7 @@ mustard-lense/
 | `src/components/panel/ListItems.tsx` | List views | Type-specific list item components: TodoListItem, PeopleListItem, IdeaListItem, DailyLogListItem |
 | `src/components/panel/sort.ts` | Sort logic | Sort functions: newest first, oldest first, status grouping (open → parked → done) |
 | `src/components/panel/sort.test.ts` | Tests | Unit tests for sort logic: date asc, date desc, status grouping |
-| `src/App.tsx` | UI | Split-screen layout — CRUD panel (left, collapsible ~40%), lense (right, always visible). Responsive at 768px. |
+| `src/App.tsx` | UI | Split-screen layout — CRUD panel (left, collapsible ~40%), lense (right, always visible). Theme toggle. Responsive at 768px. |
 | `src/smoke/*.ts` | Smoke tests | On-demand, invoke real CLI/API — NOT run by `npm test` |
 | `e2e/*.spec.ts` | E2E tests | Playwright tests with mocked SSE + records API — NOT run by `npm test` |
 
@@ -112,12 +113,21 @@ mustard-lense/
 
 - **Split-screen** — CRUD panel on left (~40% width), lense on right (fills remaining). Flex layout.
 - **Panel toggle** — collapses/expands the CRUD panel. Auto-collapses at viewports below 768px.
+- **Theme toggle** — button next to "Mustard" heading. Toggles `data-theme` attribute on `<html>`. Persists to `localStorage` key `mustard-theme`.
 - **Title** — "Mustard" (not "Mustard Lense").
+
+## Design tokens and dark mode
+
+- **Token file** — `src/components/tokens.css`. All color values defined as `--lense-color-*` CSS custom properties.
+- **Warm gold palette** — accent `#c8982c`, background `#faf9f6`, type-specific colors (todo `#4a7fc4`, people `#7b5ea7`, daily `#e07850`, idea `#2d9574`), success/error tokens.
+- **Dark mode** — `[data-theme="dark"]` selector overrides all color tokens. `@media (prefers-color-scheme: dark) { html:not([data-theme="light"]) }` provides system-preference fallback.
+- **No-flash** — inline `<script>` in `index.html` applies saved theme before React hydrates.
+- **Type-specific colors** — tabs and list items use `--lense-color-type-*` tokens for active borders, count badges, and left indicators.
 
 ## CRUD panel
 
 - **Type tabs** — Todos, People, Ideas, Daily Logs. Each tab fetches `GET /api/records?type=<log_type>`.
-- **Active tab** — distinguished via `aria-selected` attribute and `.crud-panel-tab--active` CSS class.
+- **Active tab** — distinguished via `aria-selected` attribute, `.crud-panel-tab--active` CSS class, and type-specific border color (e.g., `--lense-color-type-todo` for Todos tab).
 - **Count badges** — each tab shows a record count.
 - **Type-specific list views** — TodoListItem (status + text + due date), PeopleListItem (person bold + text + date), IdeaListItem (status + text), DailyLogListItem (date + theme + text).
 - **Empty state** — "No records found." when a tab has zero records.
@@ -178,7 +188,8 @@ Defined in `src/shared/schema.ts`, used by both server and frontend.
 
 ## Testing
 
-- `npm test` — Vitest unit tests (68 tests: 8 CLI + 30 server + 9 synthesiser + 7 RAG + 7 panel + 5 sort + 2 reserved) with mocked dependencies
+- `npm test` — Vitest unit tests (73 tests: 8 CLI + 30 server + 9 synthesiser + 7 RAG + 7 panel + 5 sort + 7 reserved) with mocked dependencies
+- `npm start` — builds and runs production server on port 7777 (serves `dist/` + API on single port)
 - `npm run test:e2e` — Playwright E2E tests with mocked SSE endpoint and mocked records API
 - `npm run smoke:basic` / `npm run smoke:admin` — real CLI invocation
 - `npm run smoke:lense` — real E2E through API + RAG + Claude + data store (reads SSE stream)

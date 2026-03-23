@@ -36,3 +36,10 @@ entries:
     result: "pass"
     notes: "Celebration animations criteria met. E2E tests remain for US-D4."
     tokens: ~
+  - task: 6
+    time: "2026-03-23T01:23:00Z"
+    story: "US-D4"
+    description: "Add E2E test for delete UI (edit/create mode, confirmation). 12 E2E pass, 79 unit pass."
+    result: "pass"
+    notes: "US-D4 nearly complete — user guide update remains. Moving to US-D5."
+    tokens: ~

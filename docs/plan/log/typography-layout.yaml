@@ -8,3 +8,10 @@ entries:
     result: "pass"
     notes: "CSS/JS-only phase. Need new --lense-font-size-xs token for 0.75rem replacements."
     tokens: ~
+  - task: 2
+    time: "2026-03-23T22:53:00Z"
+    story: "US-R1"
+    description: "Implement: added --lense-font-size-xs (0.75rem), raised --lense-font-size-sm to 0.9rem, replaced 7 hardcoded font-size values with tokens. 79 tests pass. ✓ US-R1 complete."
+    result: "pass"
+    notes: "All US-R1 criteria met. Story milestone committed."
+    tokens: ~

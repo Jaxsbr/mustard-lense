@@ -7,7 +7,7 @@ config:
   quality_check_suppressions: []
 
 state:
-  task_number: 2
+  task_number: 3
   phase: typography-layout
   phase_complete: false
   review_stage: null
@@ -16,6 +16,6 @@ state:
   pr_number: null
   status: running
   last_result: pass
-  next_task: "[US-R1] Raise font-size tokens in tokens.css and replace all hardcoded font-size values in panel CSS with tokens"
+  next_task: null
   consecutive_fails: 0
-  completed_stories: []
+  completed_stories: [US-R1]

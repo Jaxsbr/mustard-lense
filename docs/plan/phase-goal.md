@@ -12,14 +12,14 @@ Increase baseline legibility across the CRUD panel and detail drawer by raising 
 ### Done-when (observable)
 
 **US-R1 — Typography scale increase:**
-- [ ] `tokens.css` `:root` defines `--lense-font-size-sm` with a value >= `0.875rem` (currently `0.85rem`) [US-R1]
-- [ ] `tokens.css` `:root` defines `--lense-font-size-base` with a value >= `1rem` [US-R1]
-- [ ] `tokens.css` `:root` defines `--lense-font-size-lg` with a value >= `1.25rem` [US-R1]
-- [ ] Tab labels (`.crud-panel-tab` or equivalent) use a font-size token (`--lense-font-size-*`) — no hardcoded px/rem values in the tab CSS rule [US-R1]
-- [ ] List item primary text uses a font-size token — no hardcoded px/rem for the main text line in `ListItems.css` [US-R1]
-- [ ] Sort/limit controls (`ListControls.css`) use font-size tokens — no hardcoded px/rem for control labels or dropdowns [US-R1]
-- [ ] Detail drawer labels and input text use font-size tokens — no hardcoded px/rem in `DetailDrawer.css` for `.drawer-label`, `.drawer-input`, `.drawer-textarea` [US-R1]
-- [ ] `npm run typecheck && npm run lint && npm test` passes with zero errors [US-R1]
+- [x] `tokens.css` `:root` defines `--lense-font-size-sm` with a value >= `0.875rem` (currently `0.85rem`) [US-R1]
+- [x] `tokens.css` `:root` defines `--lense-font-size-base` with a value >= `1rem` [US-R1]
+- [x] `tokens.css` `:root` defines `--lense-font-size-lg` with a value >= `1.25rem` [US-R1]
+- [x] Tab labels (`.crud-panel-tab` or equivalent) use a font-size token (`--lense-font-size-*`) — no hardcoded px/rem values in the tab CSS rule [US-R1]
+- [x] List item primary text uses a font-size token — no hardcoded px/rem for the main text line in `ListItems.css` [US-R1]
+- [x] Sort/limit controls (`ListControls.css`) use font-size tokens — no hardcoded px/rem for control labels or dropdowns [US-R1]
+- [x] Detail drawer labels and input text use font-size tokens — no hardcoded px/rem in `DetailDrawer.css` for `.drawer-label`, `.drawer-input`, `.drawer-textarea` [US-R1]
+- [x] `npm run typecheck && npm run lint && npm test` passes with zero errors [US-R1]
 
 **US-R2 — Detail drawer layout improvement:**
 - [ ] Detail drawer width is >= 500px (currently 400px) in `DetailDrawer.css` — verifiable by reading the `.detail-drawer` width value [US-R2]

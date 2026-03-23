@@ -36,3 +36,10 @@ entries:
     result: "pass"
     notes: "Phase complete. 2 stories shipped (US-R1, US-R2)."
     tokens: ~
+  - task: 6
+    time: "2026-03-23T22:58:00Z"
+    story: "phase"
+    description: "Created PR #8. Queued review-pr."
+    result: "pass"
+    notes: "Review stage: pr_created."
+    tokens: ~

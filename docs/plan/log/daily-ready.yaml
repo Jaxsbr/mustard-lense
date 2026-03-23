@@ -29,3 +29,10 @@ entries:
     result: "pass"
     notes: "✓ US-D2 complete"
     tokens: ~
+  - task: 5
+    time: "2026-03-23T00:08:00Z"
+    story: "US-D3"
+    description: "Implement: type-specific tab colors (border + badge via CSS class per type), list item left border indicators, E2E test. 73 tests pass, build exits 0."
+    result: "pass"
+    notes: "✓ US-D3 complete"
+    tokens: ~

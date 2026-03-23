@@ -6,6 +6,12 @@
   bottom: 0;
   background: rgba(0, 0, 0, 0.2);
   z-index: 100;
+  animation: backdrop-fade-in 0.2s ease-out;
+}
+
+@keyframes backdrop-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
 
 .detail-drawer {

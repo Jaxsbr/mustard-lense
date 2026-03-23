@@ -259,7 +259,7 @@ export function CrudPanel({ collapsed, onToggle }: CrudPanelProps) {
               </button>
             ))}
           </div>
-          <div className="crud-panel-body">
+          <div key={activeTab} className="crud-panel-body">
             {loading && <div className="crud-panel-loading" data-testid="panel-loading">Loading...</div>}
             {!loading && records.length === 0 && (
               <p className="crud-panel-empty" data-testid="panel-empty">No records found.</p>

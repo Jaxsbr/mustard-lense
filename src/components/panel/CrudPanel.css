@@ -148,6 +148,12 @@
   flex: 1;
   overflow-y: auto;
   padding: var(--lense-spacing-md);
+  animation: tab-crossfade 0.18s ease-in-out;
+}
+
+@keyframes tab-crossfade {
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
 
 .crud-panel-loading {

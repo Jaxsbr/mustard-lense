@@ -4,17 +4,34 @@
   --lense-font-size-base: 1rem;
   --lense-font-size-lg: 1.25rem;
 
-  --lense-color-text: #1a1a2e;
-  --lense-color-text-muted: #6b7280;
-  --lense-color-bg: #ffffff;
-  --lense-color-bg-subtle: #f9fafb;
-  --lense-color-border: #e5e7eb;
-  --lense-color-accent: #4f6d7a;
-  --lense-color-accent-light: #e8f0f3;
+  --lense-color-text: #2d2d2d;
+  --lense-color-text-muted: #6b6b6b;
+  --lense-color-bg: #faf9f6;
+  --lense-color-bg-subtle: #f5f4f0;
+  --lense-color-border: #e5e3de;
+  --lense-color-accent: #c8982c;
+  --lense-color-accent-light: #f8f0db;
+  --lense-color-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+
+  --lense-color-type-todo: #4a7fc4;
+  --lense-color-type-people: #7b5ea7;
+  --lense-color-type-daily: #e07850;
+  --lense-color-type-idea: #2d9574;
 
   --lense-color-status-open: #d97706;
   --lense-color-status-done: #059669;
   --lense-color-status-parked: #6b7280;
+
+  --lense-color-success-bg: #e8f5e6;
+  --lense-color-success-text: #2e6b28;
+  --lense-color-error-bg: #fde8e8;
+  --lense-color-error-text: #9b2c2c;
+
+  --lense-color-input-border: #d5d3ce;
+  --lense-color-elapsed: #9ca3af;
+  --lense-color-verse-border: #c8982c;
+  --lense-color-verse-bg: #fdf8e8;
+  --lense-color-verse-footer: #6b6b6b;
 
   --lense-spacing-xs: 0.25rem;
   --lense-spacing-sm: 0.5rem;
@@ -23,5 +40,4 @@
   --lense-spacing-xl: 2rem;
 
   --lense-radius: 8px;
-  --lense-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
 }

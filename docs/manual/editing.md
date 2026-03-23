@@ -21,12 +21,31 @@ The `log_type` and `id` fields are displayed but not editable in edit mode.
 | Idea | Text (textarea), Status (open/done/parked) |
 | Daily Log | Text (textarea), Theme |
 
+### Deleting a record
+
+1. Click a record to open the detail drawer in edit mode.
+2. Click **Delete** at the bottom-left of the drawer.
+3. A confirmation prompt appears — click **Yes, delete** to confirm, or **Cancel** to go back.
+4. On confirm, the record plays a farewell animation (tilt, shrink, fade) and is removed from the list. The tab count decrements.
+
+The delete button is only visible in edit mode — it does not appear when creating a new record.
+
 ### Closing the drawer
 
 - Click the **Close** button (✕) in the drawer header
-- Click outside the drawer (on the backdrop)
+- Click outside the drawer (on the backdrop). The backdrop fades in when the drawer opens.
 
 Neither action saves changes.
+
+## Celebration animations
+
+The app celebrates your actions with subtle CSS animations:
+
+- **Create** — a burst/pop animation plays on the active tab header when a new record saves.
+- **Edit** — a shimmer animation highlights the updated list item after saving.
+- **Delete** — a farewell animation (tilt, shrink, fade) plays on the departing item before it disappears.
+
+All three animations are cohesive and happen automatically — no action needed.
 
 ## Adding a new record
 

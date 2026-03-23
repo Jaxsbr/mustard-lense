@@ -45,6 +45,13 @@ Each tab renders a compact list view designed for quick scanning:
 - Key identifying fields (person name, status, due date) are shown prominently.
 - Empty tabs display a friendly message instead of a blank panel.
 
+### Interaction feedback
+
+- **Hover states** — hovering over a list item highlights it with a type-appropriate background color (blue tint for Todos, purple for People, orange for Daily Logs, green for Ideas). Works in both light and dark mode.
+- **Click feedback** — clicking a list item triggers a brief scale animation before the detail drawer opens.
+- **Tab crossfade** — switching between tabs fades the new content in smoothly (~180ms) instead of an instant swap.
+- **Drawer backdrop** — the semi-transparent backdrop fades in when the drawer opens.
+
 ## Sort and limit controls
 
 Above the record list, a controls bar provides sorting and limiting options:

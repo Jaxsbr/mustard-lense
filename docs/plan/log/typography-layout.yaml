@@ -43,3 +43,10 @@ entries:
     result: "pass"
     notes: "Review stage: pr_created."
     tokens: ~
+  - task: 7
+    time: "2026-03-23T22:58:00Z"
+    story: "phase"
+    description: "[review] review-pr pr=8 — posted COMMENT review with 0 critical, 1 concern, 0 nits."
+    result: "pass"
+    notes: "Concern: flex+resize interaction on textarea."
+    tokens: ~

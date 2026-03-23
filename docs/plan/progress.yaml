@@ -9,7 +9,7 @@ config:
 state:
   task_number: 8
   phase: living-polish
-  phase_complete: false
+  phase_complete: true
   review_stage: null
   review_complete: false
   retro_complete: false

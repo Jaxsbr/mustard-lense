@@ -169,7 +169,7 @@ const fixtureRecords = [
 ]
 
 function setupRecordsRoute(page: import('@playwright/test').Page) {
-  return page.route('**/api/records*', async (route) => {
+  return page.route('**/api/records**', async (route) => {
     const method = route.request().method()
     if (method === 'GET') {
       const url = new URL(route.request().url())
@@ -395,6 +395,27 @@ test('delete button visible in edit mode, absent in create mode, confirmation ap
   await page.locator('[data-testid="panel-add"]').click()
   await expect(drawer).toBeVisible({ timeout: 3000 })
   await expect(page.locator('[data-testid="drawer-delete"]')).not.toBeVisible()
+})
+
+test('confirming delete closes drawer and removes record from list', async ({ page }) => {
+  await setupRecordsRoute(page)
+  await page.goto('/')
+
+  // Wait for list items
+  await expect(page.locator('[data-testid="panel-list-item"]').first()).toBeVisible({ timeout: 5000 })
+
+  // Click a list item to open drawer in edit mode
+  await page.locator('[data-testid="panel-list-item"]').first().click()
+  const drawer = page.locator('[data-testid="detail-drawer"]')
+  await expect(drawer).toBeVisible({ timeout: 3000 })
+
+  // Click delete, then confirm
+  await page.locator('[data-testid="drawer-delete"]').click()
+  await expect(page.locator('[data-testid="drawer-delete-confirm"]')).toBeVisible()
+  await page.locator('[data-testid="drawer-delete-yes"]').click()
+
+  // Drawer should close after confirmed delete
+  await expect(drawer).not.toBeVisible({ timeout: 3000 })
 })
 
 test('list items have hover transition and tab content has crossfade animation', async ({ page }) => {

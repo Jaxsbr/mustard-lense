@@ -11,7 +11,7 @@
   --lense-color-border: #e5e3de;
   --lense-color-accent: #c8982c;
   --lense-color-accent-light: #f8f0db;
-  --lense-color-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+  --lense-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
 
   --lense-color-type-todo: #4a7fc4;
   --lense-color-type-people: #7b5ea7;
@@ -51,7 +51,7 @@
   --lense-color-border: #3a3a3e;
   --lense-color-accent: #dab04d;
   --lense-color-accent-light: #332d1a;
-  --lense-color-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+  --lense-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
 
   --lense-color-type-todo: #6a9fd4;
   --lense-color-type-people: #9b7ec7;
@@ -84,7 +84,7 @@
     --lense-color-border: #3a3a3e;
     --lense-color-accent: #dab04d;
     --lense-color-accent-light: #332d1a;
-    --lense-color-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+    --lense-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
 
     --lense-color-type-todo: #6a9fd4;
     --lense-color-type-people: #9b7ec7;

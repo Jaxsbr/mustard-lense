@@ -32,7 +32,7 @@ async function start() {
   // In production, serve Vite build static files so the full app runs on a single port
   if (process.env.NODE_ENV !== 'development') {
     app.use(express.static(distDir))
-    app.get('*', (_req, res) => {
+    app.get(/^(?!\/api\/).*/, (_req, res) => {
       res.sendFile(path.join(distDir, 'index.html'))
     })
   }

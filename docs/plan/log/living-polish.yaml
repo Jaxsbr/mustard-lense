@@ -50,3 +50,10 @@ entries:
     result: "pass"
     notes: "US-D5 nearly complete — user guide update remains."
     tokens: ~
+  - task: 8
+    time: "2026-03-23T01:28:00Z"
+    story: "US-D4, US-D5"
+    description: "Update AGENTS.md + user guides. Both stories complete. ✓ US-D4 complete. ✓ US-D5 complete."
+    result: "pass"
+    notes: "All story criteria met. Phase-level criteria remain (AGENTS.md done in this task)."
+    tokens: ~

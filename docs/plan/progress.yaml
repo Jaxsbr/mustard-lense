@@ -16,6 +16,6 @@ state:
   pr_number: null
   status: running
   last_result: pass
-  next_task: null
+  next_task: "[US-D4] Update user guides (editing.md + layout.md) and AGENTS.md for delete, celebrations, and interaction polish"
   consecutive_fails: 0
-  completed_stories: []
+  completed_stories: [US-D4, US-D5]

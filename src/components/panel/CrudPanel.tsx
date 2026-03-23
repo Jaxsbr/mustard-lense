@@ -161,6 +161,22 @@ export function CrudPanel({ collapsed, onToggle }: CrudPanelProps) {
     setSelectedRecord(null)
   }
 
+  async function handleDelete(id: string) {
+    const controller = new AbortController()
+    try {
+      const res = await fetch(`/api/records/${id}`, {
+        method: 'DELETE',
+        signal: controller.signal,
+      })
+      if (!res.ok) return
+      handleDrawerClose()
+      setCountsLoaded(false)
+      fetchRecords(activeTab)
+    } catch {
+      // delete failed — drawer stays open
+    }
+  }
+
   async function handleDrawerSave(data: Partial<MustardRecord> & { log_type: string }) {
     try {
       if (drawerMode === 'edit' && data.id) {
@@ -264,6 +280,7 @@ export function CrudPanel({ collapsed, onToggle }: CrudPanelProps) {
         open={drawerOpen}
         onClose={handleDrawerClose}
         onSave={handleDrawerSave}
+        onDelete={handleDelete}
       />
     </aside>
   )

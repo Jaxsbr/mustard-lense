@@ -9,6 +9,7 @@ interface DetailDrawerProps {
   open: boolean
   onClose: () => void
   onSave: (data: Partial<MustardRecord> & { log_type: string }) => void
+  onDelete?: (id: string) => void
 }
 
 const STATUS_OPTIONS = ['open', 'done', 'parked']
@@ -19,7 +20,7 @@ const LOG_TYPE_OPTIONS = [
   { value: 'daily_log', label: 'Daily Log' },
 ]
 
-export function DetailDrawer({ record, mode, defaultLogType, open, onClose, onSave }: DetailDrawerProps) {
+export function DetailDrawer({ record, mode, defaultLogType, open, onClose, onSave, onDelete }: DetailDrawerProps) {
   function handleBackdropClick(e: React.MouseEvent) {
     if (e.target === e.currentTarget) onClose()
   }
@@ -39,6 +40,7 @@ export function DetailDrawer({ record, mode, defaultLogType, open, onClose, onSa
           defaultLogType={defaultLogType}
           onClose={onClose}
           onSave={onSave}
+          onDelete={onDelete}
         />
       </div>
     </div>
@@ -51,9 +53,10 @@ interface DrawerFormProps {
   defaultLogType?: string
   onClose: () => void
   onSave: (data: Partial<MustardRecord> & { log_type: string }) => void
+  onDelete?: (id: string) => void
 }
 
-function DrawerForm({ record, mode, defaultLogType, onClose, onSave }: DrawerFormProps) {
+function DrawerForm({ record, mode, defaultLogType, onClose, onSave, onDelete }: DrawerFormProps) {
   const initLogType = mode === 'edit' && record ? record.log_type : (defaultLogType ?? 'todo')
   const [logType, setLogType] = useState(initLogType)
   const [text, setText] = useState(mode === 'edit' && record ? record.text : '')
@@ -61,6 +64,7 @@ function DrawerForm({ record, mode, defaultLogType, onClose, onSave }: DrawerFor
   const [dueDate, setDueDate] = useState(mode === 'edit' && record ? (record.due_date_local ?? '') : '')
   const [person, setPerson] = useState(mode === 'edit' && record ? (record.person ?? '') : '')
   const [theme, setTheme] = useState(mode === 'edit' && record ? (record.theme ?? '') : '')
+  const [confirmingDelete, setConfirmingDelete] = useState(false)
   const textRef = useRef<HTMLTextAreaElement>(null)
 
   useEffect(() => {
@@ -187,6 +191,35 @@ function DrawerForm({ record, mode, defaultLogType, onClose, onSave }: DrawerFor
         )}
       </div>
       <div className="drawer-footer">
+        {mode === 'edit' && record && onDelete && (
+          confirmingDelete ? (
+            <div className="drawer-delete-confirm" data-testid="drawer-delete-confirm">
+              <span className="drawer-delete-confirm-text">Delete this record?</span>
+              <button
+                className="drawer-delete-yes"
+                onClick={() => onDelete(record.id)}
+                data-testid="drawer-delete-yes"
+              >
+                Yes, delete
+              </button>
+              <button
+                className="drawer-delete-no"
+                onClick={() => setConfirmingDelete(false)}
+                data-testid="drawer-delete-no"
+              >
+                Cancel
+              </button>
+            </div>
+          ) : (
+            <button
+              className="drawer-delete"
+              onClick={() => setConfirmingDelete(true)}
+              data-testid="drawer-delete"
+            >
+              Delete
+            </button>
+          )
+        )}
         <button
           className="drawer-save"
           onClick={handleSave}

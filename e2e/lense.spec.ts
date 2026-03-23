@@ -300,6 +300,30 @@ test('sort dropdown changes list order and limit caps visible items', async ({ p
   expect(await filteredItems.count()).toBeLessThanOrEqual(10)
 })
 
+test('theme toggle button exists and clicking it changes data-theme attribute', async ({ page }) => {
+  await page.goto('/')
+
+  // Theme toggle button exists with accessible label
+  const toggle = page.locator('button[aria-label*="theme" i]')
+  await expect(toggle).toBeVisible({ timeout: 3000 })
+
+  // Get initial theme state
+  const initialTheme = await page.evaluate(() => document.documentElement.getAttribute('data-theme'))
+
+  // Click toggle
+  await toggle.click()
+
+  // data-theme attribute should change
+  const newTheme = await page.evaluate(() => document.documentElement.getAttribute('data-theme'))
+  expect(newTheme).not.toEqual(initialTheme)
+  expect(['dark', 'light']).toContain(newTheme)
+
+  // Click again to toggle back
+  await toggle.click()
+  const finalTheme = await page.evaluate(() => document.documentElement.getAttribute('data-theme'))
+  expect(finalTheme).not.toEqual(newTheme)
+})
+
 test('clicking Add opens drawer in create mode with active tab type pre-selected', async ({ page }) => {
   await setupRecordsRoute(page)
   await page.goto('/')

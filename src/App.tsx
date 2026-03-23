@@ -1,10 +1,37 @@
-import { useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import type { LenseResponse } from './shared/schema.js'
 import { ResultRenderer } from './components/ResultRenderer.js'
 import { CrudPanel } from './components/panel/CrudPanel.js'
 import './App.css'
 
 type Stage = 'idle' | 'retrieving' | 'thinking'
+
+function ThemeToggle() {
+  const [theme, setTheme] = useState<string>(() => {
+    return document.documentElement.getAttribute('data-theme') ?? 'system'
+  })
+
+  const toggle = useCallback(() => {
+    const current = document.documentElement.getAttribute('data-theme')
+    const next = current === 'dark' ? 'light' : 'dark'
+    document.documentElement.setAttribute('data-theme', next)
+    localStorage.setItem('mustard-theme', next)
+    setTheme(next)
+  }, [])
+
+  const label = theme === 'dark' ? '☀' : '☾'
+
+  return (
+    <button
+      className="theme-toggle"
+      onClick={toggle}
+      aria-label="Toggle theme"
+      title="Toggle theme"
+    >
+      {label}
+    </button>
+  )
+}
 
 interface StageLogEntry {
   label: string
@@ -144,7 +171,10 @@ function App() {
     <div className="app-layout">
       <CrudPanel collapsed={panelCollapsed} onToggle={() => setPanelCollapsed((c) => !c)} />
       <main className="lense-main" data-testid="lense-region">
-        <h1>Mustard</h1>
+        <div className="lense-header">
+          <h1>Mustard</h1>
+          <ThemeToggle />
+        </div>
 
         <form className="lense-form" onSubmit={handleSubmit}>
           <input

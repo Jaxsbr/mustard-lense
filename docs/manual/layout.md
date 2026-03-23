@@ -7,6 +7,15 @@ Mustard uses a split-screen layout with two regions: the CRUD panel on the left 
 - **CRUD panel (left)** — structured browse interface with type tabs for navigating your mustard records. Tabs: Todos, People, Ideas, Daily Logs. Each tab shows a compact list view tailored to that record type.
 - **Lense (right)** — AI-powered intent input. Type a natural language query, and the lense retrieves relevant records, synthesises a response, and renders structured results. Always visible regardless of panel state.
 
+## Theme toggle (dark mode)
+
+A theme toggle button is visible next to the "Mustard" heading. Click it to switch between light and dark mode.
+
+- **Light mode** — warm gold palette with off-white background. The default when no preference is set and the OS is in light mode.
+- **Dark mode** — dark backgrounds with adjusted accent and type colors for comfortable use at any time of day.
+- **System preference** — if you haven't explicitly toggled the theme, the app follows your operating system's light/dark setting automatically.
+- **Persistence** — your theme choice is saved in localStorage (key: `mustard-theme`). On page load, the saved theme is applied immediately — no flash of the wrong theme.
+
 ## Panel toggle
 
 Click the toggle button in the panel header to collapse or expand the CRUD panel.

@@ -40,12 +40,12 @@ Port the original mustard app's warm visual identity into the React app and add 
 - [x] List items in the CRUD panel have a visible type-colored left indicator — a left border, accent stripe, or equivalent element using the type-specific color token (verifiable by inspecting `.list-item` computed styles or a CSS class per type in `ListItems.css`) [US-D3]
 - [x] Type-specific colors render correctly in dark mode — `[data-theme="dark"]` values for `--lense-color-type-*` tokens are applied (verifiable by setting `data-theme="dark"` and checking computed styles) [US-D3]
 - [x] Playwright E2E test verifies: active Todos tab has a border color matching `--lense-color-type-todo`, switching to People tab changes border color to match `--lense-color-type-people` [US-D3]
-- [ ] Express server (`src/server/index.ts` or `src/server/app.ts`) serves Vite production build static files from `dist/` when not in dev mode, so the full app (API + frontend) runs on a single port [phase] (enables port 7777 replacement of legacy mustard)
-- [ ] `ARCHITECTURE.md` production port entry updated from 5678 to 7777 [phase]
-- [ ] `package.json` defines a `start` script (or equivalent) that builds and starts the production server [phase]
-- [ ] `AGENTS.md` reflects: new design tokens (`--lense-color-type-*`, `--lense-color-success-*`, `--lense-color-error-*`), dark mode CSS architecture (`[data-theme]` + `prefers-color-scheme`), theme toggle UI element, production port 7777, and dark mode behavior [phase]
-- [ ] `npm test` exits 0 with all existing unit tests passing [phase]
-- [ ] `npm run test:e2e` exits 0 with all E2E tests passing (existing + new dark mode and type color tests) [phase]
+- [x] Express server (`src/server/index.ts` or `src/server/app.ts`) serves Vite production build static files from `dist/` when not in dev mode, so the full app (API + frontend) runs on a single port [phase] (enables port 7777 replacement of legacy mustard)
+- [x] `ARCHITECTURE.md` production port entry updated from 5678 to 7777 [phase]
+- [x] `package.json` defines a `start` script (or equivalent) that builds and starts the production server [phase]
+- [x] `AGENTS.md` reflects: new design tokens (`--lense-color-type-*`, `--lense-color-success-*`, `--lense-color-error-*`), dark mode CSS architecture (`[data-theme]` + `prefers-color-scheme`), theme toggle UI element, production port 7777, and dark mode behavior [phase]
+- [x] `npm test` exits 0 with all existing unit tests passing [phase]
+- [x] `npm run test:e2e` exits 0 with all E2E tests passing (existing + new dark mode and type color tests) [phase]
 
 ### Golden principles (phase-relevant)
 - **People first** — warm gold creates emotional familiarity ("this is MY tool"); dark mode respects comfort at any time of day; type-specific colors provide instant recognition

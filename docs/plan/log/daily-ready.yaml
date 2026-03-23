@@ -36,3 +36,10 @@ entries:
     result: "pass"
     notes: "✓ US-D3 complete"
     tokens: ~
+  - task: 7
+    time: "2026-03-23T00:10:00Z"
+    story: "phase"
+    description: "Production static serving from dist/ + start script + AGENTS.md update. Phase completion gate passed — 73 unit tests, 11 E2E tests, all done-when criteria verified."
+    result: "pass"
+    notes: "Phase complete. 3 stories shipped."
+    tokens: ~

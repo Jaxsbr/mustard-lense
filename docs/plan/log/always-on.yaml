@@ -15,4 +15,11 @@ entries:
     result: "pass"
     notes: "9/16 criteria met. Docs criteria remain."
     tokens: ~
+  - task: 3
+    time: "2026-03-24T10:19:00Z"
+    story: "US-D6"
+    description: "Investigation: ARCHITECTURE.md has placeholder 'planned for always-on phase' section. Need to expand with setup, teardown, rationale."
+    result: "pass"
+    notes: "Queued ARCHITECTURE.md docs task."
+    tokens: ~
 # Each entry: {task, time, story, description, result, notes, tokens}

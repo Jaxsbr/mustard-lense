@@ -16,6 +16,6 @@ state:
   pr_number: null
   status: running
   last_result: pass
-  next_task: null
+  next_task: "[US-D6] Add always-on deployment section to ARCHITECTURE.md — setup (copy plist, customize, launchctl load), teardown (launchctl unload), LaunchAgent vs LaunchDaemon rationale"
   consecutive_fails: 0
   completed_stories: []

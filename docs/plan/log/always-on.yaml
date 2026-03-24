@@ -64,4 +64,11 @@ entries:
     result: "pass"
     notes: "No issues found."
     tokens: ~
+  - task: 10
+    time: "2026-03-24T10:25:00Z"
+    story: "phase"
+    description: "[review] handle-pr-review pr=10 — no review threads to handle. Posted summary. Review complete."
+    result: "pass"
+    notes: "Review complete. Summary posted to PR."
+    tokens: ~
 # Each entry: {task, time, story, description, result, notes, tokens}

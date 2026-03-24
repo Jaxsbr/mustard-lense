@@ -120,12 +120,6 @@ function StyledEditor({ value, onChange, autoFocus }: StyledEditorProps) {
     }
   }, [editor, value])
 
-  // Cleanup
-  useEffect(() => {
-    return () => {
-      editor?.destroy()
-    }
-  }, [editor])
 
   if (!editor) return null
 

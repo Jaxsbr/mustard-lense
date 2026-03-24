@@ -236,7 +236,7 @@ The design token system in `tokens.css` uses CSS custom properties (`--lense-*`)
 
 Theme persistence: `localStorage` key `mustard-theme`. An inline `<script>` in `index.html` applies the stored theme before React hydrates, preventing flash-of-wrong-theme.
 
-### Production static serving (planned for daily-ready phase)
+### Production static serving
 
 In production, the Express server serves Vite's `dist/` static files alongside the API endpoints, so the full app runs on a single port (7777). This replaces the legacy mustard Flask app on the same port.
 
@@ -254,7 +254,39 @@ Dual-mode Markdown editing in the detail drawer's `text` field. `DetailDrawer.ts
 
 **Toolbar:** 9 actions (bold, italic, strikethrough, link, bullet list, ordered list, blockquote, inline code, code block). No underline (non-standard CommonMark). All controls have accessible `aria-label` attributes.
 
-### Future (beyond markdown-editor)
+### Always-on deployment
+
+macOS LaunchAgent configuration that keeps mustard-lense running at `localhost:7777` across reboots and crashes. The plist template at `deploy/com.mustard.lense.plist` configures `RunAtLoad` + `KeepAlive` so the server starts on login and restarts if it exits.
+
+**Why LaunchAgent (not LaunchDaemon):** LaunchDaemons run as root outside any user session. The mustard-lense server needs user-session access to `MUSTARD_DATA_DIR` (in the user's home directory) and the `claude` CLI (user-level authentication). LaunchAgent runs in the user's login session, providing the correct environment without requiring elevated privileges.
+
+**Setup:**
+
+1. Copy the template to the LaunchAgents directory:
+   ```bash
+   cp deploy/com.mustard.lense.plist ~/Library/LaunchAgents/com.mustard.lense.plist
+   ```
+2. Edit `~/Library/LaunchAgents/com.mustard.lense.plist` — replace `/Users/YOURUSERNAME/dev/mustard-lense` in `WorkingDirectory` with your actual project path.
+3. Load the agent:
+   ```bash
+   launchctl load ~/Library/LaunchAgents/com.mustard.lense.plist
+   ```
+4. Verify it's running: open `http://localhost:7777` in a browser, or check logs at `/tmp/com.mustard.lense.out.log` and `/tmp/com.mustard.lense.err.log`.
+
+**Teardown:**
+
+1. Unload the agent:
+   ```bash
+   launchctl unload ~/Library/LaunchAgents/com.mustard.lense.plist
+   ```
+2. Optionally remove the plist:
+   ```bash
+   rm ~/Library/LaunchAgents/com.mustard.lense.plist
+   ```
+
+**PATH resolution:** The plist uses `/bin/zsh -l -c "..."` (login shell) so that `node` and `npm` are findable via the user's shell profile (`~/.zprofile`, `~/.zshrc`). This avoids hardcoding a `PATH` value that varies across machines and Node version managers (nvm, fnm, Homebrew).
+
+### Future (beyond always-on)
 
 Metadata-filtered retrieval, data repo separation (`mustard-data`), old mustard archival, and mustard-capture skill deletion are planned for subsequent phases.
 
@@ -263,7 +295,7 @@ Metadata-filtered retrieval, data repo separation (`mustard-data`), old mustard 
 | Environment | Port | Mechanism |
 |-------------|------|-----------|
 | Development | 5234 | Vite dev server (`npm run dev`) |
-| Production | 7777 | Express server serving `dist/` static files + API (planned for daily-ready phase, replacing legacy mustard on same port) |
+| Production | 7777 | Express server serving `dist/` static files + API on single port, replacing legacy mustard. Always-on via macOS LaunchAgent (`deploy/com.mustard.lense.plist`). |
 
 ## Dependencies on external systems
 

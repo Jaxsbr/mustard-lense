@@ -716,6 +716,28 @@ As a user, I want a compact toolbar for common Markdown formatting actions, so I
 
 **Design rationale:** CommonMark does not define underline syntax; including it would require non-standard storage (HTML tags or custom extension) that complicates plain-text round-tripping. Omitting it keeps the toolbar honest and the storage clean.
 
+### Always-On
+
+### US-D6 — Always-on LaunchAgent deployment
+
+As Jaco, I want a macOS LaunchAgent plist template in the repo that keeps mustard-lense running at `localhost:7777` with RunAtLoad and KeepAlive, so that the app is always available without manual intervention — replacing the legacy mustard Flask app and preserving my muscle memory and bookmarks.
+
+**Acceptance criteria:**
+- A valid plist template exists at `deploy/com.mustard.lense.plist` with RunAtLoad and KeepAlive enabled
+- The plist's ProgramArguments start the production server (the existing `npm run start` flow)
+- The plist includes WorkingDirectory, log output paths (StandardOutPath/StandardErrorPath), and EnvironmentVariables (PORT defaulting to 7777)
+- The plist uses LaunchAgent placement (~/Library/LaunchAgents/) — not LaunchDaemon — so the process runs in user session with access to MUSTARD_DATA_DIR and the claude CLI
+- The plist accounts for PATH resolution (node/npm are not in LaunchAgent's default minimal PATH)
+- ARCHITECTURE.md documents setup (copy plist, customize paths, `launchctl load`) and teardown (`launchctl unload`, remove plist)
+- ARCHITECTURE.md explains why LaunchAgent (not LaunchDaemon) is required
+
+**User guidance:**
+- Discovery: `deploy/` directory in the repo root; ARCHITECTURE.md "Always-On Deployment" section
+- Manual section: ARCHITECTURE.md (new section) — no separate manual page
+- Key steps: 1. Copy `deploy/com.mustard.lense.plist` to `~/Library/LaunchAgents/`. 2. Edit the plist to set your actual project path and node/npm location. 3. Run `launchctl load ~/Library/LaunchAgents/com.mustard.lense.plist` to start.
+
+**Design rationale:** LaunchAgent (not LaunchDaemon) because the server needs user-session access to MUSTARD_DATA_DIR (in the user's home directory) and the claude CLI (user-level auth). A checked-in template (not an auto-install script) keeps the deployment explicit, auditable, and safe — the user controls when and how it activates.
+
 ---
 
 ## Implementation phases
@@ -730,7 +752,8 @@ As a user, I want a compact toolbar for common Markdown formatting actions, so I
 | 6 | Daily-Ready Visual Identity | US-D1, US-D2, US-D3 | Shipped |
 | 7 | Living Polish | US-D4, US-D5 | Shipped |
 | 8 | Typography & Layout | US-R1, US-R2 | Shipped |
-| 9 | Markdown Editor | US-R3, US-R4, US-R5 | Planned |
+| 9 | Markdown Editor | US-R3, US-R4, US-R5 | Shipped |
+| 10 | Always-On | US-D6 | Shipped |
 
 ### Phase 1 — Foundation
 
@@ -1217,60 +1240,45 @@ Improve legibility of the CRUD panel and detail drawer through a larger, token-b
 
 ### Phase 9 — Markdown Editor
 
-Add Markdown authoring for the shared record `text` field in the detail drawer: a mode control switching between raw Markdown source and a styled, editable rich view (Notion-like), a compact formatting toolbar, and localStorage persistence of the preferred mode. Storage remains plain text — no API or schema changes. Applies to all four record types.
+See [phases/markdown-rich-text.md](phases/markdown-rich-text.md) — **Shipped** (US-R3, US-R4, US-R5).
+
+### Phase 10 — Always-On
+
+Make mustard-lense always available at `localhost:7777` without manual intervention by adding a macOS LaunchAgent plist template and deployment documentation. The production build and start script already exist (shipped in Phase 6); this phase adds the LaunchAgent configuration that keeps the server running across reboots and crashes, and documents setup/teardown in ARCHITECTURE.md.
 
 **Done-when (observable):**
 
-**US-R3 — Raw vs styled Markdown mode toggle:**
-
-- [ ] `DetailDrawer.tsx` (or a child component it imports) renders a visible mode control element for the main `text` field when the drawer is open in edit mode [US-R3]
-- [ ] The mode control is present in create mode for all four `log_type` values: `todo`, `people_note`, `idea`, `daily_log` [US-R3]
-- [ ] User can switch between raw mode (plain textarea) and styled mode (editable rich view); automated test (Vitest or Playwright) asserts both modes are reachable from the UI [US-R3]
-- [ ] Default text editing mode is read from `localStorage` key `mustard-text-mode` on drawer open; changing mode writes the same key [US-R3]
-- [ ] Switching modes does not clear `text` in component state — automated test: set text, switch modes twice, assert same string value [US-R3]
-- [ ] Save sends only existing fields to `POST /api/records` and `PUT /api/records/:id` with `text` as a plain string — no new JSON keys added to the request body (verifiable by server.test.ts existing create/update tests still passing) [US-R3]
-
-**US-R4 — Styled editable rich text surface:**
-
-- [ ] In styled mode, the text area is interactive: typing produces content in the editor (not a read-only preview) — automated test verifies typing produces a state change [US-R4]
-- [ ] Styled-mode content serializes to a plain Markdown string stored in `text`; Vitest test covers at least one formatting case (e.g. `**bold**` or `- list item`) round-tripping through serialize → deserialize [US-R4]
-- [ ] `rg 'dangerouslySetInnerHTML' src/components/panel/` returns zero matches, OR any matches use a sanitization library (e.g. DOMPurify) — not raw user-controlled strings [US-R4]
-- [ ] Rapid open/close of the drawer in styled mode does not throw — Playwright or Vitest test exercises: open drawer → styled mode → close → reopen [US-R4]
-- [ ] Editor component cleans up on unmount — useEffect return (or equivalent) disposes the editor instance; no orphan event listeners (verifiable by source inspection of cleanup in the editor wrapper component) [US-R4]
-
-**US-R5 — Compact formatting toolbar:**
-
-- [ ] A toolbar element is visible in the DOM when styled mode is active [US-R5]
-- [ ] Toolbar is hidden or absent from the DOM when raw mode is active [US-R5]
-- [ ] Toolbar contains controls with accessible names (`aria-label` or `title` attribute) for each of: bold, italic, strikethrough, link, bullet list, ordered list, blockquote, inline code, code block — automated test asserts presence of 9 labeled controls [US-R5]
-- [ ] No toolbar button for underline exists in the DOM — `rg -i 'underline' src/components/panel/` returns zero matches in toolbar component source (or matches are limited to CSS text-decoration, not a toolbar action) [US-R5]
-- [ ] At least one toolbar action (e.g. bold) updates the serialized `text` state — Vitest test asserts Markdown marker (e.g. `**`) present in serialized output after invoking bold [US-R5]
-- [ ] Toolbar styling uses `var(--lense-*)` design tokens from `tokens.css` — no hardcoded color hex values in the toolbar component's CSS (verifiable by `rg '#[0-9a-fA-F]{3,8}' <toolbar-css-file>` returning zero matches) [US-R5]
+**Plist template:**
+- [ ] `deploy/com.mustard.lense.plist` exists and passes `plutil -lint deploy/com.mustard.lense.plist` (valid XML plist) [US-D6]
+- [ ] Plist `Label` key value is `com.mustard.lense` (verifiable by `grep` or `plutil -extract Label raw`) [US-D6]
+- [ ] Plist `RunAtLoad` key is `true` [US-D6]
+- [ ] Plist `KeepAlive` key is `true` [US-D6]
+- [ ] Plist `ProgramArguments` array contains a command that runs the production server — either `npm run start` via a shell, or a direct `node` invocation equivalent to the `start` script [US-D6]
+- [ ] Plist contains a `WorkingDirectory` key with a template path (e.g. `/Users/<you>/dev/mustard-lense`) that the user customizes [US-D6]
+- [ ] Plist contains `StandardOutPath` and `StandardErrorPath` keys pointing to log file locations [US-D6]
+- [ ] Plist `EnvironmentVariables` dict includes `PORT` with value `7777` [US-D6]
+- [ ] Plist handles PATH resolution so `node`/`npm` are findable — either `EnvironmentVariables` includes a `PATH` key with a documented template value, or `ProgramArguments` uses a login shell (e.g. `/bin/zsh -l -c "..."`) that inherits user PATH [US-D6]
 
 **Documentation:**
-
-- [ ] `docs/manual/editing.md` includes a "Markdown editing" subsection documenting: mode control location and appearance, raw vs styled mode behavior, mode persistence via localStorage [US-R3] [US-R4]
-- [ ] `docs/manual/editing.md` includes a "Formatting toolbar" subsection listing all 9 available actions and noting that underline is unsupported (CommonMark limitation) [US-R5]
+- [ ] `docs/architecture/ARCHITECTURE.md` contains an always-on deployment section documenting LaunchAgent setup: copy plist to `~/Library/LaunchAgents/`, customize paths, run `launchctl load ~/Library/LaunchAgents/com.mustard.lense.plist` [US-D6]
+- [ ] `docs/architecture/ARCHITECTURE.md` documents LaunchAgent teardown: `launchctl unload ~/Library/LaunchAgents/com.mustard.lense.plist` and plist removal [US-D6]
+- [ ] `docs/architecture/ARCHITECTURE.md` explains that LaunchAgent (not LaunchDaemon) is required for user-session access to `MUSTARD_DATA_DIR` and the `claude` CLI [US-D6]
 
 **Structural:**
-
-- [ ] `docs/architecture/ARCHITECTURE.md` documents the new editor module path(s) and their relationship to `DetailDrawer.tsx` [phase]
-- [ ] `AGENTS.md` directory layout and file ownership table list the new editor module(s), toolbar component, and any new CSS files introduced in this phase [phase]
-
-**Auto-added safety criteria:**
-
-- [ ] `POST /api/records` and `PUT /api/records/:id` still return 400 when `text` exceeds server max length (existing `validateText` behavior); `server.test.ts` existing over-length rejection test still passes after editor integration [phase]
+- [ ] `AGENTS.md` directory layout includes `deploy/` directory with `com.mustard.lense.plist` [phase]
+- [ ] `AGENTS.md` file ownership table includes an entry for `deploy/com.mustard.lense.plist` [phase]
+- [ ] `npm run build` exits 0 (production build still works) [phase]
+- [ ] `npm test` exits 0 with all existing unit tests passing [phase]
 
 **AGENTS.md sections affected:**
-- File ownership map (new editor module(s), toolbar component, editor CSS)
-- Directory layout (new files under `src/components/panel/`)
-- Detail drawer behavior (dual-mode editing, toolbar)
+- Directory layout (new `deploy/` directory)
+- File ownership map (new `deploy/com.mustard.lense.plist` entry)
+- Hosting table (LaunchAgent deployment context)
 
 **User documentation:**
-- Updated `docs/manual/editing.md` with "Markdown editing" and "Formatting toolbar" subsections
+- ARCHITECTURE.md new "Always-On Deployment" section (setup, teardown, rationale). No separate manual page — this is ops documentation, not user-facing feature docs.
 
 **Golden principles (phase-relevant):**
-- **Clarity over complexity** — one editor integration path; styled mode is the single rich surface (no parallel preview + edit panes)
-- **People first** — mode toggle respects both Markdown-native and WYSIWYG preferences; persistence means the app remembers your choice
-- **Faithful stewardship** — no unsafe HTML rendering; existing server validation unchanged; editor library is free/open-source with zero API calls
-- **Continuous improvement** — editor module is isolated behind a component boundary for future Markdown extensions (e.g. tables, task lists)
+- **Faithful stewardship** — the plist template is a deployment artifact that directly affects availability; get the LaunchAgent configuration right (Label, KeepAlive, PATH resolution)
+- **Safety and ethics** — LaunchAgent (not LaunchDaemon) respects least privilege; no system-level access needed, user controls installation explicitly
+- **Clarity over complexity** — a checked-in template with clear docs, not an auto-install script; the user stays in control of when and how the service activates

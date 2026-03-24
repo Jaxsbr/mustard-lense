@@ -1,0 +1,4 @@
+phase: "always-on"
+started: "2026-03-24T10:14:00Z"
+entries: []
+# Each entry: {task, time, story, description, result, notes, tokens}

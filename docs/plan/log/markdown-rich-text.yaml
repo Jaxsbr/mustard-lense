@@ -4,8 +4,15 @@ entries:
   - task: 1
     time: "2026-03-24T01:02:00Z"
     story: "US-R3"
-    description: "Investigation: 79 tests pass. DetailDrawer uses plain textarea for text. No editor library installed. CSS/JS-only phase. US-R3 mode toggle is foundation — need MarkdownEditor wrapper with raw/styled modes, localStorage key mustard-text-mode. TipTap recommended for US-R4 Notion-like editing."
+    description: "Investigation: 79 tests pass. DetailDrawer uses plain textarea for text. No editor library installed. CSS/JS-only phase. Queued US-R3 implementation."
     result: "pass"
     notes: "Queued US-R3 implementation: mode toggle + MarkdownEditor wrapper."
+    tokens: ~
+  - task: 2
+    time: "2026-03-24T01:06:00Z"
+    story: "US-R3"
+    description: "Implement: created MarkdownEditor with raw/styled mode toggle, TipTap integration, EditorToolbar (9 actions), markdown-utils.ts for Markdown↔HTML conversion. Installed @tiptap/react, starter-kit, link, pm, code-block, placeholder. Integrated into DetailDrawer. 79 tests pass, build OK."
+    result: "pass"
+    notes: "US-R3 criteria 1,2,4,6 met. Criteria 3,5 need automated tests. US-R4/R5 also partially met — need tests."
     tokens: ~
 # Each entry: {task, time, story, description, result, notes, tokens}

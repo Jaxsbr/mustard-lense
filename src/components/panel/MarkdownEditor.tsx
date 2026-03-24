@@ -1,7 +1,6 @@
 import { useCallback, useEffect, useState } from 'react'
 import { useEditor, EditorContent } from '@tiptap/react'
 import StarterKit from '@tiptap/starter-kit'
-import Link from '@tiptap/extension-link'
 import { markdownToHtml, htmlToMarkdown } from './markdown-utils.js'
 import './MarkdownEditor.css'
 
@@ -92,10 +91,10 @@ function StyledEditor({ value, onChange, autoFocus }: StyledEditorProps) {
         codeBlock: {
           HTMLAttributes: { class: 'markdown-editor__code-block' },
         },
-      }),
-      Link.configure({
-        openOnClick: false,
-        HTMLAttributes: { class: 'markdown-editor__link' },
+        link: {
+          openOnClick: false,
+          HTMLAttributes: { class: 'markdown-editor__link' },
+        },
       }),
     ],
     content: markdownToHtml(value),

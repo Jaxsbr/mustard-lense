@@ -3,7 +3,7 @@ import * as path from 'node:path'
 import { parse as parseYaml } from 'yaml'
 import type { MustardRecord } from '../../shared/record.js'
 
-const DEFAULT_DATA_PATH = '~/dev/mustard/data'
+const DEFAULT_DATA_PATH = '~/dev/mustard-data'
 
 export function getDataDir(): string {
   return resolveHome(process.env.MUSTARD_DATA_DIR ?? DEFAULT_DATA_PATH)

@@ -133,7 +133,7 @@ describe('invokeClaude', () => {
       mode: 'basic',
       prompt: 'test',
       allowedTools: ['Read', 'Glob'],
-      addDirs: ['~/dev/mustard/data'],
+      addDirs: ['~/dev/mustard-data'],
     })
 
     proc.stdout.emit('data', Buffer.from('{}'))
@@ -143,7 +143,7 @@ describe('invokeClaude', () => {
 
     expect(mockSpawn).toHaveBeenCalledWith('claude', [
       '--allowedTools', 'Read', 'Glob',
-      '--add-dir', '~/dev/mustard/data',
+      '--add-dir', '~/dev/mustard-data',
       '-p', 'test',
     ])
   })

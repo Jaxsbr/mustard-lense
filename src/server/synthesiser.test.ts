@@ -41,7 +41,7 @@ describe('buildSynthesisPrompt', () => {
 
   it('does not reference data store path or file-reading instructions', () => {
     const prompt = buildSynthesisPrompt('test', sampleRecords)
-    expect(prompt).not.toContain('~/dev/mustard/data')
+    expect(prompt).not.toContain('~/dev/mustard-data')
     expect(prompt).not.toContain('Read the relevant YAML')
     expect(prompt).not.toContain('allowedTools')
     expect(prompt).not.toContain('addDirs')

@@ -1,6 +1,6 @@
 // On-demand smoke test — lense E2E (SSE stream)
 // Requires: API server running on port 3001 (npm run dev:server)
-// Requires: real claude CLI and mustard data store at ~/dev/mustard/data/
+// Requires: real claude CLI and mustard data store at ~/dev/mustard-data/
 
 const API_URL = 'http://localhost:3001/api/lense'
 const INTENT = "what's going on this week"

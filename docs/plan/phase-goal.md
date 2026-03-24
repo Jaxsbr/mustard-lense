@@ -40,17 +40,17 @@ Add Markdown authoring for the shared record `text` field in the detail drawer: 
 
 **Documentation:**
 
-- [ ] `docs/manual/editing.md` includes a "Markdown editing" subsection documenting: mode control location and appearance, raw vs styled mode behavior, mode persistence via localStorage [US-R3] [US-R4]
-- [ ] `docs/manual/editing.md` includes a "Formatting toolbar" subsection listing all 9 available actions and noting that underline is unsupported (CommonMark limitation) [US-R5]
+- [x] `docs/manual/editing.md` includes a "Markdown editing" subsection documenting: mode control location and appearance, raw vs styled mode behavior, mode persistence via localStorage [US-R3] [US-R4]
+- [x] `docs/manual/editing.md` includes a "Formatting toolbar" subsection listing all 9 available actions and noting that underline is unsupported (CommonMark limitation) [US-R5]
 
 **Structural:**
 
-- [ ] `docs/architecture/ARCHITECTURE.md` documents the new editor module path(s) and their relationship to `DetailDrawer.tsx` [phase]
-- [ ] `AGENTS.md` directory layout and file ownership table list the new editor module(s), toolbar component, and any new CSS files introduced in this phase [phase]
+- [x] `docs/architecture/ARCHITECTURE.md` documents the new editor module path(s) and their relationship to `DetailDrawer.tsx` [phase]
+- [x] `AGENTS.md` directory layout and file ownership table list the new editor module(s), toolbar component, and any new CSS files introduced in this phase [phase]
 
 **Auto-added safety criteria:**
 
-- [ ] `POST /api/records` and `PUT /api/records/:id` still return 400 when `text` exceeds server max length (existing `validateText` behavior); `server.test.ts` existing over-length rejection test still passes after editor integration [phase]
+- [x] `POST /api/records` and `PUT /api/records/:id` still return 400 when `text` exceeds server max length (existing `validateText` behavior); `server.test.ts` existing over-length rejection test still passes after editor integration [phase]
 
 ### Golden principles (phase-relevant)
 - **Clarity over complexity** — one editor integration path; styled mode is the single rich surface (no parallel preview + edit panes)

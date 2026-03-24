@@ -4,29 +4,43 @@ entries:
   - task: 1
     time: "2026-03-24T01:02:00Z"
     story: "US-R3"
-    description: "Investigation: 79 tests pass. DetailDrawer uses plain textarea for text. No editor library installed. CSS/JS-only phase. Queued US-R3 implementation."
+    description: "Investigation: 79 tests pass. DetailDrawer uses plain textarea. No editor library installed. CSS/JS-only phase. Queued US-R3 implementation."
     result: "pass"
-    notes: "Queued US-R3 implementation: mode toggle + MarkdownEditor wrapper."
+    notes: "Queued US-R3 implementation."
     tokens: ~
   - task: 2
     time: "2026-03-24T01:06:00Z"
     story: "US-R3"
-    description: "Implement: created MarkdownEditor with raw/styled mode toggle, TipTap integration, EditorToolbar (9 actions), markdown-utils.ts for Markdown↔HTML conversion. Installed @tiptap/react, starter-kit, pm. Integrated into DetailDrawer. 79 tests pass, build OK."
+    description: "Implement: MarkdownEditor with raw/styled mode toggle, TipTap, EditorToolbar (9 actions), markdown-utils.ts. Integrated into DetailDrawer. 79 tests pass."
     result: "pass"
-    notes: "US-R3 criteria 1,2,4,6 met. Criteria 3,5 need automated tests."
+    notes: "US-R3 criteria 1,2,4,6 met."
     tokens: ~
   - task: 3
     time: "2026-03-24T01:08:00Z"
     story: "US-R3"
-    description: "Tests: 13 new tests — mode toggle rendering, localStorage persistence, mode switching preserves text, toolbar with 9 controls, no underline, markdown round-trip. 92 tests pass. ✓ US-R3 complete."
+    description: "Tests: 13 new tests — mode toggle, localStorage, toolbar 9 controls, markdown round-trip. 92 tests pass. ✓ US-R3 complete."
     result: "pass"
-    notes: "All US-R3 criteria met. Story milestone committed."
+    notes: "Story milestone committed."
     tokens: ~
   - task: 4
     time: "2026-03-24T01:10:00Z"
     story: "US-R4"
-    description: "Tests + fix: added 4 US-R4 tests (styled interactivity, rapid mount/unmount, cleanup) + 1 US-R5 test (bold toolbar action → ** markers). Fixed duplicate Link extension (StarterKit includes it). 96 tests pass. ✓ US-R4 complete. ✓ US-R5 complete."
+    description: "Tests + fix: 4 US-R4 tests + 1 US-R5 test. Fixed duplicate Link extension. 96 tests pass. ✓ US-R4 complete. ✓ US-R5 complete."
     result: "pass"
-    notes: "All US-R4 and US-R5 story criteria met. Phase-level criteria remain (docs, AGENTS.md, architecture)."
+    notes: "Story milestones committed."
+    tokens: ~
+  - task: 5
+    time: "2026-03-24T01:12:00Z"
+    story: "phase"
+    description: "Documentation: updated docs/manual/editing.md (Markdown editing + Formatting toolbar subsections), ARCHITECTURE.md (editor module shipped), AGENTS.md (directory layout, file ownership, test count). 96 tests pass."
+    result: "pass"
+    notes: "All phase-level criteria met."
+    tokens: ~
+  - task: 6
+    time: "2026-03-24T01:13:00Z"
+    story: "phase"
+    description: "Phase completion gate passed. All 23 done-when criteria verified. 96 tests, typecheck, lint, build all pass. AGENTS.md consistent with actual project structure."
+    result: "pass"
+    notes: "Phase complete. 3 stories shipped (US-R3, US-R4, US-R5)."
     tokens: ~
 # Each entry: {task, time, story, description, result, notes, tokens}

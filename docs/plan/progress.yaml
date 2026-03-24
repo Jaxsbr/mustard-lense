@@ -7,15 +7,15 @@ config:
   quality_check_suppressions: []
 
 state:
-  task_number: 9
-  phase: typography-layout
-  phase_complete: true
-  review_stage: review_posted
-  review_complete: true
-  retro_complete: true
-  pr_number: 8
-  status: idle
-  last_result: pass
+  task_number: 1
+  phase: markdown-rich-text
+  phase_complete: false
+  review_stage: null
+  review_complete: false
+  retro_complete: false
+  pr_number: null
+  status: running
+  last_result: null
   next_task: null
   consecutive_fails: 0
-  completed_stories: [US-R1, US-R2]
+  completed_stories: []

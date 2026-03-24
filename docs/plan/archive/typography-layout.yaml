@@ -1,5 +1,11 @@
 phase: "typography-layout"
 started: "2026-03-23T22:49:21Z"
+reconciliation_status:
+  r1: done
+  r2: done
+  r3: done
+  r4: done
+  r5: done
 entries:
   - task: 1
     time: "2026-03-23T22:51:00Z"

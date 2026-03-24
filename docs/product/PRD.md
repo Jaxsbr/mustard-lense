@@ -615,6 +615,109 @@ As Jaco, I want hover states with type-appropriate colors, click feedback before
 
 ---
 
+### Readability — Typography & Layout
+
+### US-R1 — Legible typography for browse and edit surfaces
+
+As Jaco, I want larger, token-driven type in the CRUD panel and detail drawer so list rows, tabs, controls, and form labels are comfortable to read without leaning in.
+
+**Acceptance criteria**:
+- `tokens.css` `:root` increases the core reading scale: `--lense-font-size-base` is strictly greater than `1rem`, and `--lense-font-size-sm` is strictly greater than `0.85rem` (both values remain expressed as CSS length tokens, not hardcoded per-component `px` for body copy).
+- Primary list row text, tab labels, list control labels, and drawer field labels use the updated scale via `var(--lense-font-size-*)` (no regression to smaller ad-hoc `rem` for those elements).
+- `docs/design.md` typography section is updated to describe the new scale and reference the token names.
+- `npm run build` and `npm run typecheck` exit 0.
+
+**User guidance:**
+- Discovery: Open the app — text in the left panel and in the detail drawer is visibly larger than before.
+- Manual section: existing pages `docs/manual/layout.md` and `docs/manual/editing.md` (legibility note).
+- Key steps: 1. Scan the CRUD tabs and list — body text should read at a comfortable size. 2. Open a record — labels and inputs match the improved scale. 3. Toggle dark mode — sizing still comes from tokens.
+
+**Design rationale:** Centralizing changes in `tokens.css` keeps light/dark parity and avoids one-off font sizes that drift from `docs/design.md`.
+
+---
+
+### US-R2 — Wider detail drawer and full-height text area
+
+As Jaco, I want the detail drawer to use more horizontal space and the main text field to fill the vertical space between the form header and the footer so long notes and logs are edited in a spacious, full-height area without relying on a tiny default box.
+
+**Acceptance criteria**:
+- The slide-over drawer is meaningfully wider than the current `400px` fixed width on desktop (e.g. `min(560px, 90vw)` or equivalent documented rule) while remaining usable on narrow viewports.
+- The drawer body uses a column flex layout so the scrollable/flexible region allocates remaining height between the fixed header and footer (`min-height: 0` where required for correct flex overflow).
+- The main `text` `<textarea>` is no longer height-limited primarily by `rows={5}`; it expands to fill the flexible text region (wrapper + CSS `flex`/`min-height` as needed).
+- Playwright E2E test with mocked `GET /api/records`: open the detail drawer, assert the text field element's bounding box height is greater than 200px at a fixed viewport (e.g. 900×800).
+
+**User guidance:**
+- Discovery: Click any record — the drawer is wider; the text area fills the drawer vertically above Save.
+- Manual section: `docs/manual/editing.md` (drawer dimensions and text area behavior).
+- Key steps: 1. Open a record with long text. 2. Observe the text area using most of the drawer height. 3. Resize the viewport — drawer remains usable without clipping the primary text region unexpectedly.
+
+**Design rationale:** Horizontal room and vertical fill address scanning and editing ergonomics before any Markdown layer; flex layout avoids magic `rows` as the main height driver.
+
+---
+
+### Markdown Editor
+
+### US-R3 — Raw vs styled Markdown mode toggle
+
+As a user, I want to switch between editing raw Markdown and a styled editable view for the main record text, so that I can choose direct source editing or a richer surface without losing my work.
+
+**Acceptance criteria**:
+- A visible mode control exists in the detail drawer for the main `text` field in both create and edit modes for all four record types.
+- User can switch between raw Markdown editing (plain textarea) and styled editable rich view.
+- The selected mode persists via `localStorage` key `mustard-text-mode`.
+- Switching modes preserves unsaved text in component state.
+- Save sends the same `text` string to `POST /api/records` and `PUT /api/records/:id` — no new JSON keys or API changes.
+
+**User guidance:**
+- Discovery: Open the detail drawer (Add or click a list item); the mode control appears near the main text area.
+- Manual section: existing page `docs/manual/editing.md`, new "Markdown editing" subsection.
+- Key steps: 1. Open any record in the detail drawer. 2. Toggle between raw and styled mode using the mode control. 3. Type text in either mode, switch modes — text is preserved. 4. Save — the record stores plain Markdown text as before.
+
+**Design rationale:** An explicit toggle avoids trapping users in one paradigm. Raw mode serves Markdown-fluent users; styled mode serves visual editors. Both serialize to the same plain-text string, keeping storage unchanged.
+
+---
+
+### US-R4 — Styled editable rich text surface
+
+As a user, I want the styled view to be fully editable (Notion-like), not a read-only preview, so that formatting long notes feels continuous and natural.
+
+**Acceptance criteria**:
+- Styled mode renders an interactive rich text editor where typing, selection, and formatting work inline (not a separate preview pane).
+- Content serializes to a plain Markdown string compatible with existing `text` field storage and `validateText` constraints (max length, non-empty for save).
+- Rendering path does not inject unsanitized user-controlled HTML via `dangerouslySetInnerHTML`.
+- Editor teardown on drawer close cleans up event listeners and subscriptions (no leaks on unmount).
+- Rapid open/close of the drawer in styled mode does not throw errors.
+
+**User guidance:**
+- Discovery: Switch to styled mode using the mode control (US-R3) — the text area transforms into a rich editing surface.
+- Manual section: existing page `docs/manual/editing.md`, "Markdown editing" subsection.
+- Key steps: 1. Enter styled mode. 2. Type paragraphs, add bold text, create lists — formatting renders inline as you type. 3. Save, close the drawer, reopen — content loads and displays with formatting. 4. Save button remains disabled when text is empty (existing validation preserved).
+
+**Design rationale:** An editable rendered view (not split-pane preview) fits the narrow drawer width and delivers the Notion-like feel. Split preview would halve the already-limited horizontal space.
+
+---
+
+### US-R5 — Compact formatting toolbar
+
+As a user, I want a compact toolbar for common Markdown formatting actions, so I can format notes without memorizing syntax.
+
+**Acceptance criteria**:
+- Toolbar is visible when styled mode is active; hidden or minimized in raw mode.
+- Toolbar provides controls for: bold, italic, strikethrough, link, bullet list, ordered list, blockquote, inline code, code block.
+- Underline is omitted (non-standard CommonMark); documented as unsupported in user guide.
+- Each control has an accessible name (`aria-label` or `title`).
+- Toolbar styling uses existing design tokens from `tokens.css` and integrates with drawer styles.
+- At least one toolbar action produces a verifiable effect on the serialized `text` state.
+
+**User guidance:**
+- Discovery: Toolbar appears above the text area when styled mode is active.
+- Manual section: existing page `docs/manual/editing.md`, new "Formatting toolbar" subsection.
+- Key steps: 1. Open styled mode in the detail drawer. 2. Select text and click Bold — the text becomes bold inline. 3. Use the list button to create bullet points. 4. Save and verify the stored text contains Markdown formatting.
+
+**Design rationale:** CommonMark does not define underline syntax; including it would require non-standard storage (HTML tags or custom extension) that complicates plain-text round-tripping. Omitting it keeps the toolbar honest and the storage clean.
+
+---
+
 ## Implementation phases
 
 | Phase | Name | Stories | Status |
@@ -625,7 +728,9 @@ As Jaco, I want hover states with type-appropriate colors, click feedback before
 | 4 | Structured Browse | US-U1, US-U2, US-U3, US-U4 | Shipped |
 | 5 | Capture & Edit | US-U5, US-U6, US-U7, US-U8 | Shipped |
 | 6 | Daily-Ready Visual Identity | US-D1, US-D2, US-D3 | Shipped |
-| 7 | Living Polish | US-D4, US-D5 | Planned |
+| 7 | Living Polish | US-D4, US-D5 | Shipped |
+| 8 | Typography & Layout | US-R1, US-R2 | Shipped |
+| 9 | Markdown Editor | US-R3, US-R4, US-R5 | Planned |
 
 ### Phase 1 — Foundation
 
@@ -1059,3 +1164,113 @@ Add interaction feedback and micro-animations to the CRUD panel, plus delete fun
 - **Faithful stewardship** — CSS-only animations add zero dependency weight; delete reuses existing ID-to-filepath safety patterns from PUT
 - **Clarity over complexity** — pure CSS effects are declarative and maintainable; no animation runtime to debug or upgrade
 - **Continuous improvement** — the token system compounds: hover color variants build on type tokens from US-D3; celebration patterns can extend to future actions
+
+### Phase 8 — Typography & Layout
+
+Improve legibility of the CRUD panel and detail drawer through a larger, token-based font scale. Widen the detail drawer and make the main `text` textarea fill the vertical space between the drawer header and footer.
+
+**Done-when (observable):**
+
+**US-R1 — Typography:**
+
+- [ ] `tokens.css` `:root` declares `--lense-font-size-base` with a CSS length value strictly greater than `1rem` (e.g. `1.0625rem` or larger) [US-R1]
+- [ ] `tokens.css` `:root` declares `--lense-font-size-sm` with a CSS length value strictly greater than `0.85rem` [US-R1]
+- [ ] `CrudPanel.css` tab labels and panel header text use `font-size` via `var(--lense-font-size-*)` only (no new literal `font-size: 0.85rem` or smaller for primary tab labels) [US-R1]
+- [ ] `ListItems.css` primary list row text uses `font-size` via `var(--lense-font-size-*)` (not a hardcoded `rem` smaller than `--lense-font-size-base` for the main title line) [US-R1]
+- [ ] `ListControls.css` sort and limit labels use `font-size` via `var(--lense-font-size-*)` [US-R1]
+- [ ] `DetailDrawer.css` drawer title, labels, inputs, and textarea use `font-size` via `var(--lense-font-size-*)` for their respective roles [US-R1]
+- [ ] `docs/design.md` contains an updated typography subsection listing the `--lense-font-size-*` tokens used for panel and drawer body text [US-R1]
+- [ ] `npm run typecheck` exits 0 [US-R1]
+- [ ] `npm run build` exits 0 [US-R1]
+
+**US-R2 — Drawer width and full-height text:**
+
+- [ ] `DetailDrawer.css` rule for `.detail-drawer` sets `width` to a value strictly greater than `400px` on typical viewports (e.g. `min(560px, 90vw)` or equivalent — verifiable by source inspection of the `width` declaration) [US-R2]
+- [ ] `DetailDrawer.css` defines a flex column chain from `.detail-drawer` through `.drawer-body` such that `.drawer-body` has `flex: 1 1 auto` (or equivalent) and `min-height: 0` where required for nested flex overflow [US-R2]
+- [ ] The main text field is wrapped or styled so its container has `flex: 1 1 auto` and `min-height: 0` (or the textarea itself participates in flex growth) — verifiable in `DetailDrawer.css` [US-R2]
+- [ ] `DetailDrawer.tsx` does not pass `rows={5}` as the sole height control for the text textarea (attribute removed, or `rows` omitted in favor of CSS-driven height) [US-R2]
+- [ ] Playwright E2E test exists: mocks `GET /api/records` with at least one record, opens the detail drawer, sets viewport to 900×800, asserts `[data-testid="drawer-field-text"]` bounding box `height > 200` [US-R2]
+- [ ] `npm run test:e2e` exits 0 including the new test [US-R2]
+
+**Documentation:**
+
+- [ ] `docs/manual/layout.md` documents the improved default text sizing in the CRUD panel (tabs, list, controls) [US-R1]
+- [ ] `docs/manual/editing.md` documents the wider drawer and full-height text area behavior [US-R2]
+
+**Structural:**
+
+- [ ] `AGENTS.md` reflects updated typography tokens and detail drawer layout behavior introduced in this phase [phase]
+
+**AGENTS.md sections affected:**
+- File ownership map (`tokens.css`, panel CSS, `DetailDrawer`)
+- Design tokens (`--lense-font-size-*` values)
+- Detail drawer behavior (width and text-area layout)
+
+**User documentation:**
+- Updated `docs/manual/layout.md` (legibility / sizing in the panel)
+- Updated `docs/manual/editing.md` (drawer width and full-height text area)
+
+**Golden principles (phase-relevant):**
+- **People first** — comfortable reading and editing reduce daily friction
+- **Faithful stewardship** — token-first typography stays aligned with `docs/design.md`
+- **Clarity over complexity** — flex layout and width rules stay CSS-first; no new dependencies for this phase
+
+### Phase 9 — Markdown Editor
+
+Add Markdown authoring for the shared record `text` field in the detail drawer: a mode control switching between raw Markdown source and a styled, editable rich view (Notion-like), a compact formatting toolbar, and localStorage persistence of the preferred mode. Storage remains plain text — no API or schema changes. Applies to all four record types.
+
+**Done-when (observable):**
+
+**US-R3 — Raw vs styled Markdown mode toggle:**
+
+- [ ] `DetailDrawer.tsx` (or a child component it imports) renders a visible mode control element for the main `text` field when the drawer is open in edit mode [US-R3]
+- [ ] The mode control is present in create mode for all four `log_type` values: `todo`, `people_note`, `idea`, `daily_log` [US-R3]
+- [ ] User can switch between raw mode (plain textarea) and styled mode (editable rich view); automated test (Vitest or Playwright) asserts both modes are reachable from the UI [US-R3]
+- [ ] Default text editing mode is read from `localStorage` key `mustard-text-mode` on drawer open; changing mode writes the same key [US-R3]
+- [ ] Switching modes does not clear `text` in component state — automated test: set text, switch modes twice, assert same string value [US-R3]
+- [ ] Save sends only existing fields to `POST /api/records` and `PUT /api/records/:id` with `text` as a plain string — no new JSON keys added to the request body (verifiable by server.test.ts existing create/update tests still passing) [US-R3]
+
+**US-R4 — Styled editable rich text surface:**
+
+- [ ] In styled mode, the text area is interactive: typing produces content in the editor (not a read-only preview) — automated test verifies typing produces a state change [US-R4]
+- [ ] Styled-mode content serializes to a plain Markdown string stored in `text`; Vitest test covers at least one formatting case (e.g. `**bold**` or `- list item`) round-tripping through serialize → deserialize [US-R4]
+- [ ] `rg 'dangerouslySetInnerHTML' src/components/panel/` returns zero matches, OR any matches use a sanitization library (e.g. DOMPurify) — not raw user-controlled strings [US-R4]
+- [ ] Rapid open/close of the drawer in styled mode does not throw — Playwright or Vitest test exercises: open drawer → styled mode → close → reopen [US-R4]
+- [ ] Editor component cleans up on unmount — useEffect return (or equivalent) disposes the editor instance; no orphan event listeners (verifiable by source inspection of cleanup in the editor wrapper component) [US-R4]
+
+**US-R5 — Compact formatting toolbar:**
+
+- [ ] A toolbar element is visible in the DOM when styled mode is active [US-R5]
+- [ ] Toolbar is hidden or absent from the DOM when raw mode is active [US-R5]
+- [ ] Toolbar contains controls with accessible names (`aria-label` or `title` attribute) for each of: bold, italic, strikethrough, link, bullet list, ordered list, blockquote, inline code, code block — automated test asserts presence of 9 labeled controls [US-R5]
+- [ ] No toolbar button for underline exists in the DOM — `rg -i 'underline' src/components/panel/` returns zero matches in toolbar component source (or matches are limited to CSS text-decoration, not a toolbar action) [US-R5]
+- [ ] At least one toolbar action (e.g. bold) updates the serialized `text` state — Vitest test asserts Markdown marker (e.g. `**`) present in serialized output after invoking bold [US-R5]
+- [ ] Toolbar styling uses `var(--lense-*)` design tokens from `tokens.css` — no hardcoded color hex values in the toolbar component's CSS (verifiable by `rg '#[0-9a-fA-F]{3,8}' <toolbar-css-file>` returning zero matches) [US-R5]
+
+**Documentation:**
+
+- [ ] `docs/manual/editing.md` includes a "Markdown editing" subsection documenting: mode control location and appearance, raw vs styled mode behavior, mode persistence via localStorage [US-R3] [US-R4]
+- [ ] `docs/manual/editing.md` includes a "Formatting toolbar" subsection listing all 9 available actions and noting that underline is unsupported (CommonMark limitation) [US-R5]
+
+**Structural:**
+
+- [ ] `docs/architecture/ARCHITECTURE.md` documents the new editor module path(s) and their relationship to `DetailDrawer.tsx` [phase]
+- [ ] `AGENTS.md` directory layout and file ownership table list the new editor module(s), toolbar component, and any new CSS files introduced in this phase [phase]
+
+**Auto-added safety criteria:**
+
+- [ ] `POST /api/records` and `PUT /api/records/:id` still return 400 when `text` exceeds server max length (existing `validateText` behavior); `server.test.ts` existing over-length rejection test still passes after editor integration [phase]
+
+**AGENTS.md sections affected:**
+- File ownership map (new editor module(s), toolbar component, editor CSS)
+- Directory layout (new files under `src/components/panel/`)
+- Detail drawer behavior (dual-mode editing, toolbar)
+
+**User documentation:**
+- Updated `docs/manual/editing.md` with "Markdown editing" and "Formatting toolbar" subsections
+
+**Golden principles (phase-relevant):**
+- **Clarity over complexity** — one editor integration path; styled mode is the single rich surface (no parallel preview + edit panes)
+- **People first** — mode toggle respects both Markdown-native and WYSIWYG preferences; persistence means the app remembers your choice
+- **Faithful stewardship** — no unsafe HTML rendering; existing server validation unchanged; editor library is free/open-source with zero API calls
+- **Continuous improvement** — editor module is isolated behind a component boundary for future Markdown extensions (e.g. tables, task lists)

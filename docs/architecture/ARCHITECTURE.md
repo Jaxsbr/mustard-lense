@@ -97,6 +97,8 @@ src/
 │   ├── panel/                 # CRUD panel — browse, edit, capture
 │   │   ├── CrudPanel.tsx      # Collapsible panel container with type tabs and list views
 │   │   ├── DetailDrawer.tsx   # Slide-over drawer for view/edit/create records
+│   │   ├── MarkdownEditor.tsx # (planned for markdown-editor phase) Rich text editor wrapper — mode toggle, TipTap/Lexical integration, Markdown serialization
+│   │   ├── EditorToolbar.tsx  # (planned for markdown-editor phase) Compact formatting toolbar — 9 actions, accessible labels
 │   │   ├── ListControls.tsx   # Sort dropdown + limit control above record list
 │   │   └── ...                # Type-specific list view components
 │   ├── components.css         # Shared component styles
@@ -236,7 +238,20 @@ Theme persistence: `localStorage` key `mustard-theme`. An inline `<script>` in `
 
 In production, the Express server serves Vite's `dist/` static files alongside the API endpoints, so the full app runs on a single port (7777). This replaces the legacy mustard Flask app on the same port.
 
-### Future (beyond living-polish)
+### Markdown editor (planned for `markdown-editor` phase)
+
+Dual-mode Markdown editing in the detail drawer's `text` field. `DetailDrawer.tsx` composes a new `MarkdownEditor` wrapper that manages mode state (raw vs styled) and a `EditorToolbar` component visible in styled mode. The editor integrates a ProseMirror-based library (e.g. TipTap) or equivalent for WYSIWYG editing, with Markdown serialization/deserialization for storage. No API changes — the `text` field remains a plain string.
+
+**Data flow (styled mode):**
+1. Drawer opens → reads `mustard-text-mode` from `localStorage` → selects raw or styled
+2. Editor loads `text` string → deserializes Markdown into ProseMirror document
+3. User edits inline (WYSIWYG) or uses toolbar actions
+4. On save → serializes document back to Markdown string → sends via existing `POST`/`PUT` API
+5. On drawer close → editor instance destroyed (useEffect cleanup)
+
+**Toolbar:** 9 actions (bold, italic, strikethrough, link, bullet list, ordered list, blockquote, inline code, code block). No underline (non-standard CommonMark). All controls have accessible names.
+
+### Future (beyond markdown-editor)
 
 Metadata-filtered retrieval, data repo separation (`mustard-data`), old mustard archival, and mustard-capture skill deletion are planned for subsequent phases.
 
@@ -252,7 +267,7 @@ Metadata-filtered retrieval, data repo separation (`mustard-data`), old mustard 
 | System | Purpose | Required |
 |--------|---------|----------|
 | Claude Code CLI (`claude`) | AI synthesis engine (receives pre-retrieved records, returns structured JSON) | Yes (smoke tests require it; unit tests mock synthesiser) |
-| Mustard data store (`MUSTARD_DATA_DIR`, defaults to `~/dev/mustard/data/`) | Record storage (YAML files) | Yes for indexing and browse API; configurable via `MUSTARD_DATA_DIR` env var; unit tests use fixture data |
+| Mustard data store (`MUSTARD_DATA_DIR`, defaults to `~/dev/mustard-data`) | Record storage (YAML files) | Yes for indexing and browse API; configurable via `MUSTARD_DATA_DIR` env var; unit tests use fixture data |
 | Express | API server for lense endpoint (SSE) and reindex endpoint | Yes |
 | Playwright | E2E browser testing for lense UI | Yes |
 | transformers.js (`all-MiniLM-L6-v2`) | Local embedding model for RAG pipeline (planned for rag-lense) | Yes — runs in-process, no external API |

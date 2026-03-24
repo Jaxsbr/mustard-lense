@@ -2,6 +2,11 @@
  * Minimal Markdown ↔ HTML conversion helpers.
  * Handles the subset supported by the toolbar: bold, italic, strikethrough,
  * links, bullet/ordered lists, blockquote, inline code, code blocks.
+ *
+ * Known limitation: regex-based parsing does not handle nested inline markup,
+ * multi-line blockquotes, or list items with inline formatting. This is
+ * acceptable while input is toolbar-driven. If arbitrary markdown paste
+ * support is added, swap in a proper parser (e.g. markdown-it or marked).
  */
 
 export function markdownToHtml(md: string): string {

@@ -1,4 +1,11 @@
 phase: "always-on"
 started: "2026-03-24T10:14:00Z"
-entries: []
+entries:
+  - task: 1
+    time: "2026-03-24T10:17:00Z"
+    story: "US-D6"
+    description: "Investigation: 96 tests pass, build OK. No deploy/ dir yet. npm start = npm run build && PORT=7777 node --import tsx src/server/index.ts. Phase is deployment artifact + docs only."
+    result: "pass"
+    notes: "Queued plist template creation."
+    tokens: ~
 # Each entry: {task, time, story, description, result, notes, tokens}

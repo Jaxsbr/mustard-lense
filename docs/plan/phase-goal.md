@@ -8,20 +8,20 @@ Make mustard-lense always available at `localhost:7777` without manual intervent
 ### Done-when (observable)
 
 **Plist template:**
-- [ ] `deploy/com.mustard.lense.plist` exists and passes `plutil -lint deploy/com.mustard.lense.plist` (valid XML plist) [US-D6]
-- [ ] Plist `Label` key value is `com.mustard.lense` (verifiable by `grep` or `plutil -extract Label raw`) [US-D6]
-- [ ] Plist `RunAtLoad` key is `true` [US-D6]
-- [ ] Plist `KeepAlive` key is `true` [US-D6]
-- [ ] Plist `ProgramArguments` array contains a command that runs the production server — either `npm run start` via a shell, or a direct `node` invocation equivalent to the `start` script [US-D6]
-- [ ] Plist contains a `WorkingDirectory` key with a template path (e.g. `/Users/<you>/dev/mustard-lense`) that the user customizes [US-D6]
-- [ ] Plist contains `StandardOutPath` and `StandardErrorPath` keys pointing to log file locations [US-D6]
-- [ ] Plist `EnvironmentVariables` dict includes `PORT` with value `7777` [US-D6]
-- [ ] Plist handles PATH resolution so `node`/`npm` are findable — either `EnvironmentVariables` includes a `PATH` key with a documented template value, or `ProgramArguments` uses a login shell (e.g. `/bin/zsh -l -c "..."`) that inherits user PATH [US-D6]
+- [x] `deploy/com.mustard.lense.plist` exists and passes `plutil -lint deploy/com.mustard.lense.plist` (valid XML plist) [US-D6]
+- [x] Plist `Label` key value is `com.mustard.lense` (verifiable by `grep` or `plutil -extract Label raw`) [US-D6]
+- [x] Plist `RunAtLoad` key is `true` [US-D6]
+- [x] Plist `KeepAlive` key is `true` [US-D6]
+- [x] Plist `ProgramArguments` array contains a command that runs the production server — either `npm run start` via a shell, or a direct `node` invocation equivalent to the `start` script [US-D6]
+- [x] Plist contains a `WorkingDirectory` key with a template path (e.g. `/Users/<you>/dev/mustard-lense`) that the user customizes [US-D6]
+- [x] Plist contains `StandardOutPath` and `StandardErrorPath` keys pointing to log file locations [US-D6]
+- [x] Plist `EnvironmentVariables` dict includes `PORT` with value `7777` [US-D6]
+- [x] Plist handles PATH resolution so `node`/`npm` are findable — either `EnvironmentVariables` includes a `PATH` key with a documented template value, or `ProgramArguments` uses a login shell (e.g. `/bin/zsh -l -c "..."`) that inherits user PATH [US-D6]
 
 **Documentation:**
-- [ ] `docs/architecture/ARCHITECTURE.md` contains an always-on deployment section documenting LaunchAgent setup: copy plist to `~/Library/LaunchAgents/`, customize paths, run `launchctl load ~/Library/LaunchAgents/com.mustard.lense.plist` [US-D6]
-- [ ] `docs/architecture/ARCHITECTURE.md` documents LaunchAgent teardown: `launchctl unload ~/Library/LaunchAgents/com.mustard.lense.plist` and plist removal [US-D6]
-- [ ] `docs/architecture/ARCHITECTURE.md` explains that LaunchAgent (not LaunchDaemon) is required for user-session access to `MUSTARD_DATA_DIR` and the `claude` CLI [US-D6]
+- [x] `docs/architecture/ARCHITECTURE.md` contains an always-on deployment section documenting LaunchAgent setup: copy plist to `~/Library/LaunchAgents/`, customize paths, run `launchctl load ~/Library/LaunchAgents/com.mustard.lense.plist` [US-D6]
+- [x] `docs/architecture/ARCHITECTURE.md` documents LaunchAgent teardown: `launchctl unload ~/Library/LaunchAgents/com.mustard.lense.plist` and plist removal [US-D6]
+- [x] `docs/architecture/ARCHITECTURE.md` explains that LaunchAgent (not LaunchDaemon) is required for user-session access to `MUSTARD_DATA_DIR` and the `claude` CLI [US-D6]
 
 **Structural:**
 - [ ] `AGENTS.md` directory layout includes `deploy/` directory with `com.mustard.lense.plist` [phase]

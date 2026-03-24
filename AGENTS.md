@@ -62,6 +62,8 @@ mustard-lense/
 │       ├── basic.ts          # On-demand smoke test — basic mode
 │       ├── admin.ts          # On-demand smoke test — admin mode
 │       └── lense.ts          # On-demand smoke test — lense E2E (reads SSE stream)
+├── deploy/
+│   └── com.mustard.lense.plist  # macOS LaunchAgent template for always-on deployment
 ├── e2e/
 │   └── lense.spec.ts        # Playwright E2E tests (mocked SSE endpoint + mocked records API)
 ├── docs/
@@ -115,6 +117,7 @@ mustard-lense/
 | `src/App.tsx` | UI | Split-screen layout — CRUD panel (left, collapsible ~40%), lense (right, always visible). Theme toggle. Responsive at 768px. |
 | `src/smoke/*.ts` | Smoke tests | On-demand, invoke real CLI/API — NOT run by `npm test` |
 | `e2e/*.spec.ts` | E2E tests | Playwright tests with mocked SSE + records API — NOT run by `npm test` |
+| `deploy/com.mustard.lense.plist` | Deployment | macOS LaunchAgent template — RunAtLoad + KeepAlive, login shell for PATH, PORT=7777. Copy to `~/Library/LaunchAgents/` and customize. |
 
 ## App layout
 

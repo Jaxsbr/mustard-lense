@@ -236,7 +236,7 @@ The design token system in `tokens.css` uses CSS custom properties (`--lense-*`)
 
 Theme persistence: `localStorage` key `mustard-theme`. An inline `<script>` in `index.html` applies the stored theme before React hydrates, preventing flash-of-wrong-theme.
 
-### Production static serving (planned for daily-ready phase)
+### Production static serving
 
 In production, the Express server serves Vite's `dist/` static files alongside the API endpoints, so the full app runs on a single port (7777). This replaces the legacy mustard Flask app on the same port.
 
@@ -254,7 +254,11 @@ Dual-mode Markdown editing in the detail drawer's `text` field. `DetailDrawer.ts
 
 **Toolbar:** 9 actions (bold, italic, strikethrough, link, bullet list, ordered list, blockquote, inline code, code block). No underline (non-standard CommonMark). All controls have accessible `aria-label` attributes.
 
-### Future (beyond markdown-editor)
+### Always-on deployment (planned for `always-on` phase)
+
+macOS LaunchAgent configuration that keeps mustard-lense running at `localhost:7777` across reboots and crashes. A plist template at `deploy/com.mustard.lense.plist` configures RunAtLoad + KeepAlive. LaunchAgent (not LaunchDaemon) runs in user session for access to `MUSTARD_DATA_DIR` and the `claude` CLI. Template is checked in to the repo; the user copies it to `~/Library/LaunchAgents/` and customizes paths. Setup and teardown documented in a dedicated section below.
+
+### Future (beyond always-on)
 
 Metadata-filtered retrieval, data repo separation (`mustard-data`), old mustard archival, and mustard-capture skill deletion are planned for subsequent phases.
 
@@ -263,7 +267,7 @@ Metadata-filtered retrieval, data repo separation (`mustard-data`), old mustard 
 | Environment | Port | Mechanism |
 |-------------|------|-----------|
 | Development | 5234 | Vite dev server (`npm run dev`) |
-| Production | 7777 | Express server serving `dist/` static files + API (planned for daily-ready phase, replacing legacy mustard on same port) |
+| Production | 7777 | Express server serving `dist/` static files + API on single port, replacing legacy mustard. Always-on via macOS LaunchAgent (planned for `always-on` phase). |
 
 ## Dependencies on external systems
 

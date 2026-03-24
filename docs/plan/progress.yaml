@@ -7,7 +7,7 @@ config:
   quality_check_suppressions: []
 
 state:
-  task_number: 3
+  task_number: 4
   phase: markdown-rich-text
   phase_complete: false
   review_stage: null
@@ -18,4 +18,4 @@ state:
   last_result: pass
   next_task: null
   consecutive_fails: 0
-  completed_stories: []
+  completed_stories: [US-R3]

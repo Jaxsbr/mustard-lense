@@ -14,12 +14,12 @@ Add Markdown authoring for the shared record `text` field in the detail drawer: 
 
 **US-R3 — Raw vs styled Markdown mode toggle:**
 
-- [ ] `DetailDrawer.tsx` (or a child component it imports) renders a visible mode control element for the main `text` field when the drawer is open in edit mode [US-R3]
-- [ ] The mode control is present in create mode for all four `log_type` values: `todo`, `people_note`, `idea`, `daily_log` [US-R3]
-- [ ] User can switch between raw mode (plain textarea) and styled mode (editable rich view); automated test (Vitest or Playwright) asserts both modes are reachable from the UI [US-R3]
-- [ ] Default text editing mode is read from `localStorage` key `mustard-text-mode` on drawer open; changing mode writes the same key [US-R3]
-- [ ] Switching modes does not clear `text` in component state — automated test: set text, switch modes twice, assert same string value [US-R3]
-- [ ] Save sends only existing fields to `POST /api/records` and `PUT /api/records/:id` with `text` as a plain string — no new JSON keys added to the request body (verifiable by server.test.ts existing create/update tests still passing) [US-R3]
+- [x] `DetailDrawer.tsx` (or a child component it imports) renders a visible mode control element for the main `text` field when the drawer is open in edit mode [US-R3]
+- [x] The mode control is present in create mode for all four `log_type` values: `todo`, `people_note`, `idea`, `daily_log` [US-R3]
+- [x] User can switch between raw mode (plain textarea) and styled mode (editable rich view); automated test (Vitest or Playwright) asserts both modes are reachable from the UI [US-R3]
+- [x] Default text editing mode is read from `localStorage` key `mustard-text-mode` on drawer open; changing mode writes the same key [US-R3]
+- [x] Switching modes does not clear `text` in component state — automated test: set text, switch modes twice, assert same string value [US-R3]
+- [x] Save sends only existing fields to `POST /api/records` and `PUT /api/records/:id` with `text` as a plain string — no new JSON keys added to the request body (verifiable by server.test.ts existing create/update tests still passing) [US-R3]
 
 **US-R4 — Styled editable rich text surface:**
 

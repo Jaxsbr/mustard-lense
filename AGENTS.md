@@ -28,6 +28,10 @@ mustard-lense/
 │   │       ├── CrudPanel.test.tsx # Unit tests for panel tabs and rendering
 │   │       ├── DetailDrawer.tsx  # Slide-over drawer for viewing/editing/creating records
 │   │       ├── DetailDrawer.css  # Drawer, form, and backdrop styles
+│   │       ├── MarkdownEditor.tsx # Dual-mode editor (raw/styled) with TipTap, EditorToolbar inline
+│   │       ├── MarkdownEditor.css # Editor surface, mode toggle, toolbar styles (all design tokens)
+│   │       ├── MarkdownEditor.test.tsx # Tests: mode toggle, toolbar, markdown round-trip
+│   │       ├── markdown-utils.ts # markdownToHtml / htmlToMarkdown conversion helpers
 │   │       ├── ListControls.tsx  # Sort dropdown + limit control above record list
 │   │       ├── ListControls.css  # Controls bar styles
 │   │       ├── ListItems.tsx     # Type-specific list item components
@@ -100,7 +104,10 @@ mustard-lense/
 | `src/components/*.tsx` | Renderers | Template components for each mustard data type |
 | `src/components/panel/CrudPanel.tsx` | CRUD panel | Collapsible panel with type tabs, list views, detail drawer, sort/limit controls, Add button, localStorage prefs, celebration animations (create/edit/delete) |
 | `src/components/panel/CrudPanel.test.tsx` | Tests | Unit tests for tab rendering, active state, fetch, loading, empty state |
-| `src/components/panel/DetailDrawer.tsx` | Detail drawer | Slide-over drawer for viewing/editing/creating/deleting records, type-specific form fields, inline delete confirmation |
+| `src/components/panel/DetailDrawer.tsx` | Detail drawer | Slide-over drawer for viewing/editing/creating/deleting records, type-specific form fields, inline delete confirmation, composes MarkdownEditor for text field |
+| `src/components/panel/MarkdownEditor.tsx` | Markdown editor | Dual-mode editor (raw textarea / styled TipTap), mode toggle with localStorage persistence, EditorToolbar (9 actions, no underline) |
+| `src/components/panel/markdown-utils.ts` | Markdown utils | markdownToHtml / htmlToMarkdown conversion for TipTap ↔ Markdown round-trip |
+| `src/components/panel/MarkdownEditor.test.tsx` | Tests | Mode toggle, localStorage, toolbar 9 controls, markdown round-trip, rapid mount/unmount |
 | `src/components/panel/ListControls.tsx` | List controls | Sort dropdown (newest, oldest, status) + limit control (default 25) + Show all |
 | `src/components/panel/ListItems.tsx` | List views | Type-specific list item components: TodoListItem, PeopleListItem, IdeaListItem, DailyLogListItem |
 | `src/components/panel/sort.ts` | Sort logic | Sort functions: newest first, oldest first, status grouping (open → parked → done) |
@@ -144,6 +151,7 @@ mustard-lense/
 - **Slide-over** — overlays from the right, `min(520px, 90vw)` wide. CSS slide transition. Text textarea uses flex layout to fill remaining vertical space (no fixed `rows` constraint).
 - **Edit mode** — click a list item. Shows all fields in editable form inputs. `log_type` and `id` are read-only.
 - **Create mode** — click Add button. Empty form, `log_type` changeable via dropdown, `text` auto-focused.
+- **Markdown editor** — text field uses `MarkdownEditor` with raw/styled mode toggle. Raw mode: plain textarea. Styled mode: TipTap rich editor with formatting toolbar (9 actions). Mode persisted in `localStorage` key `mustard-text-mode`. Both modes serialize to plain Markdown string — no API changes.
 - **Type-specific fields** — todo: text (textarea), status (dropdown), due_date (date input). people_note: text, person. idea: text, status. daily_log: text, theme.
 - **Save** — PUT `/api/records/:id` (edit) or POST `/api/records` (create). Drawer closes, list refreshes, counts update. Create triggers tab celebration animation; edit triggers shimmer on updated list item.
 - **Delete** — visible in edit mode only. Two-step inline confirmation (no browser `confirm()`). Calls DELETE `/api/records/:id`. Departing item plays farewell animation.
@@ -193,7 +201,7 @@ Defined in `src/shared/schema.ts`, used by both server and frontend.
 
 ## Testing
 
-- `npm test` — Vitest unit tests (79 tests: 8 CLI + 36 server + 9 synthesiser + 7 RAG + 7 panel + 5 sort + 7 reserved) with mocked dependencies
+- `npm test` — Vitest unit tests (96 tests: 8 CLI + 36 server + 9 synthesiser + 7 RAG + 7 panel + 5 sort + 17 markdown editor + 7 reserved) with mocked dependencies
 - `npm start` — builds and runs production server on port 7777 (serves `dist/` + API on single port)
 - `npm run test:e2e` — Playwright E2E tests with mocked SSE endpoint and mocked records API
 - `npm run smoke:basic` / `npm run smoke:admin` — real CLI invocation

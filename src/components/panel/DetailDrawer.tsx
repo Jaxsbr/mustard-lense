@@ -1,5 +1,6 @@
-import { useEffect, useRef, useState } from 'react'
+import { useState } from 'react'
 import type { MustardRecord } from '../../shared/record.js'
+import { MarkdownEditor } from './MarkdownEditor.js'
 import './DetailDrawer.css'
 
 interface DetailDrawerProps {
@@ -65,13 +66,6 @@ function DrawerForm({ record, mode, defaultLogType, onClose, onSave, onDelete }:
   const [person, setPerson] = useState(mode === 'edit' && record ? (record.person ?? '') : '')
   const [theme, setTheme] = useState(mode === 'edit' && record ? (record.theme ?? '') : '')
   const [confirmingDelete, setConfirmingDelete] = useState(false)
-  const textRef = useRef<HTMLTextAreaElement>(null)
-
-  useEffect(() => {
-    if (mode === 'create' && textRef.current) {
-      textRef.current.focus()
-    }
-  }, [mode])
 
   function handleSave() {
     const data: Partial<MustardRecord> & { log_type: string } = {
@@ -125,12 +119,10 @@ function DrawerForm({ record, mode, defaultLogType, onClose, onSave, onDelete }:
 
         <div className="drawer-field drawer-field--text">
           <label className="drawer-label">Text</label>
-          <textarea
-            ref={textRef}
-            className="drawer-textarea"
+          <MarkdownEditor
             value={text}
-            onChange={(e) => setText(e.target.value)}
-            data-testid="drawer-field-text"
+            onChange={setText}
+            autoFocus={mode === 'create'}
           />
         </div>
 

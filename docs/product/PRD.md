@@ -753,7 +753,7 @@ As Jaco, I want a macOS LaunchAgent plist template in the repo that keeps mustar
 | 7 | Living Polish | US-D4, US-D5 | Shipped |
 | 8 | Typography & Layout | US-R1, US-R2 | Shipped |
 | 9 | Markdown Editor | US-R3, US-R4, US-R5 | Shipped |
-| 10 | Always-On | US-D6 | Planned |
+| 10 | Always-On | US-D6 | Shipped |
 
 ### Phase 1 — Foundation
 

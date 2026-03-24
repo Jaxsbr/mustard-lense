@@ -1,0 +1,157 @@
+.markdown-editor {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+}
+
+.markdown-editor__mode-control {
+  display: flex;
+  gap: var(--lense-spacing-xs);
+  margin-bottom: var(--lense-spacing-sm);
+}
+
+.markdown-editor__mode-btn {
+  background: none;
+  border: 1px solid var(--lense-color-border);
+  border-radius: var(--lense-radius-sm);
+  padding: var(--lense-spacing-xs) var(--lense-spacing-sm);
+  font-family: inherit;
+  font-size: var(--lense-font-size-xs);
+  font-weight: var(--lense-font-weight-semibold, 600);
+  color: var(--lense-color-text-muted);
+  cursor: pointer;
+  transition: background-color 0.15s, color 0.15s, border-color 0.15s;
+}
+
+.markdown-editor__mode-btn:hover {
+  background: var(--lense-color-bg-subtle);
+}
+
+.markdown-editor__mode-btn--active {
+  background: var(--lense-color-accent-light);
+  border-color: var(--lense-color-accent);
+  color: var(--lense-color-accent);
+}
+
+.markdown-editor__raw {
+  flex: 1;
+  min-height: 120px;
+}
+
+/* TipTap editor surface */
+.markdown-editor__styled {
+  flex: 1;
+  min-height: 120px;
+  padding: var(--lense-spacing-sm);
+  border: 1px solid var(--lense-color-border);
+  border-radius: var(--lense-radius);
+  background: var(--lense-color-bg);
+  color: var(--lense-color-text);
+  font-family: inherit;
+  font-size: var(--lense-font-size-sm);
+  overflow-y: auto;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.markdown-editor__styled:focus {
+  border-color: var(--lense-color-accent);
+}
+
+.markdown-editor__styled p {
+  margin: 0 0 0.5em;
+}
+
+.markdown-editor__styled p:last-child {
+  margin-bottom: 0;
+}
+
+.markdown-editor__styled strong {
+  font-weight: 700;
+}
+
+.markdown-editor__styled em {
+  font-style: italic;
+}
+
+.markdown-editor__styled s {
+  text-decoration: line-through;
+}
+
+.markdown-editor__styled a {
+  color: var(--lense-color-accent);
+  text-decoration: underline;
+}
+
+.markdown-editor__styled ul,
+.markdown-editor__styled ol {
+  padding-left: 1.5em;
+  margin: 0.5em 0;
+}
+
+.markdown-editor__styled blockquote {
+  border-left: 3px solid var(--lense-color-accent);
+  padding-left: var(--lense-spacing-sm);
+  margin: 0.5em 0;
+  color: var(--lense-color-text-muted);
+}
+
+.markdown-editor__styled code {
+  background: var(--lense-color-bg-subtle);
+  border-radius: var(--lense-radius-sm);
+  padding: 0.1em 0.3em;
+  font-size: 0.9em;
+}
+
+.markdown-editor__code-block {
+  background: var(--lense-color-bg-subtle);
+  border-radius: var(--lense-radius);
+  padding: var(--lense-spacing-sm);
+  margin: 0.5em 0;
+  overflow-x: auto;
+  font-family: monospace;
+  font-size: var(--lense-font-size-xs);
+}
+
+/* Toolbar */
+.markdown-editor__toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px;
+  margin-bottom: var(--lense-spacing-xs);
+}
+
+.markdown-editor__toolbar-btn {
+  background: none;
+  border: 1px solid var(--lense-color-border);
+  border-radius: var(--lense-radius-sm);
+  padding: var(--lense-spacing-xs);
+  font-family: inherit;
+  font-size: var(--lense-font-size-xs);
+  color: var(--lense-color-text-muted);
+  cursor: pointer;
+  transition: background-color 0.15s, color 0.15s;
+  min-width: 44px;
+  min-height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.markdown-editor__toolbar-btn:hover {
+  background: var(--lense-color-bg-subtle);
+  color: var(--lense-color-text);
+}
+
+.markdown-editor__toolbar-btn--active {
+  background: var(--lense-color-accent-light);
+  color: var(--lense-color-accent);
+  border-color: var(--lense-color-accent);
+}
+
+/* Ensure TipTap wrapper fills flex space */
+.markdown-editor .tiptap {
+  flex: 1;
+  min-height: 120px;
+}

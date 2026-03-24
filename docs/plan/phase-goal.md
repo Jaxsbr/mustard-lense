@@ -23,20 +23,20 @@ Add Markdown authoring for the shared record `text` field in the detail drawer: 
 
 **US-R4 — Styled editable rich text surface:**
 
-- [ ] In styled mode, the text area is interactive: typing produces content in the editor (not a read-only preview) — automated test verifies typing produces a state change [US-R4]
-- [ ] Styled-mode content serializes to a plain Markdown string stored in `text`; Vitest test covers at least one formatting case (e.g. `**bold**` or `- list item`) round-tripping through serialize → deserialize [US-R4]
-- [ ] `rg 'dangerouslySetInnerHTML' src/components/panel/` returns zero matches, OR any matches use a sanitization library (e.g. DOMPurify) — not raw user-controlled strings [US-R4]
-- [ ] Rapid open/close of the drawer in styled mode does not throw — Playwright or Vitest test exercises: open drawer → styled mode → close → reopen [US-R4]
-- [ ] Editor component cleans up on unmount — useEffect return (or equivalent) disposes the editor instance; no orphan event listeners (verifiable by source inspection of cleanup in the editor wrapper component) [US-R4]
+- [x] In styled mode, the text area is interactive: typing produces content in the editor (not a read-only preview) — automated test verifies typing produces a state change [US-R4]
+- [x] Styled-mode content serializes to a plain Markdown string stored in `text`; Vitest test covers at least one formatting case (e.g. `**bold**` or `- list item`) round-tripping through serialize → deserialize [US-R4]
+- [x] `rg 'dangerouslySetInnerHTML' src/components/panel/` returns zero matches, OR any matches use a sanitization library (e.g. DOMPurify) — not raw user-controlled strings [US-R4]
+- [x] Rapid open/close of the drawer in styled mode does not throw — Playwright or Vitest test exercises: open drawer → styled mode → close → reopen [US-R4]
+- [x] Editor component cleans up on unmount — useEffect return (or equivalent) disposes the editor instance; no orphan event listeners (verifiable by source inspection of cleanup in the editor wrapper component) [US-R4]
 
 **US-R5 — Compact formatting toolbar:**
 
-- [ ] A toolbar element is visible in the DOM when styled mode is active [US-R5]
-- [ ] Toolbar is hidden or absent from the DOM when raw mode is active [US-R5]
-- [ ] Toolbar contains controls with accessible names (`aria-label` or `title` attribute) for each of: bold, italic, strikethrough, link, bullet list, ordered list, blockquote, inline code, code block — automated test asserts presence of 9 labeled controls [US-R5]
-- [ ] No toolbar button for underline exists in the DOM — `rg -i 'underline' src/components/panel/` returns zero matches in toolbar component source (or matches are limited to CSS text-decoration, not a toolbar action) [US-R5]
-- [ ] At least one toolbar action (e.g. bold) updates the serialized `text` state — Vitest test asserts Markdown marker (e.g. `**`) present in serialized output after invoking bold [US-R5]
-- [ ] Toolbar styling uses `var(--lense-*)` design tokens from `tokens.css` — no hardcoded color hex values in the toolbar component's CSS (verifiable by `rg '#[0-9a-fA-F]{3,8}' <toolbar-css-file>` returning zero matches) [US-R5]
+- [x] A toolbar element is visible in the DOM when styled mode is active [US-R5]
+- [x] Toolbar is hidden or absent from the DOM when raw mode is active [US-R5]
+- [x] Toolbar contains controls with accessible names (`aria-label` or `title` attribute) for each of: bold, italic, strikethrough, link, bullet list, ordered list, blockquote, inline code, code block — automated test asserts presence of 9 labeled controls [US-R5]
+- [x] No toolbar button for underline exists in the DOM — `rg -i 'underline' src/components/panel/` returns zero matches in toolbar component source (or matches are limited to CSS text-decoration, not a toolbar action) [US-R5]
+- [x] At least one toolbar action (e.g. bold) updates the serialized `text` state — Vitest test asserts Markdown marker (e.g. `**`) present in serialized output after invoking bold [US-R5]
+- [x] Toolbar styling uses `var(--lense-*)` design tokens from `tokens.css` — no hardcoded color hex values in the toolbar component's CSS (verifiable by `rg '#[0-9a-fA-F]{3,8}' <toolbar-css-file>` returning zero matches) [US-R5]
 
 **Documentation:**
 

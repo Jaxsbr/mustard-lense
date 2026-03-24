@@ -8,4 +8,11 @@ entries:
     result: "pass"
     notes: "Queued plist template creation."
     tokens: ~
+  - task: 2
+    time: "2026-03-24T10:18:00Z"
+    story: "US-D6"
+    description: "Created deploy/com.mustard.lense.plist — valid plist with Label, RunAtLoad, KeepAlive, login shell PATH, PORT=7777, log paths, template WorkingDirectory. plutil -lint OK."
+    result: "pass"
+    notes: "9/16 criteria met. Docs criteria remain."
+    tokens: ~
 # Each entry: {task, time, story, description, result, notes, tokens}

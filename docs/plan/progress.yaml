@@ -7,7 +7,7 @@ config:
   quality_check_suppressions: []
 
 state:
-  task_number: 2
+  task_number: 3
   phase: always-on
   phase_complete: false
   review_stage: null
@@ -16,6 +16,6 @@ state:
   pr_number: null
   status: running
   last_result: pass
-  next_task: "[US-D6] Create deploy/com.mustard.lense.plist — LaunchAgent plist template with RunAtLoad, KeepAlive, login shell for PATH, PORT=7777, log paths, template WorkingDirectory"
+  next_task: null
   consecutive_fails: 0
   completed_stories: []

@@ -7,7 +7,7 @@ config:
   quality_check_suppressions: []
 
 state:
-  task_number: 3
+  task_number: 5
   phase: always-on
   phase_complete: false
   review_stage: null
@@ -16,6 +16,6 @@ state:
   pr_number: null
   status: running
   last_result: pass
-  next_task: "[US-D6] Add always-on deployment section to ARCHITECTURE.md — setup (copy plist, customize, launchctl load), teardown (launchctl unload), LaunchAgent vs LaunchDaemon rationale"
+  next_task: null
   consecutive_fails: 0
   completed_stories: [US-D6]

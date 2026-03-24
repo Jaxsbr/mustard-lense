@@ -22,4 +22,11 @@ entries:
     result: "pass"
     notes: "Queued ARCHITECTURE.md docs task."
     tokens: ~
+  - task: 4
+    time: "2026-03-24T10:20:00Z"
+    story: "US-D6"
+    description: "Added always-on deployment section to ARCHITECTURE.md — setup, teardown, LaunchAgent rationale, PATH resolution. Updated Hosting table."
+    result: "pass"
+    notes: "✓ US-D6 complete. All 12 US-D6 criteria met."
+    tokens: ~
 # Each entry: {task, time, story, description, result, notes, tokens}

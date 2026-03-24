@@ -7,7 +7,7 @@ config:
   quality_check_suppressions: []
 
 state:
-  task_number: 1
+  task_number: 2
   phase: markdown-rich-text
   phase_complete: false
   review_stage: null
@@ -15,7 +15,7 @@ state:
   retro_complete: false
   pr_number: null
   status: running
-  last_result: null
-  next_task: null
+  last_result: pass
+  next_task: "[US-R3] Implement mode toggle (raw/styled) in DetailDrawer with localStorage persistence — add MarkdownEditor wrapper component with mode state, wire to existing text state"
   consecutive_fails: 0
   completed_stories: []

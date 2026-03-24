@@ -50,4 +50,11 @@ entries:
     result: "pass"
     notes: "Phase complete. 1 story shipped (US-D6)."
     tokens: ~
+  - task: 8
+    time: "2026-03-24T10:24:00Z"
+    story: "phase"
+    description: "Created PR #10. Queued review-pr."
+    result: "pass"
+    notes: "Review stage: pr_created."
+    tokens: ~
 # Each entry: {task, time, story, description, result, notes, tokens}

@@ -36,4 +36,11 @@ entries:
     result: "pass"
     notes: "Queued AGENTS.md update."
     tokens: ~
+  - task: 6
+    time: "2026-03-24T10:22:00Z"
+    story: "phase"
+    description: "Updated AGENTS.md — added deploy/ to directory layout and com.mustard.lense.plist to file ownership table."
+    result: "pass"
+    notes: "All phase-level criteria now met."
+    tokens: ~
 # Each entry: {task, time, story, description, result, notes, tokens}

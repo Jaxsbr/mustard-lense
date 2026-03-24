@@ -24,10 +24,10 @@ Make mustard-lense always available at `localhost:7777` without manual intervent
 - [x] `docs/architecture/ARCHITECTURE.md` explains that LaunchAgent (not LaunchDaemon) is required for user-session access to `MUSTARD_DATA_DIR` and the `claude` CLI [US-D6]
 
 **Structural:**
-- [ ] `AGENTS.md` directory layout includes `deploy/` directory with `com.mustard.lense.plist` [phase]
-- [ ] `AGENTS.md` file ownership table includes an entry for `deploy/com.mustard.lense.plist` [phase]
-- [ ] `npm run build` exits 0 (production build still works) [phase]
-- [ ] `npm test` exits 0 with all existing unit tests passing [phase]
+- [x] `AGENTS.md` directory layout includes `deploy/` directory with `com.mustard.lense.plist` [phase]
+- [x] `AGENTS.md` file ownership table includes an entry for `deploy/com.mustard.lense.plist` [phase]
+- [x] `npm run build` exits 0 (production build still works) [phase]
+- [x] `npm test` exits 0 with all existing unit tests passing [phase]
 
 ### Golden principles (phase-relevant)
 - **Faithful stewardship** — the plist template is a deployment artifact that directly affects availability; get the LaunchAgent configuration right (Label, KeepAlive, PATH resolution)

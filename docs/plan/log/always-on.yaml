@@ -29,4 +29,11 @@ entries:
     result: "pass"
     notes: "✓ US-D6 complete. All 12 US-D6 criteria met."
     tokens: ~
+  - task: 5
+    time: "2026-03-24T10:21:00Z"
+    story: "phase"
+    description: "Investigation: AGENTS.md missing deploy/ in layout and ownership. build/test already passing."
+    result: "pass"
+    notes: "Queued AGENTS.md update."
+    tokens: ~
 # Each entry: {task, time, story, description, result, notes, tokens}

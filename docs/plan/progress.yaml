@@ -16,6 +16,6 @@ state:
   pr_number: null
   status: running
   last_result: pass
-  next_task: null
+  next_task: "[phase] Update AGENTS.md — add deploy/ to directory layout, add deploy/com.mustard.lense.plist to file ownership table"
   consecutive_fails: 0
   completed_stories: [US-D6]

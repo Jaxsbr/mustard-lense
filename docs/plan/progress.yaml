@@ -7,15 +7,15 @@ config:
   quality_check_suppressions: []
 
 state:
-  task_number: 8
+  task_number: 9
   phase: markdown-rich-text
   phase_complete: true
-  review_stage: pr_created
+  review_stage: review_posted
   review_complete: false
   retro_complete: false
   pr_number: 9
   status: running
   last_result: pass
-  next_task: "[review] review-pr pr=9 auto=true"
+  next_task: "[review] handle-pr-review pr=9 auto=true"
   consecutive_fails: 0
   completed_stories: [US-R3, US-R4, US-R5]

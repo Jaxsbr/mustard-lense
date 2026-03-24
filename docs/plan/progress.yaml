@@ -9,7 +9,7 @@ config:
 state:
   task_number: 7
   phase: always-on
-  phase_complete: false
+  phase_complete: true
   review_stage: null
   review_complete: false
   retro_complete: false

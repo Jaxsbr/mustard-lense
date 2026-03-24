@@ -30,6 +30,41 @@ The `log_type` and `id` fields are displayed but not editable in edit mode.
 
 The delete button is only visible in edit mode — it does not appear when creating a new record.
 
+## Markdown editing
+
+The text field in the detail drawer supports two editing modes:
+
+### Mode control
+
+A **Raw** / **Styled** toggle appears above the text area. Click to switch between modes:
+
+- **Raw mode** — a plain textarea where you type Markdown source directly (e.g. `**bold**`, `- list item`). This is the default.
+- **Styled mode** — a rich editor where formatting renders inline as you type (Notion-like). Bold text appears bold, lists appear as actual lists, etc.
+
+Your preferred mode is saved in your browser (`localStorage` key `mustard-text-mode`). The next time you open the drawer, your last-used mode is restored automatically.
+
+Switching modes preserves your text — nothing is lost when toggling. Both modes save to the same plain Markdown string, so your data is always portable.
+
+### Formatting toolbar
+
+When styled mode is active, a compact toolbar appears above the editor with 9 formatting actions:
+
+| Action | What it does |
+|--------|-------------|
+| **Bold** | Wraps selected text in `**...**` |
+| **Italic** | Wraps selected text in `*...*` |
+| **Strikethrough** | Wraps selected text in `~~...~~` |
+| **Link** | Prompts for a URL and creates `[text](url)` |
+| **Bullet list** | Converts lines to `- item` list |
+| **Ordered list** | Converts lines to `1. item` list |
+| **Blockquote** | Prefixes lines with `> ` |
+| **Inline code** | Wraps selection in backticks |
+| **Code block** | Wraps selection in triple backtick fences |
+
+**Note:** Underline is intentionally unsupported — it is not part of the CommonMark Markdown standard, and including it would complicate plain-text storage.
+
+The toolbar is hidden in raw mode.
+
 ### Closing the drawer
 
 - Click the **Close** button (✕) in the drawer header

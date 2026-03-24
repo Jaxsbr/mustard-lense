@@ -97,8 +97,10 @@ src/
 │   ├── panel/                 # CRUD panel — browse, edit, capture
 │   │   ├── CrudPanel.tsx      # Collapsible panel container with type tabs and list views
 │   │   ├── DetailDrawer.tsx   # Slide-over drawer for view/edit/create records
-│   │   ├── MarkdownEditor.tsx # (planned for markdown-editor phase) Rich text editor wrapper — mode toggle, TipTap/Lexical integration, Markdown serialization
-│   │   ├── EditorToolbar.tsx  # (planned for markdown-editor phase) Compact formatting toolbar — 9 actions, accessible labels
+│   │   ├── MarkdownEditor.tsx # Rich text editor wrapper — raw/styled mode toggle, TipTap integration, EditorToolbar (inline)
+│   │   ├── MarkdownEditor.css # Editor, mode toggle, toolbar, and TipTap surface styles
+│   │   ├── markdown-utils.ts  # Markdown ↔ HTML conversion helpers (markdownToHtml, htmlToMarkdown)
+│   │   ├── MarkdownEditor.test.tsx # Unit tests for mode toggle, toolbar, markdown round-trip
 │   │   ├── ListControls.tsx   # Sort dropdown + limit control above record list
 │   │   └── ...                # Type-specific list view components
 │   ├── components.css         # Shared component styles
@@ -238,18 +240,19 @@ Theme persistence: `localStorage` key `mustard-theme`. An inline `<script>` in `
 
 In production, the Express server serves Vite's `dist/` static files alongside the API endpoints, so the full app runs on a single port (7777). This replaces the legacy mustard Flask app on the same port.
 
-### Markdown editor (planned for `markdown-editor` phase)
+### Markdown editor
 
-Dual-mode Markdown editing in the detail drawer's `text` field. `DetailDrawer.tsx` composes a new `MarkdownEditor` wrapper that manages mode state (raw vs styled) and a `EditorToolbar` component visible in styled mode. The editor integrates a ProseMirror-based library (e.g. TipTap) or equivalent for WYSIWYG editing, with Markdown serialization/deserialization for storage. No API changes — the `text` field remains a plain string.
+Dual-mode Markdown editing in the detail drawer's `text` field. `DetailDrawer.tsx` composes `MarkdownEditor` which manages mode state (raw vs styled) and includes `EditorToolbar` (inline component) visible in styled mode. The editor uses TipTap (ProseMirror-based) for WYSIWYG editing, with `markdown-utils.ts` providing Markdown ↔ HTML serialization. No API changes — the `text` field remains a plain string.
 
 **Data flow (styled mode):**
 1. Drawer opens → reads `mustard-text-mode` from `localStorage` → selects raw or styled
-2. Editor loads `text` string → deserializes Markdown into ProseMirror document
+2. Editor loads `text` string → `markdownToHtml()` converts to ProseMirror document
 3. User edits inline (WYSIWYG) or uses toolbar actions
-4. On save → serializes document back to Markdown string → sends via existing `POST`/`PUT` API
-5. On drawer close → editor instance destroyed (useEffect cleanup)
+4. On each edit → `htmlToMarkdown()` serializes back → `onChange` propagates to parent
+5. On save → sends plain Markdown string via existing `POST`/`PUT` API
+6. On drawer close → editor instance destroyed (useEffect cleanup)
 
-**Toolbar:** 9 actions (bold, italic, strikethrough, link, bullet list, ordered list, blockquote, inline code, code block). No underline (non-standard CommonMark). All controls have accessible names.
+**Toolbar:** 9 actions (bold, italic, strikethrough, link, bullet list, ordered list, blockquote, inline code, code block). No underline (non-standard CommonMark). All controls have accessible `aria-label` attributes.
 
 ### Future (beyond markdown-editor)
 

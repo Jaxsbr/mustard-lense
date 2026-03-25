@@ -1,0 +1,10 @@
+phase: "markdown-toolbar-icons"
+started: "2026-03-25"
+entries:
+  - task: 1
+    time: "2026-03-25"
+    story: "US-X4"
+    description: "Replace all 9 toolbar text labels with inline SVG icons, add title attributes"
+    result: pass
+    notes: "Single task, all 104 tests pass. No new dependencies."
+    tokens: ~8000

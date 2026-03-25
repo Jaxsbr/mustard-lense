@@ -1,4 +1,17 @@
 run_started: "2026-03-25T00:00:00Z"
 mode: "supervised"
 briefs_queued: [todo-due-date-ux, markdown-toolbar-icons, month-folder-organisation, record-title-field, multi-scan-retrieval]
-phases: []
+phases:
+  - brief: "todo-due-date-ux"
+    phase_name: "todo-due-date-ux"
+    started: "2026-03-25"
+    spec_complete: "2026-03-25"
+    build_complete: "2026-03-25"
+    review_complete: "2026-03-25"
+    retro_complete: "2026-03-25"
+    merged: "2026-03-25"
+    status: "merged"
+    failure_reason: null
+    pr_number: 11
+    retro_findings_count: 0
+    must_fix_count: 0

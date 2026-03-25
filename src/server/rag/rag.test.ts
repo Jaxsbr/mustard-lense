@@ -285,6 +285,17 @@ describe('extractKeywords', () => {
     const kws = extractKeywords("what's my todo?", vocab)
     expect(kws).toEqual([{ term: 'todo', filter: "log_type = 'todo'" }])
   })
+
+  it('maps person and people to people_note log type', () => {
+    const vocab = { persons: new Set<string>(), tags: new Set<string>(), themes: new Set<string>() }
+    const kws = extractKeywords('person notes', vocab)
+    expect(kws).toEqual([
+      { term: 'person', filter: "log_type = 'people_note'" },
+      { term: 'notes', filter: "log_type = 'people_note'" },
+    ])
+    const kws2 = extractKeywords('people updates', vocab)
+    expect(kws2).toEqual([{ term: 'people', filter: "log_type = 'people_note'" }])
+  })
 })
 
 describe('planScans', () => {
@@ -308,6 +319,17 @@ describe('planScans', () => {
     expect(plans).toEqual([
       { k: 5, filter: "log_type = 'todo'" },
       { k: 5, filter: "person = 'alice'" },
+      { k: 5 },
+    ])
+  })
+
+  it('deduplicates keywords with same filter', () => {
+    const plans = planScans([
+      { term: 'daily', filter: "log_type = 'daily_log'" },
+      { term: 'logs', filter: "log_type = 'daily_log'" },
+    ])
+    expect(plans).toEqual([
+      { k: 5, filter: "log_type = 'daily_log'" },
       { k: 5 },
     ])
   })

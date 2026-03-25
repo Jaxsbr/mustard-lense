@@ -8,6 +8,8 @@ const STATIC_DICT: Record<string, string> = {
   todos: "log_type = 'todo'",
   idea: "log_type = 'idea'",
   ideas: "log_type = 'idea'",
+  person: "log_type = 'people_note'",
+  people: "log_type = 'people_note'",
   note: "log_type = 'people_note'",
   notes: "log_type = 'people_note'",
   people_note: "log_type = 'people_note'",
@@ -74,17 +76,27 @@ export function extractKeywords(query: string, vocabulary: Vocabulary): Keyword[
  * 3+ keywords → 3 filtered top-5
  */
 export function planScans(keywords: Keyword[]): ScanPlan[] {
-  if (keywords.length === 0) {
+  // Deduplicate by filter value to avoid wasting scan slots
+  const seen = new Set<string>()
+  const unique: Keyword[] = []
+  for (const kw of keywords) {
+    if (!seen.has(kw.filter)) {
+      seen.add(kw.filter)
+      unique.push(kw)
+    }
+  }
+
+  if (unique.length === 0) {
     return [{ k: 10 }]
   }
-  if (keywords.length === 1) {
-    return [{ k: 5, filter: keywords[0].filter }, { k: 5 }]
+  if (unique.length === 1) {
+    return [{ k: 5, filter: unique[0].filter }, { k: 5 }]
   }
-  if (keywords.length === 2) {
-    return [{ k: 5, filter: keywords[0].filter }, { k: 5, filter: keywords[1].filter }, { k: 5 }]
+  if (unique.length === 2) {
+    return [{ k: 5, filter: unique[0].filter }, { k: 5, filter: unique[1].filter }, { k: 5 }]
   }
   // 3+
-  return keywords.slice(0, 3).map((kw) => ({ k: 5, filter: kw.filter }))
+  return unique.slice(0, 3).map((kw) => ({ k: 5, filter: kw.filter }))
 }
 
 /**

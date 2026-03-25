@@ -22,7 +22,7 @@ const MAX_TITLE_LENGTH = 120
 export interface CreateRecordInput {
   log_type: string
   text: string
-  title?: string
+  title?: string | null
   person?: string
   status?: string
   due_date_local?: string

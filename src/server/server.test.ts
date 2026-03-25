@@ -24,10 +24,10 @@ const mockResponse: LenseResponse = {
 }
 
 const fixtureRecords = [
-  { id: 'todo-1', log_type: 'todo', capture_date_local: '2026-03-15', text: 'Buy groceries', person: null, status: 'open', due_date_local: '2026-03-16', category: null, theme: null, period: null, tags: ['personal'] },
-  { id: 'todo-2', log_type: 'todo', capture_date_local: '2026-03-14', text: 'Review PR', person: null, status: 'done', due_date_local: '2026-03-14', category: null, theme: null, period: null, tags: ['work'] },
-  { id: 'note-1', log_type: 'people_note', capture_date_local: '2026-03-14', text: 'Alice working on design system', person: 'alice', status: null, due_date_local: null, category: null, theme: null, period: null, tags: ['design'] },
-  { id: 'log-1', log_type: 'daily_log', capture_date_local: '2026-03-15', text: 'Productive day', person: null, status: null, due_date_local: null, category: null, theme: 'engineering', period: null, tags: ['dev'] },
+  { id: 'todo-1', log_type: 'todo', capture_date_local: '2026-03-15', title: null, text: 'Buy groceries', person: null, status: 'open', due_date_local: '2026-03-16', category: null, theme: null, period: null, tags: ['personal'] },
+  { id: 'todo-2', log_type: 'todo', capture_date_local: '2026-03-14', title: null, text: 'Review PR', person: null, status: 'done', due_date_local: '2026-03-14', category: null, theme: null, period: null, tags: ['work'] },
+  { id: 'note-1', log_type: 'people_note', capture_date_local: '2026-03-14', title: null, text: 'Alice working on design system', person: 'alice', status: null, due_date_local: null, category: null, theme: null, period: null, tags: ['design'] },
+  { id: 'log-1', log_type: 'daily_log', capture_date_local: '2026-03-15', title: null, text: 'Productive day', person: null, status: null, due_date_local: null, category: null, theme: 'engineering', period: null, tags: ['dev'] },
 ]
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -57,6 +57,7 @@ beforeEach(() => {
     id: 'aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee',
     log_type: 'todo',
     capture_date_local: '2026-03-22',
+    title: null,
     text: 'Buy milk',
     person: null,
     status: null,
@@ -70,6 +71,7 @@ beforeEach(() => {
     id: 'todo-1',
     log_type: 'todo',
     capture_date_local: '2026-03-15',
+    title: null,
     text: 'Buy groceries updated',
     person: null,
     status: 'done',
@@ -386,10 +388,10 @@ describe('POST /api/records', () => {
     const app = createApp(deps)
     await request(app)
       .post('/api/records')
-      .send({ log_type: 'todo', text: 'test', status: 'open', due_date_local: '2026-04-01' })
+      .send({ log_type: 'todo', text: 'test', title: 'My Title', status: 'open', due_date_local: '2026-04-01' })
       .expect(201)
 
-    expect(mockCreateRecord).toHaveBeenCalledWith(expect.objectContaining({ status: 'open', due_date_local: '2026-04-01' }))
+    expect(mockCreateRecord).toHaveBeenCalledWith(expect.objectContaining({ title: 'My Title', status: 'open', due_date_local: '2026-04-01' }))
   })
 })
 

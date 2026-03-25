@@ -7,13 +7,13 @@ config:
   quality_check_suppressions: []
 
 state:
-  task_number: 2
+  task_number: 5
   phase: multi-scan-retrieval
   phase_complete: true
-  review_stage: null
-  review_complete: false
+  review_stage: review_posted
+  review_complete: true
   retro_complete: false
-  pr_number: null
+  pr_number: 15
   status: running
   last_result: pass
   next_task: null

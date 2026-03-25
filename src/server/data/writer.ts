@@ -50,10 +50,10 @@ export function createRecord(input: CreateRecordInput, dataDir?: string): Mustar
   const dir = dataDir ?? getDataDir()
   const logType = input.log_type as LogType
   const id = crypto.randomUUID()
-  const today = new Date().toISOString().slice(0, 10)
+  const captureDate = new Date().toISOString().slice(0, 10)
 
-  // Derive YYYY/MM from capture_date_local for month-folder organisation
-  const [year, month] = today.split('-')
+  // Derive YYYY/MM from captureDate for month-folder organisation
+  const [year, month] = captureDate.split('-')
   const subDir = path.join(dir, LOG_TYPE_DIR[logType], year, month)
 
   fs.mkdirSync(subDir, { recursive: true })
@@ -61,7 +61,7 @@ export function createRecord(input: CreateRecordInput, dataDir?: string): Mustar
   const record: Record<string, unknown> = {
     id,
     log_type: logType,
-    capture_date_local: today,
+    capture_date_local: captureDate,
     text: input.text,
     source: 'mustard-app',
     meta: { tags: [] },
@@ -82,7 +82,7 @@ export function createRecord(input: CreateRecordInput, dataDir?: string): Mustar
   return {
     id,
     log_type: logType,
-    capture_date_local: today,
+    capture_date_local: captureDate,
     text: input.text,
     person: input.person ?? null,
     status: input.status ?? null,

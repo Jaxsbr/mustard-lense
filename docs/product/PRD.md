@@ -53,7 +53,8 @@ Full specifications (stories, acceptance criteria, done-when checklists) for eac
 | 8 | Typography & Layout | US-R1, US-R2 | Shipped | [phases/typography-layout.md](phases/typography-layout.md) |
 | 9 | Markdown Editor | US-R3, US-R4, US-R5 | Shipped | [phases/markdown-rich-text.md](phases/markdown-rich-text.md) |
 | 10 | Always-On | US-D6 | Shipped | [phases/always-on.md](phases/always-on.md) |
-| 11 | Todo Due Date UX | US-X1, US-X2, US-X3 | In Progress | [phases/todo-due-date-ux.md](phases/todo-due-date-ux.md) |
+| 11 | Todo Due Date UX | US-X1, US-X2, US-X3 | Shipped | [phases/todo-due-date-ux.md](phases/todo-due-date-ux.md) |
+| 12 | Markdown Toolbar Icons | US-X4 | In Progress | [phases/markdown-toolbar-icons.md](phases/markdown-toolbar-icons.md) |
 
 ---
 
@@ -74,3 +75,4 @@ All story IDs allocated across all phases, for quick reference when assigning ne
 | US-R3 – US-R5 | Markdown Editor | 9 |
 | US-D6 | Always-On | 10 |
 | US-X1 – US-X3 | Todo Due Date UX | 11 |
+| US-X4 | Markdown Toolbar Icons | 12 |

@@ -1,7 +1,7 @@
 ---
 date: 2026-03-25
 topic: markdown-toolbar-icons
-status: draft
+status: specced
 ---
 
 # Intent Brief: Icon-Based Markdown Toolbar with Tooltips

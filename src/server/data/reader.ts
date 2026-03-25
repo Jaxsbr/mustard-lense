@@ -33,6 +33,7 @@ function parseRecord(filePath: string): MustardRecord | null {
       id: String(doc.id),
       log_type: String(doc.log_type ?? ''),
       capture_date_local: String(doc.capture_date_local ?? ''),
+      title: doc.title ?? null,
       text: doc.text,
       person: doc.person ?? null,
       status: doc.status ?? null,

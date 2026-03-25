@@ -17,9 +17,12 @@ const LOG_TYPE_DIR: Record<LogType, string> = {
 
 const MAX_TEXT_LENGTH = 10000
 
+const MAX_TITLE_LENGTH = 120
+
 export interface CreateRecordInput {
   log_type: string
   text: string
+  title?: string
   person?: string
   status?: string
   due_date_local?: string
@@ -30,6 +33,7 @@ export interface CreateRecordInput {
 
 export interface UpdateRecordInput {
   text?: string
+  title?: string | null
   person?: string | null
   status?: string | null
   due_date_local?: string | null
@@ -44,6 +48,11 @@ export function validateLogType(logType: unknown): logType is LogType {
 
 export function validateText(text: unknown): text is string {
   return typeof text === 'string' && text.trim().length > 0 && text.length <= MAX_TEXT_LENGTH
+}
+
+export function validateTitle(title: unknown): boolean {
+  if (title === undefined || title === null || title === '') return true
+  return typeof title === 'string' && title.length <= MAX_TITLE_LENGTH
 }
 
 export function createRecord(input: CreateRecordInput, dataDir?: string): MustardRecord {
@@ -68,6 +77,7 @@ export function createRecord(input: CreateRecordInput, dataDir?: string): Mustar
   }
 
   // Add optional fields if provided
+  if (input.title !== undefined) record.title = input.title
   if (input.person !== undefined) record.person = input.person
   if (input.status !== undefined) record.status = input.status
   if (input.due_date_local !== undefined) record.due_date_local = input.due_date_local
@@ -83,6 +93,7 @@ export function createRecord(input: CreateRecordInput, dataDir?: string): Mustar
     id,
     log_type: logType,
     capture_date_local: captureDate,
+    title: input.title ?? null,
     text: input.text,
     person: input.person ?? null,
     status: input.status ?? null,
@@ -107,6 +118,7 @@ export function updateRecord(id: string, input: UpdateRecordInput, dataDir?: str
 
   // Update fields
   if (input.text !== undefined) doc.text = input.text
+  if (input.title !== undefined) doc.title = input.title
   if (input.person !== undefined) doc.person = input.person
   if (input.status !== undefined) doc.status = input.status
   if (input.due_date_local !== undefined) doc.due_date_local = input.due_date_local
@@ -121,6 +133,7 @@ export function updateRecord(id: string, input: UpdateRecordInput, dataDir?: str
     id: String(doc.id),
     log_type: String(doc.log_type),
     capture_date_local: String(doc.capture_date_local),
+    title: (doc.title as string) ?? null,
     text: String(doc.text),
     person: (doc.person as string) ?? null,
     status: (doc.status as string) ?? null,
@@ -157,4 +170,4 @@ export function deleteRecord(id: string, dataDir?: string): string | null {
   return id
 }
 
-export { VALID_LOG_TYPES, MAX_TEXT_LENGTH }
+export { VALID_LOG_TYPES, MAX_TEXT_LENGTH, MAX_TITLE_LENGTH }

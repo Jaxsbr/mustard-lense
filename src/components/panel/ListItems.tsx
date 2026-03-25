@@ -23,12 +23,19 @@ function statusClass(status: string | null): string {
   }
 }
 
+function todayLocal(): string {
+  return new Date().toLocaleDateString('en-CA')
+}
+
 export function TodoListItem({ record }: { record: PanelRecord }) {
+  const isToday = record.due_date_local === todayLocal()
   return (
     <div className="list-item list-item--todo" data-testid="list-item-todo">
       <span className={`list-status ${statusClass(record.status)}`}>{statusIcon(record.status)}</span>
       <span className="list-text">{truncate(record.text)}</span>
-      {record.due_date_local && <span className="list-date">{record.due_date_local}</span>}
+      {record.due_date_local && (
+        <span className={`list-date${isToday ? ' list-date--today' : ''}`}>{record.due_date_local}</span>
+      )}
     </div>
   )
 }

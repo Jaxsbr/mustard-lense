@@ -73,6 +73,11 @@
   color: var(--lense-color-text-muted);
 }
 
+.list-date--today {
+  color: var(--lense-color-success-text);
+  font-weight: 600;
+}
+
 .list-theme {
   flex-shrink: 0;
   font-size: var(--lense-font-size-xs);

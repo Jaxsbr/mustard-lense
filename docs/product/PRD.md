@@ -57,7 +57,7 @@ Full specifications (stories, acceptance criteria, done-when checklists) for eac
 | 12 | Markdown Toolbar Icons | US-X4 | Shipped | [phases/markdown-toolbar-icons.md](phases/markdown-toolbar-icons.md) |
 | 13 | Month-Folder Organisation | US-X5 | Shipped | [phases/month-folder-organisation.md](phases/month-folder-organisation.md) |
 | 14 | Record Title Field | US-X6, US-X7 | Shipped | [phases/record-title-field.md](phases/record-title-field.md) |
-| 15 | Multi-Scan Retrieval | US-X8, US-X9, US-X10 | In Progress | [phases/multi-scan-retrieval.md](phases/multi-scan-retrieval.md) |
+| 15 | Multi-Scan Retrieval | US-X8, US-X9, US-X10 | Shipped | [phases/multi-scan-retrieval.md](phases/multi-scan-retrieval.md) |
 
 ---
 

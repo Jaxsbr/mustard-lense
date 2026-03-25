@@ -49,14 +49,14 @@ export function validateText(text: unknown): text is string {
 export function createRecord(input: CreateRecordInput, dataDir?: string): MustardRecord {
   const dir = dataDir ?? getDataDir()
   const logType = input.log_type as LogType
-  const subDir = path.join(dir, LOG_TYPE_DIR[logType])
-
-  if (!fs.existsSync(subDir)) {
-    fs.mkdirSync(subDir, { recursive: true })
-  }
-
   const id = crypto.randomUUID()
   const today = new Date().toISOString().slice(0, 10)
+
+  // Derive YYYY/MM from capture_date_local for month-folder organisation
+  const [year, month] = today.split('-')
+  const subDir = path.join(dir, LOG_TYPE_DIR[logType], year, month)
+
+  fs.mkdirSync(subDir, { recursive: true })
 
   const record: Record<string, unknown> = {
     id,

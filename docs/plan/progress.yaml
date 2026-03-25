@@ -8,14 +8,14 @@ config:
 
 state:
   task_number: 5
-  phase: record-title-field
+  phase: multi-scan-retrieval
   phase_complete: true
   review_stage: review_posted
   review_complete: true
   retro_complete: true
-  pr_number: 14
+  pr_number: 15
   status: running
   last_result: pass
   next_task: null
   consecutive_fails: 0
-  completed_stories: [US-X6, US-X7]
+  completed_stories: [US-X8, US-X9, US-X10]

@@ -49,8 +49,33 @@ export async function buildIndex(dataPath?: string): Promise<IndexResult> {
   }
   await db.createTable(TABLE_NAME, rows)
 
+  currentVocabulary = collectVocabulary(records)
   console.log(`[indexer] Indexed ${rows.length} records into LanceDB`)
   return { records: rows.length }
+}
+
+export interface Vocabulary {
+  persons: Set<string>
+  tags: Set<string>
+  themes: Set<string>
+}
+
+let currentVocabulary: Vocabulary = { persons: new Set(), tags: new Set(), themes: new Set() }
+
+function collectVocabulary(records: MustardRecord[]): Vocabulary {
+  const persons = new Set<string>()
+  const tags = new Set<string>()
+  const themes = new Set<string>()
+  for (const r of records) {
+    if (r.person) persons.add(r.person.toLowerCase())
+    for (const t of r.tags) tags.add(t.toLowerCase())
+    if (r.theme) themes.add(r.theme.toLowerCase())
+  }
+  return { persons, tags, themes }
+}
+
+export function getVocabulary(): Vocabulary {
+  return currentVocabulary
 }
 
 export { DB_PATH, TABLE_NAME, EMBEDDING_DIM }

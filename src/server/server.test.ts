@@ -80,7 +80,7 @@ beforeEach(() => {
     tags: ['personal'],
   })
   mockDeleteRecord = vi.fn().mockReturnValue('aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee')
-  deps = { retrieve: mockRetrieve, synthesiser: { synthesise: mockSynthesise }, buildIndex: mockBuildIndex, readRecords: mockReadRecords, createRecord: mockCreateRecord, updateRecord: mockUpdateRecord, deleteRecord: mockDeleteRecord }
+  deps = { retrieve: mockRetrieve, multiRetrieve: mockRetrieve, synthesiser: { synthesise: mockSynthesise }, buildIndex: mockBuildIndex, readRecords: mockReadRecords, createRecord: mockCreateRecord, updateRecord: mockUpdateRecord, deleteRecord: mockDeleteRecord }
 })
 
 describe('POST /api/lense', () => {

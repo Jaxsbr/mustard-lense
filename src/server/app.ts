@@ -9,6 +9,7 @@ const MAX_INTENT_LENGTH = 2000
 
 export interface AppDependencies {
   retrieve: (query: string, k?: number) => Promise<RetrievedRecord[]>
+  multiRetrieve: (intent: string) => Promise<RetrievedRecord[]>
   synthesiser: Synthesiser
   buildIndex: (dataPath?: string) => Promise<IndexResult>
   readRecords: (dataDir?: string) => MustardRecord[]
@@ -48,7 +49,7 @@ export function createApp(deps: AppDependencies) {
       // Stage: retrieving
       sendEvent('retrieving', '{}')
       const startRetrieve = Date.now()
-      const records = await deps.retrieve(intent)
+      const records = await deps.multiRetrieve(intent)
       const retrieveMs = Date.now() - startRetrieve
       console.log(`[lense] retrieval: ${retrieveMs}ms (${records.length} records)`)
 

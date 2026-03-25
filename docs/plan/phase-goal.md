@@ -1,26 +1,30 @@
 ## Phase goal
 
-Add an optional `title` field to all record types. Display title in list views when present, fall back to truncated text. Editable in detail drawer. Server-side 120-char validation.
+Replace the single unfiltered vector search with parallel keyword-guided scans for better retrieval across record types.
 
 ### Stories in scope
-- US-X6 — Optional title field across the stack
-- US-X7 — Title field validation
+- US-X8 — Dynamic vocabulary from indexed data
+- US-X9 — Keyword extraction and scan planning
+- US-X10 — Multi-retrieve with merge and dedup
 
 ### Done-when (observable)
 
-- [x] `MustardRecord` interface includes `title: string | null` [US-X6]
-- [x] `readRecords()` returns `title` from YAML, defaulting to `null` [US-X6]
-- [x] `createRecord()` and `updateRecord()` persist `title` to YAML [US-X6]
-- [x] `POST /api/records` and `PUT /api/records/:id` accept `title` in request body [US-X6]
-- [x] All 4 list item components prefer `title` over `truncate(text)` when title is non-empty [US-X6]
-- [x] Detail drawer shows a "Title (optional)" input above text editor [US-X6]
-- [x] Server returns 400 when title exceeds 120 characters [US-X7]
-- [x] Empty/null title is accepted without error [US-X7]
+- [x] `getVocabulary()` returns person names, tags, themes after `buildIndex()` [US-X8]
+- [x] Vocabulary is refreshed on every `buildIndex()` call [US-X8]
+- [x] Keyword extraction maps static terms to log_type filters [US-X9]
+- [x] Keyword extraction maps person names from vocabulary to metadata filters [US-X9]
+- [x] Scan slot allocation follows 0/1/2/3+ keyword rules [US-X9]
+- [x] `multiRetrieve()` runs parallel scans and returns deduped top-10 [US-X10]
+- [x] `retrieve()` supports optional `filter` parameter [US-X10]
+- [x] `_distance` is included in `RetrievedRecord` [US-X10]
+- [x] `/api/lense` uses `multiRetrieve` [US-X10]
+- [x] No new npm dependencies [US-X10]
 - [x] `npm run typecheck` exits 0 [phase]
 - [x] `npm run lint` exits 0 [phase]
 - [x] `npm test` exits 0 with all tests passing [phase]
 - [x] `npm run build` exits 0 [phase]
-- [x] Unit tests cover title display preference and validation [phase]
+- [x] Unit tests cover keyword extraction, vocabulary, scan planning, multi-retrieve [phase]
 
 ### Golden principles (phase-relevant)
-- **Faithful stewardship** — no data migration; existing records without title work unchanged
+- **Faithful stewardship** — the existing `retrieve()` remains intact as the single-scan primitive; `multiRetrieve` composes it
+- **Clarity over complexity** — deterministic keyword matching, no LLM at query time

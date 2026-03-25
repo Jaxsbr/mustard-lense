@@ -16,17 +16,22 @@ export interface RetrievedRecord {
   theme: string | null
   period: string | null
   tags: string
+  _distance: number
 }
 
 function toNullable(val: string | undefined | null): string | null {
   return val && val !== '' ? val : null
 }
 
-export async function retrieve(query: string, k: number = DEFAULT_K): Promise<RetrievedRecord[]> {
+export async function retrieve(query: string, k: number = DEFAULT_K, filter?: string): Promise<RetrievedRecord[]> {
   const queryVector = await embed(query)
   const db = await lancedb.connect(DB_PATH)
   const table = await db.openTable(TABLE_NAME)
-  const results = await table.vectorSearch(queryVector).limit(k).toArray()
+  let search = table.vectorSearch(queryVector)
+  if (filter) {
+    search = search.where(filter)
+  }
+  const results = await search.limit(k).toArray()
 
   return results.map((row) => ({
     id: String(row.id),
@@ -40,5 +45,6 @@ export async function retrieve(query: string, k: number = DEFAULT_K): Promise<Re
     theme: toNullable(row.theme as string),
     period: toNullable(row.period as string),
     tags: String(row.tags ?? ''),
+    _distance: typeof row._distance === 'number' ? row._distance : 0,
   }))
 }

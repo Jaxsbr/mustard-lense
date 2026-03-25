@@ -27,6 +27,44 @@ vi.mock('./embedder.js', () => {
 // Store for mock LanceDB tables
 const tables: Map<string, { rows: Record<string, unknown>[]; name: string }> = new Map()
 
+function makeSearchChain(tableName: string, queryVec: number[], whereFilter?: string) {
+  return {
+    where: vi.fn((filter: string) => makeSearchChain(tableName, queryVec, filter)),
+    limit: vi.fn((k: number) => ({
+      toArray: vi.fn(async () => {
+        const table = tables.get(tableName)
+        if (!table) return []
+        let rows = table.rows
+        // Apply simple WHERE filter parsing for tests
+        if (whereFilter) {
+          const eqMatch = whereFilter.match(/^(\w+)\s*=\s*'([^']*)'$/)
+          const likeMatch = whereFilter.match(/^(\w+)\s+LIKE\s+'%([^%]*)%'$/)
+          if (eqMatch) {
+            const [, col, val] = eqMatch
+            rows = rows.filter((r) => String(r[col]).toLowerCase() === val.toLowerCase())
+          } else if (likeMatch) {
+            const [, col, val] = likeMatch
+            rows = rows.filter((r) => String(r[col]).toLowerCase().includes(val.toLowerCase()))
+          }
+        }
+        const scored = rows.map((row) => {
+          const vec = row.vector as number[]
+          let dot = 0
+          for (let i = 0; i < vec.length; i++) dot += vec[i] * queryVec[i]
+          return { ...row, _score: dot, _distance: 1 - dot }
+        })
+        scored.sort((a, b) => b._score - a._score)
+        return scored.slice(0, k).map((row) => {
+          const copy = { ...(row as Record<string, unknown>) }
+          delete copy.vector
+          delete copy._score
+          return copy
+        })
+      }),
+    })),
+  }
+}
+
 vi.mock('@lancedb/lancedb', () => {
   return {
     connect: vi.fn(async () => ({
@@ -34,64 +72,22 @@ vi.mock('@lancedb/lancedb', () => {
       createTable: vi.fn(async (name: string, rows: Record<string, unknown>[]) => {
         tables.set(name, { rows, name })
         return {
-          vectorSearch: vi.fn((queryVec: number[]) => ({
-            limit: vi.fn((k: number) => ({
-              toArray: vi.fn(async () => {
-                // Simple cosine-distance ranking
-                const table = tables.get(name)
-                if (!table) return []
-                const scored = table.rows.map((row) => {
-                  const vec = row.vector as number[]
-                  let dot = 0
-                  for (let i = 0; i < vec.length; i++) dot += vec[i] * queryVec[i]
-                  return { ...row, _score: dot }
-                })
-                scored.sort((a, b) => b._score - a._score)
-                return scored.slice(0, k).map((row) => {
-                  const copy = { ...(row as Record<string, unknown>) }
-                  delete copy.vector
-                  delete copy._score
-                  return copy
-                })
-              }),
-            })),
-          })),
+          vectorSearch: vi.fn((queryVec: number[]) => makeSearchChain(name, queryVec)),
         }
       }),
       dropTable: vi.fn(async (name: string) => {
         tables.delete(name)
       }),
-      openTable: vi.fn(async (name: string) => {
-        const table = tables.get(name)
-        return {
-          vectorSearch: vi.fn((queryVec: number[]) => ({
-            limit: vi.fn((k: number) => ({
-              toArray: vi.fn(async () => {
-                if (!table) return []
-                const scored = table.rows.map((row) => {
-                  const vec = row.vector as number[]
-                  let dot = 0
-                  for (let i = 0; i < vec.length; i++) dot += vec[i] * queryVec[i]
-                  return { ...row, _score: dot }
-                })
-                scored.sort((a, b) => b._score - a._score)
-                return scored.slice(0, k).map((row) => {
-                  const copy = { ...(row as Record<string, unknown>) }
-                  delete copy.vector
-                  delete copy._score
-                  return copy
-                })
-              }),
-            })),
-          })),
-        }
-      }),
+      openTable: vi.fn(async (name: string) => ({
+        vectorSearch: vi.fn((queryVec: number[]) => makeSearchChain(name, queryVec)),
+      })),
     })),
   }
 })
 
-import { buildIndex } from './indexer.js'
+import { buildIndex, getVocabulary } from './indexer.js'
 import { retrieve } from './retriever.js'
+import { extractKeywords, planScans, multiRetrieve } from './scanner.js'
 
 beforeAll(() => {
   tables.clear()
@@ -223,5 +219,131 @@ describe('retriever', () => {
       expect(personNote.person).toBe('alice')
       expect(personNote.log_type).toBe('people_note')
     }
+  })
+
+  it('returns _distance on results', async () => {
+    await buildIndex(fixtureDir)
+    const results = await retrieve('groceries')
+    expect(results.length).toBeGreaterThan(0)
+    expect(typeof results[0]._distance).toBe('number')
+  })
+
+  it('accepts optional filter parameter', async () => {
+    await buildIndex(fixtureDir)
+    const results = await retrieve('groceries', 5, "log_type = 'todo'")
+    for (const r of results) {
+      expect(r.log_type).toBe('todo')
+    }
+  })
+})
+
+describe('vocabulary', () => {
+  it('collects person names, tags, and themes after buildIndex', async () => {
+    await buildIndex(fixtureDir)
+    const vocab = getVocabulary()
+    expect(vocab.persons.has('alice')).toBe(true)
+    expect(vocab.tags.has('personal')).toBe(true)
+    expect(vocab.tags.has('work')).toBe(true)
+    expect(vocab.tags.has('design')).toBe(true)
+    expect(vocab.themes.has('engineering')).toBe(true)
+  })
+})
+
+describe('extractKeywords', () => {
+  it('matches static dictionary terms', () => {
+    const vocab = { persons: new Set<string>(), tags: new Set<string>(), themes: new Set<string>() }
+    const kws = extractKeywords('show me all todos', vocab)
+    expect(kws).toEqual([{ term: 'todos', filter: "log_type = 'todo'" }])
+  })
+
+  it('matches dynamic vocabulary persons', () => {
+    const vocab = { persons: new Set(['alice']), tags: new Set<string>(), themes: new Set<string>() }
+    const kws = extractKeywords('what did alice say', vocab)
+    expect(kws).toEqual([{ term: 'alice', filter: "person = 'alice'" }])
+  })
+
+  it('matches dynamic vocabulary themes', () => {
+    const vocab = { persons: new Set<string>(), tags: new Set<string>(), themes: new Set(['engineering']) }
+    const kws = extractKeywords('engineering updates', vocab)
+    expect(kws).toEqual([{ term: 'engineering', filter: "theme = 'engineering'" }])
+  })
+
+  it('matches dynamic vocabulary tags', () => {
+    const vocab = { persons: new Set<string>(), tags: new Set(['design']), themes: new Set<string>() }
+    const kws = extractKeywords('design feedback', vocab)
+    expect(kws).toEqual([{ term: 'design', filter: "tags LIKE '%design%'" }])
+  })
+
+  it('returns at most 3 keywords', () => {
+    const vocab = { persons: new Set(['alice', 'bob']), tags: new Set(['design', 'dev']), themes: new Set<string>() }
+    const kws = extractKeywords('alice bob design dev extra', vocab)
+    expect(kws.length).toBe(3)
+  })
+
+  it('strips punctuation', () => {
+    const vocab = { persons: new Set<string>(), tags: new Set<string>(), themes: new Set<string>() }
+    const kws = extractKeywords("what's my todo?", vocab)
+    expect(kws).toEqual([{ term: 'todo', filter: "log_type = 'todo'" }])
+  })
+})
+
+describe('planScans', () => {
+  it('0 keywords → 1 unfiltered top-10', () => {
+    expect(planScans([])).toEqual([{ k: 10 }])
+  })
+
+  it('1 keyword → filtered top-5 + unfiltered top-5', () => {
+    const plans = planScans([{ term: 'todo', filter: "log_type = 'todo'" }])
+    expect(plans).toEqual([
+      { k: 5, filter: "log_type = 'todo'" },
+      { k: 5 },
+    ])
+  })
+
+  it('2 keywords → 2 filtered + 1 unfiltered', () => {
+    const plans = planScans([
+      { term: 'todo', filter: "log_type = 'todo'" },
+      { term: 'alice', filter: "person = 'alice'" },
+    ])
+    expect(plans).toEqual([
+      { k: 5, filter: "log_type = 'todo'" },
+      { k: 5, filter: "person = 'alice'" },
+      { k: 5 },
+    ])
+  })
+
+  it('3 keywords → 3 filtered, no unfiltered', () => {
+    const plans = planScans([
+      { term: 'todo', filter: "log_type = 'todo'" },
+      { term: 'alice', filter: "person = 'alice'" },
+      { term: 'design', filter: "tags LIKE '%design%'" },
+    ])
+    expect(plans).toEqual([
+      { k: 5, filter: "log_type = 'todo'" },
+      { k: 5, filter: "person = 'alice'" },
+      { k: 5, filter: "tags LIKE '%design%'" },
+    ])
+  })
+})
+
+describe('multiRetrieve', () => {
+  it('returns deduplicated results sorted by _distance', async () => {
+    await buildIndex(fixtureDir)
+    const results = await multiRetrieve('show todos')
+    expect(results.length).toBeGreaterThan(0)
+    expect(results.length).toBeLessThanOrEqual(10)
+    // Check sorted by _distance ascending
+    for (let i = 1; i < results.length; i++) {
+      expect(results[i]._distance).toBeGreaterThanOrEqual(results[i - 1]._distance)
+    }
+    // Check no duplicate IDs
+    const ids = results.map((r) => r.id)
+    expect(new Set(ids).size).toBe(ids.length)
+  })
+
+  it('returns results for unfiltered query', async () => {
+    await buildIndex(fixtureDir)
+    const results = await multiRetrieve('what happened today')
+    expect(results.length).toBeGreaterThan(0)
   })
 })

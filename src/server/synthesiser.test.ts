@@ -23,6 +23,7 @@ const sampleRecords: RetrievedRecord[] = [
     theme: null,
     period: null,
     tags: 'personal, errands',
+    _distance: 0.1,
   },
 ]
 

@@ -4,6 +4,7 @@ import express from 'express'
 import { createApp } from './app.js'
 import { retrieve } from './rag/retriever.js'
 import { buildIndex } from './rag/indexer.js'
+import { multiRetrieve } from './rag/scanner.js'
 import { CliSynthesiser } from './synthesiser.js'
 import { readRecords } from './data/reader.js'
 import { createRecord, updateRecord, deleteRecord } from './data/writer.js'
@@ -14,14 +15,20 @@ const distDir = path.resolve(__dirname, '../../dist')
 
 let indexReady = false
 
-const guardedRetrieve: typeof retrieve = async (query, k) => {
+const guardedRetrieve: typeof retrieve = async (query, k, filter) => {
   if (!indexReady) throw new Error('Vector index is still building. Try again shortly.')
-  return retrieve(query, k)
+  return retrieve(query, k, filter)
+}
+
+const guardedMultiRetrieve: typeof multiRetrieve = async (intent) => {
+  if (!indexReady) throw new Error('Vector index is still building. Try again shortly.')
+  return multiRetrieve(intent)
 }
 
 async function start() {
   const app = createApp({
     retrieve: guardedRetrieve,
+    multiRetrieve: guardedMultiRetrieve,
     synthesiser: new CliSynthesiser(),
     buildIndex,
     readRecords,

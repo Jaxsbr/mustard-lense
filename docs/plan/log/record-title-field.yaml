@@ -1,3 +1,10 @@
 phase: "record-title-field"
 started: "2026-03-25"
-entries: []
+entries:
+  - task: 1
+    time: "2026-03-25"
+    story: "US-X6, US-X7"
+    description: "Add title field to MustardRecord, reader, writer, API, list items, drawer. Add 120-char validation."
+    result: pass
+    notes: "123 total tests (15 new). Cross-cutting change across 10 files."
+    tokens: ~15000

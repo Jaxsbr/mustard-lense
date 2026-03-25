@@ -55,7 +55,7 @@ Full specifications (stories, acceptance criteria, done-when checklists) for eac
 | 10 | Always-On | US-D6 | Shipped | [phases/always-on.md](phases/always-on.md) |
 | 11 | Todo Due Date UX | US-X1, US-X2, US-X3 | Shipped | [phases/todo-due-date-ux.md](phases/todo-due-date-ux.md) |
 | 12 | Markdown Toolbar Icons | US-X4 | Shipped | [phases/markdown-toolbar-icons.md](phases/markdown-toolbar-icons.md) |
-| 13 | Month-Folder Organisation | US-X5 | In Progress | [phases/month-folder-organisation.md](phases/month-folder-organisation.md) |
+| 13 | Month-Folder Organisation | US-X5 | Shipped | [phases/month-folder-organisation.md](phases/month-folder-organisation.md) |
 
 ---
 

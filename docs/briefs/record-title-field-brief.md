@@ -1,7 +1,7 @@
 ---
 date: 2026-03-25
 topic: record-title-field
-status: draft
+status: specced
 ---
 
 # Intent Brief: Optional Title Field for All Record Types

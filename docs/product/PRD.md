@@ -56,6 +56,7 @@ Full specifications (stories, acceptance criteria, done-when checklists) for eac
 | 11 | Todo Due Date UX | US-X1, US-X2, US-X3 | Shipped | [phases/todo-due-date-ux.md](phases/todo-due-date-ux.md) |
 | 12 | Markdown Toolbar Icons | US-X4 | Shipped | [phases/markdown-toolbar-icons.md](phases/markdown-toolbar-icons.md) |
 | 13 | Month-Folder Organisation | US-X5 | Shipped | [phases/month-folder-organisation.md](phases/month-folder-organisation.md) |
+| 14 | Record Title Field | US-X6, US-X7 | In Progress | [phases/record-title-field.md](phases/record-title-field.md) |
 
 ---
 
@@ -78,3 +79,4 @@ All story IDs allocated across all phases, for quick reference when assigning ne
 | US-X1 – US-X3 | Todo Due Date UX | 11 |
 | US-X4 | Markdown Toolbar Icons | 12 |
 | US-X5 | Month-Folder Organisation | 13 |
+| US-X6 – US-X7 | Record Title Field | 14 |

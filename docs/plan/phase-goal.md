@@ -1,20 +1,26 @@
 ## Phase goal
 
-Update the writer to save new records into `YYYY/MM/` subdirectories within each type folder. No migration of existing flat files.
+Add an optional `title` field to all record types. Display title in list views when present, fall back to truncated text. Editable in detail drawer. Server-side 120-char validation.
 
 ### Stories in scope
-- US-X5 — Month-folder write path for new records
+- US-X6 — Optional title field across the stack
+- US-X7 — Title field validation
 
 ### Done-when (observable)
 
-- [x] `createRecord()` writes files to `<type_dir>/YYYY/MM/<uuid>.yaml` [US-X5]
-- [x] Month directory is created with `{ recursive: true }` [US-X5]
-- [x] A unit test asserts the created file path includes the correct `YYYY/MM/` subdirectory [US-X5]
-- [x] Existing records in flat directories are still readable via `readRecords()` [US-X5]
-- [x] `npm run typecheck` exits 0 [phase]
-- [x] `npm run lint` exits 0 [phase]
-- [x] `npm test` exits 0 with all tests passing [phase]
-- [x] `npm run build` exits 0 [phase]
+- [ ] `MustardRecord` interface includes `title: string | null` [US-X6]
+- [ ] `readRecords()` returns `title` from YAML, defaulting to `null` [US-X6]
+- [ ] `createRecord()` and `updateRecord()` persist `title` to YAML [US-X6]
+- [ ] `POST /api/records` and `PUT /api/records/:id` accept `title` in request body [US-X6]
+- [ ] All 4 list item components prefer `title` over `truncate(text)` when title is non-empty [US-X6]
+- [ ] Detail drawer shows a "Title (optional)" input above text editor [US-X6]
+- [ ] Server returns 400 when title exceeds 120 characters [US-X7]
+- [ ] Empty/null title is accepted without error [US-X7]
+- [ ] `npm run typecheck` exits 0 [phase]
+- [ ] `npm run lint` exits 0 [phase]
+- [ ] `npm test` exits 0 with all tests passing [phase]
+- [ ] `npm run build` exits 0 [phase]
+- [ ] Unit tests cover title display preference and validation [phase]
 
 ### Golden principles (phase-relevant)
-- **Faithful stewardship** — derive month from existing `capture_date_local`, don't re-call `new Date()`
+- **Faithful stewardship** — no data migration; existing records without title work unchanged

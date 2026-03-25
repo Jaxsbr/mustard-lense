@@ -7,15 +7,15 @@ config:
   quality_check_suppressions: []
 
 state:
-  task_number: 5
-  phase: month-folder-organisation
-  phase_complete: true
-  review_stage: review_posted
-  review_complete: true
-  retro_complete: true
-  pr_number: 13
+  task_number: 1
+  phase: record-title-field
+  phase_complete: false
+  review_stage: null
+  review_complete: false
+  retro_complete: false
+  pr_number: null
   status: running
-  last_result: pass
+  last_result: null
   next_task: null
   consecutive_fails: 0
-  completed_stories: [US-X5]
+  completed_stories: []

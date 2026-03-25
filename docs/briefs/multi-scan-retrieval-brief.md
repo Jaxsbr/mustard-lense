@@ -1,7 +1,7 @@
 ---
 date: 2026-03-25
 topic: multi-scan-retrieval
-status: draft
+status: specced
 ---
 
 # Intent Brief: Keyword-Guided Multi-Scan Retrieval

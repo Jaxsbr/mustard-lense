@@ -2,6 +2,7 @@ export interface MustardRecord {
   id: string
   log_type: string
   capture_date_local: string
+  title: string | null
   text: string
   person: string | null
   status: string | null

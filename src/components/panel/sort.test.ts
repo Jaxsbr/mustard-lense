@@ -7,6 +7,7 @@ function makeRecord(overrides: Partial<MustardRecord>): MustardRecord {
     id: 'test',
     log_type: 'todo',
     capture_date_local: '2026-03-15',
+    title: null,
     text: 'test',
     person: null,
     status: null,

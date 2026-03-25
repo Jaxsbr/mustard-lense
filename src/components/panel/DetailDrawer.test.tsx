@@ -34,6 +34,7 @@ describe('DetailDrawer due date default', () => {
       id: 'test-1',
       log_type: 'todo',
       capture_date_local: '2026-03-01',
+      title: null,
       text: 'Test',
       status: 'open',
       due_date_local: '2026-04-01',

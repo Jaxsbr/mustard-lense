@@ -60,6 +60,7 @@ interface DrawerFormProps {
 function DrawerForm({ record, mode, defaultLogType, onClose, onSave, onDelete }: DrawerFormProps) {
   const initLogType = mode === 'edit' && record ? record.log_type : (defaultLogType ?? 'todo')
   const [logType, setLogType] = useState(initLogType)
+  const [title, setTitle] = useState(mode === 'edit' && record ? (record.title ?? '') : '')
   const [text, setText] = useState(mode === 'edit' && record ? record.text : '')
   const [status, setStatus] = useState(mode === 'edit' && record ? (record.status ?? 'open') : 'open')
   const [dueDate, setDueDate] = useState(() => {
@@ -74,6 +75,7 @@ function DrawerForm({ record, mode, defaultLogType, onClose, onSave, onDelete }:
   function handleSave() {
     const data: Partial<MustardRecord> & { log_type: string } = {
       log_type: logType,
+      title: title.trim() || null,
       text,
     }
     if (logType === 'todo' || logType === 'idea') data.status = status
@@ -126,6 +128,19 @@ function DrawerForm({ record, mode, defaultLogType, onClose, onSave, onDelete }:
             </select>
           </div>
         )}
+
+        <div className="drawer-field">
+          <label className="drawer-label">Title (optional)</label>
+          <input
+            className="drawer-input"
+            type="text"
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            maxLength={120}
+            placeholder="Short label for this record"
+            data-testid="drawer-field-title"
+          />
+        </div>
 
         <div className="drawer-field drawer-field--text">
           <label className="drawer-label">Text</label>

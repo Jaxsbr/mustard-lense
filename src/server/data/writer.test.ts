@@ -2,7 +2,7 @@ import { describe, it, expect, beforeEach, afterEach } from 'vitest'
 import * as fs from 'node:fs'
 import * as path from 'node:path'
 import * as os from 'node:os'
-import { createRecord } from './writer.js'
+import { createRecord, validateTitle } from './writer.js'
 import { readRecords } from './reader.js'
 
 let tmpDir: string
@@ -64,4 +64,40 @@ describe('createRecord month-folder path', () => {
     expect(records).toHaveLength(2)
     expect(records.map(r => r.text).sort()).toEqual(['New month record', 'Old flat record'])
   })
+})
+
+describe('title field', () => {
+  it('persists title on create and returns it', () => {
+    const record = createRecord({ log_type: 'todo', text: 'Test', title: 'My Title' }, tmpDir)
+    expect(record.title).toBe('My Title')
+
+    const records = readRecords(tmpDir)
+    expect(records[0].title).toBe('My Title')
+  })
+
+  it('returns null title when not provided', () => {
+    const record = createRecord({ log_type: 'todo', text: 'Test' }, tmpDir)
+    expect(record.title).toBeNull()
+  })
+
+  it('reads title as null from YAML without title field', () => {
+    const flatDir = path.join(tmpDir, 'todos')
+    fs.mkdirSync(flatDir, { recursive: true })
+    fs.writeFileSync(
+      path.join(flatDir, 'no-title.yaml'),
+      'id: no-title-1\nlog_type: todo\ncapture_date_local: "2026-01-01"\ntext: "No title"\n'
+    )
+    const records = readRecords(tmpDir)
+    expect(records[0].title).toBeNull()
+  })
+})
+
+describe('validateTitle', () => {
+  it('accepts undefined', () => expect(validateTitle(undefined)).toBe(true))
+  it('accepts null', () => expect(validateTitle(null)).toBe(true))
+  it('accepts empty string', () => expect(validateTitle('')).toBe(true))
+  it('accepts short title', () => expect(validateTitle('Hello')).toBe(true))
+  it('accepts 120 chars', () => expect(validateTitle('a'.repeat(120))).toBe(true))
+  it('rejects 121 chars', () => expect(validateTitle('a'.repeat(121))).toBe(false))
+  it('rejects non-string', () => expect(validateTitle(42)).toBe(false))
 })

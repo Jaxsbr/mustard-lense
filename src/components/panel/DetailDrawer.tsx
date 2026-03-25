@@ -62,7 +62,11 @@ function DrawerForm({ record, mode, defaultLogType, onClose, onSave, onDelete }:
   const [logType, setLogType] = useState(initLogType)
   const [text, setText] = useState(mode === 'edit' && record ? record.text : '')
   const [status, setStatus] = useState(mode === 'edit' && record ? (record.status ?? 'open') : 'open')
-  const [dueDate, setDueDate] = useState(mode === 'edit' && record ? (record.due_date_local ?? '') : '')
+  const [dueDate, setDueDate] = useState(() => {
+    if (mode === 'edit' && record) return record.due_date_local ?? ''
+    if (initLogType === 'todo') return new Date().toLocaleDateString('en-CA')
+    return ''
+  })
   const [person, setPerson] = useState(mode === 'edit' && record ? (record.person ?? '') : '')
   const [theme, setTheme] = useState(mode === 'edit' && record ? (record.theme ?? '') : '')
   const [confirmingDelete, setConfirmingDelete] = useState(false)
@@ -107,7 +111,13 @@ function DrawerForm({ record, mode, defaultLogType, onClose, onSave, onDelete }:
             <select
               className="drawer-select"
               value={logType}
-              onChange={(e) => setLogType(e.target.value)}
+              onChange={(e) => {
+                const newType = e.target.value
+                setLogType(newType)
+                if (newType === 'todo') {
+                  setDueDate(new Date().toLocaleDateString('en-CA'))
+                }
+              }}
               data-testid="drawer-field-log-type-select"
             >
               {LOG_TYPE_OPTIONS.map((opt) => (

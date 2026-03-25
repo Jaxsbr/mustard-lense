@@ -7,15 +7,15 @@ config:
   quality_check_suppressions: []
 
 state:
-  task_number: 11
-  phase: always-on
+  task_number: 5
+  phase: todo-due-date-ux
   phase_complete: true
   review_stage: review_posted
   review_complete: true
   retro_complete: true
-  pr_number: 10
+  pr_number: 11
   status: running
   last_result: pass
   next_task: null
   consecutive_fails: 0
-  completed_stories: [US-D6]
+  completed_stories: [US-X1, US-X2, US-X3]

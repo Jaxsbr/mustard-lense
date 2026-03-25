@@ -1,7 +1,7 @@
 ---
 date: 2026-03-22
 topic: mustard-unification
-status: draft
+status: archived
 ---
 
 # Intent Brief: Mustard Unification

@@ -1,0 +1,4 @@
+run_started: "2026-03-25T00:00:00Z"
+mode: "supervised"
+briefs_queued: [todo-due-date-ux, markdown-toolbar-icons, month-folder-organisation, record-title-field, multi-scan-retrieval]
+phases: []

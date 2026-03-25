@@ -201,3 +201,14 @@
   opacity: 0.5;
   cursor: not-allowed;
 }
+
+/* Calendar picker icon visibility in dark mode */
+[data-theme="dark"] .drawer-input[type="date"]::-webkit-calendar-picker-indicator {
+  filter: invert(1);
+}
+
+@media (prefers-color-scheme: dark) {
+  html:not([data-theme="light"]) .drawer-input[type="date"]::-webkit-calendar-picker-indicator {
+    filter: invert(1);
+  }
+}

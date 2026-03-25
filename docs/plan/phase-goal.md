@@ -1,35 +1,30 @@
 ## Phase goal
 
-Make mustard-lense always available at `localhost:7777` without manual intervention by adding a macOS LaunchAgent plist template and deployment documentation. The production build and start script already exist (shipped in Phase 6); this phase adds the LaunchAgent configuration that keeps the server running across reboots and crashes, and documents setup/teardown in ARCHITECTURE.md.
+Three focused UX improvements to the todo due date field and list display: auto-populate due date on create, fix the calendar picker icon in dark mode, and highlight today's due dates in the list.
 
 ### Stories in scope
-- US-D6 — Always-on LaunchAgent deployment
+- US-X1 — Auto-populate due date on create
+- US-X2 — Calendar picker icon dark mode fix
+- US-X3 — Today highlight in todo list
 
 ### Done-when (observable)
 
-**Plist template:**
-- [x] `deploy/com.mustard.lense.plist` exists and passes `plutil -lint deploy/com.mustard.lense.plist` (valid XML plist) [US-D6]
-- [x] Plist `Label` key value is `com.mustard.lense` (verifiable by `grep` or `plutil -extract Label raw`) [US-D6]
-- [x] Plist `RunAtLoad` key is `true` [US-D6]
-- [x] Plist `KeepAlive` key is `true` [US-D6]
-- [x] Plist `ProgramArguments` array contains a command that runs the production server — either `npm run start` via a shell, or a direct `node` invocation equivalent to the `start` script [US-D6]
-- [x] Plist contains a `WorkingDirectory` key with a template path (e.g. `/Users/<you>/dev/mustard-lense`) that the user customizes [US-D6]
-- [x] Plist contains `StandardOutPath` and `StandardErrorPath` keys pointing to log file locations [US-D6]
-- [x] Plist `EnvironmentVariables` dict includes `PORT` with value `7777` [US-D6]
-- [x] Plist handles PATH resolution so `node`/`npm` are findable — either `EnvironmentVariables` includes a `PATH` key with a documented template value, or `ProgramArguments` uses a login shell (e.g. `/bin/zsh -l -c "..."`) that inherits user PATH [US-D6]
-
-**Documentation:**
-- [x] `docs/architecture/ARCHITECTURE.md` contains an always-on deployment section documenting LaunchAgent setup: copy plist to `~/Library/LaunchAgents/`, customize paths, run `launchctl load ~/Library/LaunchAgents/com.mustard.lense.plist` [US-D6]
-- [x] `docs/architecture/ARCHITECTURE.md` documents LaunchAgent teardown: `launchctl unload ~/Library/LaunchAgents/com.mustard.lense.plist` and plist removal [US-D6]
-- [x] `docs/architecture/ARCHITECTURE.md` explains that LaunchAgent (not LaunchDaemon) is required for user-session access to `MUSTARD_DATA_DIR` and the `claude` CLI [US-D6]
-
-**Structural:**
-- [x] `AGENTS.md` directory layout includes `deploy/` directory with `com.mustard.lense.plist` [phase]
-- [x] `AGENTS.md` file ownership table includes an entry for `deploy/com.mustard.lense.plist` [phase]
-- [x] `npm run build` exits 0 (production build still works) [phase]
-- [x] `npm test` exits 0 with all existing unit tests passing [phase]
+- [ ] Opening the drawer in create mode with todo type shows today's date in the due date input [US-X1]
+- [ ] Opening the drawer in edit mode shows the record's existing due date (not today) [US-X1]
+- [ ] Switching log type to non-todo and back to todo in create mode resets due date to today [US-X1]
+- [ ] Clearing the due date field and saving creates a todo with no due date [US-X1]
+- [ ] The date string uses local time, not UTC [US-X1]
+- [ ] In dark mode, the calendar picker icon inside `<input type="date">` is clearly visible [US-X2]
+- [ ] In light mode, the calendar picker icon appearance is unchanged [US-X2]
+- [ ] A todo with `due_date_local` equal to today's date renders the date in green bold [US-X3]
+- [ ] A todo with a different due date renders the date in normal styling [US-X3]
+- [ ] A todo with no due date renders no date span (existing behaviour preserved) [US-X3]
+- [ ] `npm run typecheck` exits 0 [phase]
+- [ ] `npm run lint` exits 0 [phase]
+- [ ] `npm test` exits 0 with all tests passing [phase]
+- [ ] `npm run build` exits 0 [phase]
+- [ ] Unit tests cover the auto-populate default and today highlight logic [phase]
 
 ### Golden principles (phase-relevant)
-- **Faithful stewardship** — the plist template is a deployment artifact that directly affects availability; get the LaunchAgent configuration right (Label, KeepAlive, PATH resolution)
-- **Safety and ethics** — LaunchAgent (not LaunchDaemon) respects least privilege; no system-level access needed, user controls installation explicitly
-- **Clarity over complexity** — a checked-in template with clear docs, not an auto-install script; the user stays in control of when and how the service activates
+- **Faithful stewardship** — use local time consistently for date operations; UTC mismatch would produce wrong defaults and highlights
+- **Clarity over complexity** — native `title` attribute, CSS-only dark mode fix, simple date comparison; no over-engineering

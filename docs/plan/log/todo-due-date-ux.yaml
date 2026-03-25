@@ -1,3 +1,10 @@
 phase: "todo-due-date-ux"
 started: "2026-03-25"
-entries: []
+entries:
+  - task: 1
+    time: "2026-03-25"
+    story: "US-X1, US-X2, US-X3"
+    description: "Implement all three stories: auto-populate due date, calendar icon dark mode fix, today highlight"
+    result: pass
+    notes: "All 3 stories complete in single task. 8 new tests (5 drawer, 3 list items). 104 total tests pass."
+    tokens: ~15000

@@ -52,13 +52,14 @@ export function extractKeywords(query: string, vocabulary: Vocabulary): Keyword[
       continue
     }
 
-    // Check dynamic vocabulary
+    // Check dynamic vocabulary (escape single quotes for SQL safety)
+    const escaped = token.replace(/'/g, "''")
     if (vocabulary.persons.has(token)) {
-      keywords.push({ term: token, filter: `person = '${token}'` })
+      keywords.push({ term: token, filter: `person = '${escaped}'` })
     } else if (vocabulary.themes.has(token)) {
-      keywords.push({ term: token, filter: `theme = '${token}'` })
+      keywords.push({ term: token, filter: `theme = '${escaped}'` })
     } else if (vocabulary.tags.has(token)) {
-      keywords.push({ term: token, filter: `tags LIKE '%${token}%'` })
+      keywords.push({ term: token, filter: `tags LIKE '%${escaped}%'` })
     }
   }
 

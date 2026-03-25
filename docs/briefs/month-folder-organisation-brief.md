@@ -1,7 +1,7 @@
 ---
 date: 2026-03-25
 topic: month-folder-organisation
-status: draft
+status: specced
 ---
 
 # Intent Brief: Month-Folder Organisation for New Records

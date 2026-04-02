@@ -5,6 +5,9 @@ config:
   verify: "npm run typecheck && npm run lint && npm test && npm run build"
   max_tasks_per_phase: 200
   quality_check_suppressions: []
+  build_loop_version:
+    init_version: 5
+    builds: [5, 7, 8, 9]
 
 state:
   task_number: 5

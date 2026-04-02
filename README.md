@@ -58,3 +58,7 @@ Each new query replaces the previous results. Stage transitions are animated for
 ## Architecture
 
 See [docs/architecture/ARCHITECTURE.md](docs/architecture/ARCHITECTURE.md) for system topology, module structure, CLI modes, and security considerations.
+
+<!-- build-loop -->
+---
+*Built with [build-loop](docs/plan/) — init v5 | builds v5, v7, v8, v9*
